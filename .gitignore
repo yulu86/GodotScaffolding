@@ -3,7 +3,5 @@
 /android/
 
 .DS_Store
-*.import
 *.uid
 *.zip
-
