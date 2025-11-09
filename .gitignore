@@ -15,7 +15,10 @@ export_credentials.cfg
 data_*/
 mono_crash.*.json
 
-.vscode/
-.DS_Store
-*.zip
-*.tmp
+**/.vscode/
+**/.DS_Store
+**/*.zip
+**/*.tmp
+
+# claude code
+.claude/
