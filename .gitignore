@@ -15,5 +15,22 @@ export_credentials.cfg
 data_*/
 mono_crash.*.json
 
-.DS_Store
-*.zip
+# addons
+**/addons/
+
+# workspace
+**/.vscode/
+**/.DS_Store
+**/*.zip
+**/*.tmp
+
+# claude
+**/.claude/
+!.claude/settings.local.json
+**/.context/
+
+# excalidraw
+**/.excalidraw/
+
+# log
+**/*.log
