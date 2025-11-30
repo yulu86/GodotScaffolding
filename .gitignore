@@ -24,9 +24,7 @@ mono_crash.*.json
 **/*.zip
 **/*.tmp
 
-# claude
-**/.claude/
-!.claude/settings.local.json
+# context
 **/.context/
 
 # excalidraw
