@@ -32,3 +32,9 @@ mono_crash.*.json
 
 # log
 **/*.log
+
+# claude
+**/.claude
+
+# claude skills
+!**./.claude/skills/
