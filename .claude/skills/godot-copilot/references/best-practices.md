@@ -12,22 +12,7 @@ project.godot
 │   ├── environments/ # 环境场景
 │   └── effects/      # 特效场景
 ├── scripts/          # 脚本文件(.gd)
-│   ├── core/         # 核心系统
-│   ├── characters/   # 角色脚本
-│   ├── ui/           # UI脚本
-│   ├── managers/     # 管理器脚本
-│   └── utils/        # 工具脚本
-├── assets/           # 资源文件
-│   ├── textures/     # 纹理图片
-│   ├── audio/        # 音频文件
-│   ├── fonts/        # 字体文件
-│   ├── materials/    # 材质文件
-│   └── models/       # 3D模型
-├── data/             # 数据文件
-│   ├── levels/       # 关卡数据
-│   ├── config/       # 配置文件
-│   └── localization/ # 本地化文件
-└── export/           # 导出配置
+├── assets/
 ```
 
 ### 命名规范
