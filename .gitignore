@@ -34,7 +34,8 @@ mono_crash.*.json
 **/*.log
 
 # claude
-**/.claude
+.claude/
 
-# claude skills
-!**./.claude/skills/
+# 但保留以下目录
+!.claude/.history/
+!.claude/skills/
