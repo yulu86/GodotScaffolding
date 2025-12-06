@@ -33,7 +33,11 @@
       "mcp__godot__update_project_uids",
       "Skill(godot-copilot)",
       "Skill(internal-comms)",
-      "mcp__filesystem__read_text_file"
+      "mcp__filesystem__read_text_file",
+      "mcp__filesystem__search_files",
+      "mcp__filesystem__edit_file",
+      "mcp__filesystem__move_file",
+      "Bash(git fetch:*)"
     ],
     "deny": [],
     "ask": []
