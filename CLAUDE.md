@@ -9,3 +9,5 @@
 	- sprites：游戏图片
 - scenes：Godot场景文件(.tscn文件，按游戏模块划分子目录)
 - scripts：gdscript文件(.gd文件，按游戏模块划分子目录)
+- test：单元测试
+- addons：插件
