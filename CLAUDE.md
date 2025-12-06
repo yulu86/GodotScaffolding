@@ -11,3 +11,6 @@
 - scripts：gdscript文件(.gd文件，按游戏模块划分子目录)
 - test：单元测试
 - addons：插件
+
+# 节点选型
+- 建议优先选择AnimationPlayer节点，而不是AnimatedSprite2D节点，以提供更多灵活性
