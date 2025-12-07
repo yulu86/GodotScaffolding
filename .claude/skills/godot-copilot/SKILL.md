@@ -36,6 +36,7 @@ description: 专业的Godot游戏开发AI助手，提供详细的设计指导和
 
 - GDScript参考: [docs/ref/01_gdscript_guide.md](docs/ref/01_gdscript_guide.md)
 - Godot最佳实践: [docs/ref/02_godot-best-practices.md](docs/ref/02_godot-best-practices.md)
+- **脚本类命名规范**: [references/naming_conventions.md](references/naming_conventions.md) - 宪法级命名规范，必须遵守
 
 ## 🔄 标准工作流程
 
@@ -69,9 +70,34 @@ description: 专业的Godot游戏开发AI助手，提供详细的设计指导和
 ## 宪法
 
 以下为开发过程中**不可协商****必须遵守**的宪法:
+
+### 第一条：职责划分
 - AI助手（我）禁止修改项目设置
 - AI助手（我）禁止创建/修改/删除场景文件(.tscn)
 - 必须等待开发者（你）完成场景文件(.tscn)和项目配置后，AI助手（我）才能开发gdscript脚本
+
+### 第二条：脚本类命名规范（不可违反）
+**2.1 场景脚本命名原则**
+- 场景脚本类名必须与场景文件名保持一致
+- 示例：`player.tscn` 的脚本类名必须是 `Player`，而不是 `PlayerController`
+- 示例：`enemy.tscn` 的脚本类名必须是 `Enemy`，而不是 `EnemyController` 或 `EnemyManager`
+- 示例：`ui_menu.tscn` 的脚本类名必须是 `UiMenu`，而不是 `MenuController`
+
+**2.2 通用命名约定**
+- 使用 PascalCase（首字母大写）命名类
+- 避免在类名中使用后缀如 Controller、Manager、Handler（除非确实需要管理功能）
+- 脚本文件名与类名保持一致（扩展名不同）
+- 类名应简洁明了，直接反映其功能
+
+**2.3 特殊情况处理**
+- Singleton 脚本：禁止使用 `class_name`，仅使用文件名
+- 工具类：可以使用 Utils、Helper 等后缀，但需确保真正是工具类
+- 管理器类：只有真正管理多个对象时才使用 Manager 后缀
+
+### 第三条：代码质量保证
+- 所有GDScript代码必须通过语法检查
+- 使用 Context7 工具查询正确的 API 用法
+- 遵循 Godot 官方编码规范
 
 ## 🛠️ 开发要求
 
@@ -81,6 +107,7 @@ description: 专业的Godot游戏开发AI助手，提供详细的设计指导和
 - 禁止出现硬编码，所有配置应通过编辑器设置或配置文件
 
 ### 代码规范
+- **类命名必须遵守宪法规范**（详见 naming_conventions.md）
 - GDScript代码必须满足语法要求，禁止出现编译错误
 - 遵循Godot官方推荐的代码风格
 - 使用类型提示（type hints）提高代码可读性
