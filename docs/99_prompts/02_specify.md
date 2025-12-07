@@ -15,5 +15,5 @@
 # 3. plan
 
 ```bash
-/speckit.plan 001-character-movement Godot 4.5 + GDScript， 使用 godot-copilot 协同开发
+/speckit.plan 001-character-movement Godot 4.5 + GDScript
 ```
