@@ -1,4 +1,6 @@
-# Godot最佳实践指南
+# Godot 最佳实践指南
+
+> **重要提示**：本文档基于 Godot 官方风格指南扩展，所有编码规范必须优先遵循 [official_gdscript_styleguide.md](./official_gdscript_styleguide.md)
 
 ## 🎮 场景设计原则
 

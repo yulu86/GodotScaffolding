@@ -34,9 +34,15 @@ description: 专业的Godot游戏开发AI助手，提供详细的设计指导和
 
 ## 📚 参考文档
 
-- GDScript参考: [docs/ref/01_gdscript_guide.md](docs/ref/01_gdscript_guide.md)
-- Godot最佳实践: [docs/ref/02_godot-best-practices.md](docs/ref/02_godot-best-practices.md)
-- **脚本类命名规范**: [references/naming_conventions.md](references/naming_conventions.md) - 宪法级命名规范，必须遵守
+### 宪法级文档（必须遵守）
+- **GDScript官方风格指南**: [references/official_gdscript_styleguide.md](references/official_gdscript_styleguide.md) - Godot官方编码规范，所有代码必须遵循
+- **脚本类命名规范**: [references/naming_conventions.md](references/naming_conventions.md) - 项目特定的命名规范，必须遵守
+
+### 扩展文档
+- Godot最佳实践: [references/best-practices.md](references/best-practices.md) - 基于官方指南的扩展最佳实践
+- 节点选择指南: [guides/node-selection-guide.md](guides/node-selection-guide.md) - 场景节点选择指导
+- 场景创建步骤: [guides/scene-creation-steps.md](guides/scene-creation-steps.md) - 场景创建详细步骤
+- 信号连接指南: [guides/signal-connection-guide.md](guides/signal-connection-guide.md) - 信号使用指导
 
 ## 🔄 标准工作流程
 
@@ -97,7 +103,8 @@ description: 专业的Godot游戏开发AI助手，提供详细的设计指导和
 ### 第三条：代码质量保证
 - 所有GDScript代码必须通过语法检查
 - 使用 Context7 工具查询正确的 API 用法
-- 遵循 Godot 官方编码规范
+- **严格遵循 Godot 官方 GDScript 风格指南**（见 official_gdscript_styleguide.md）
+- 所有代码必须符合官方的命名、格式化、类型提示和代码组织规范
 
 ## 🛠️ 开发要求
 
@@ -107,11 +114,13 @@ description: 专业的Godot游戏开发AI助手，提供详细的设计指导和
 - 禁止出现硬编码，所有配置应通过编辑器设置或配置文件
 
 ### 代码规范
+- **严格遵循官方 GDScript 风格指南**（详见 official_gdscript_styleguide.md）
 - **类命名必须遵守宪法规范**（详见 naming_conventions.md）
 - GDScript代码必须满足语法要求，禁止出现编译错误
-- 遵循Godot官方推荐的代码风格
 - 使用类型提示（type hints）提高代码可读性
 - 合理使用信号（signals）进行节点间通信
+- 使用 Tab 缩进，每行不超过 100 字符
+- 遵循官方的命名约定（PascalCase、snake_case、UPPER_SNAKE_CASE）
 
 ### 最佳实践
 - 确保所有功能都已正确实现
