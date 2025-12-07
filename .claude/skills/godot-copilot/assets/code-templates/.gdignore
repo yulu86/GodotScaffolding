@@ -1,0 +1,4 @@
+# Godot ignore file for code templates directory
+# Prevents template files from being imported by Godot
+
+*

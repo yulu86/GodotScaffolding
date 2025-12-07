@@ -1,272 +1,150 @@
 extends CharacterBody2D
 class_name CharacterController
 
-# 导出的编辑器属性
-@export var move_speed: float = 300.0
-@export var jump_velocity: float = -400.0
-@export var double_jump_velocity: float = -350.0
+## 角色控制器模板
+## 提供基础的移动、跳跃和动画功能
+
+# ===== 导出变量 =====
+@export_group("Movement Settings")
+@export var speed: float = 300.0
 @export var acceleration: float = 1000.0
 @export var friction: float = 1200.0
-@export var gravity_scale: float = 1.0
-@export var max_health: int = 3
+@export var jump_velocity: float = -400.0
 
-# 内部状态变量
-var current_health: int
-var can_double_jump: bool = true
-var is_grounded: bool = false
-var is_hurt: bool = false
-var is_dead: bool = false
-var facing_direction: int = 1  # 1 for right, -1 for left
+@export_group("Animation")
+@export var idle_animation_name: String = "idle"
+@export var walk_animation_name: String = "walk"
+@export var jump_animation_name: String = "jump"
 
-# 节点引用（使用@onready自动获取）
-@onready var sprite: Sprite2D = $Sprite2D
-@onready var collision_shape: CollisionShape2D = $CollisionShape2D
-@onready var animation_player: AnimationPlayer = $AnimationPlayer
-@onready var ground_ray: RayCast2D = $GroundRay
-@onready var hurt_timer: Timer = $HurtTimer
-@onready var invincibility_timer: Timer = $InvincibilityTimer
+# ===== 私有变量 =====
+var _gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
+var _is_jumping: bool = false
+var _facing_right: bool = true
 
-# 信号定义
-signal health_changed(new_health)
-signal player_died
-signal jump_performed
-signal double_jump_performed
-signal landed
+# ===== 信号 =====
+signal character_jumped
+signal character_landed
+signal direction_changed(new_direction: int)
 
-# 常量定义
-const GRAVITY: float = 980.0
+# ===== 节点引用 =====
+@onready var _sprite: Sprite2D = $Sprite2D
+@onready var _animation_player: AnimationPlayer = $AnimationPlayer
+@onready var _collision_shape: CollisionShape2D = $CollisionShape2D
+
+# ===== 生命周期 =====
 
 func _ready():
-    # 初始化状态
-    current_health = max_health
-    health_changed.emit(current_health)
-    
-    # 连接计时器信号
-    if hurt_timer:
-        hurt_timer.timeout.connect(_on_hurt_timer_timeout)
-    if invincibility_timer:
-        invincibility_timer.timeout.connect(_on_invincibility_timer_timeout)
+    # 初始化动画
+    if _animation_player and _animation_player.has_animation(idle_animation_name):
+        _animation_player.play(idle_animation_name)
 
-func _physics_process(delta):
-    if is_dead:
-        return
-    
+# ===== 物理处理 =====
+
+func _physics_process(delta: float):
     # 应用重力
     if not is_on_floor():
-        velocity.y += GRAVITY * gravity_scale * delta
-    
-    # 处理受伤状态
-    if is_hurt:
-        apply_knockback(delta)
-        move_and_slide()
-        return
-    
-    # 处理输入
-    handle_movement_input(delta)
-    handle_jump_input()
-    
-    # 应用移动
-    move_and_slide()
-    
-    # 更新状态
-    update_grounded_state()
-    update_facing_direction()
+        velocity.y += _gravity * delta
+    else:
+        if _is_jumping:
+            _is_jumping = false
+            character_landed.emit()
+
+    # 处理跳跃
+    handle_jump()
+
+    # 处理移动
+    handle_movement(delta)
+
+    # 更新动画
     update_animation()
 
-# 处理水平移动输入
-func handle_movement_input(delta):
-    var input_direction = Input.get_axis("ui_left", "ui_right")
-    
+    # 移动角色
+    move_and_slide()
+
+# ===== 移动处理 =====
+
+func handle_movement(delta: float):
+    var input_direction = Input.get_axis("move_left", "move_right")
+
     if input_direction != 0:
-        # 加速到目标速度
-        velocity.x = move_toward(velocity.x, input_direction * move_speed, acceleration * delta)
+        # 加速
+        velocity.x = move_toward(velocity.x, input_direction * speed, acceleration * delta)
+
+        # 更新朝向
+        update_facing_direction(input_direction)
     else:
-        # 应用摩擦力减速
+        # 减速
         velocity.x = move_toward(velocity.x, 0, friction * delta)
 
-# 处理跳跃输入
-func handle_jump_input():
-    if Input.is_action_just_pressed("ui_accept"):
-        if is_on_floor():
-            perform_jump()
-        elif can_double_jump:
-            perform_double_jump()
+func handle_jump():
+    if Input.is_action_just_pressed("jump") and is_on_floor():
+        velocity.y = jump_velocity
+        _is_jumping = true
+        character_jumped.emit()
 
-# 执行基础跳跃
-func perform_jump():
-    velocity.y = jump_velocity
-    can_double_jump = true
-    jump_performed.emit()
-    animation_player.play("jump")
+# ===== 朝向和动画 =====
 
-# 执行二段跳
-func perform_double_jump():
-    velocity.y = double_jump_velocity
-    can_double_jump = false
-    double_jump_performed.emit()
-    
-    # 播放二段跳特效
-    create_double_jump_effect()
+func update_facing_direction(direction: float):
+    var new_facing_right = direction > 0
 
-# 更新接地状态
-func update_grounded_state():
-    var was_grounded = is_grounded
-    is_grounded = is_on_floor()
-    
-    # 刚刚落地
-    if is_grounded and not was_grounded:
-        can_double_jump = true
-        landed.emit()
-        animation_player.play("land")
+    if new_facing_right != _facing_right:
+        _facing_right = new_facing_right
+        _sprite.flip_h = not _facing_right
+        direction_changed.emit(1 if _facing_right else -1)
 
-# 更新朝向
-func update_facing_direction():
-    if velocity.x > 0:
-        facing_direction = 1
-        sprite.flip_h = false
-    elif velocity.x < 0:
-        facing_direction = -1
-        sprite.flip_h = true
-
-# 更新动画
 func update_animation():
-    if is_hurt:
+    if not _animation_player:
         return
-    
-    if not is_grounded:
-        if velocity.y < 0:
-            if animation_player.current_animation != "jump_up":
-                animation_player.play("jump_up")
-        else:
-            if animation_player.current_animation != "fall":
-                animation_player.play("fall")
+
+    var animation_name: String
+
+    # 选择动画
+    if not is_on_floor():
+        animation_name = jump_animation_name
+    elif abs(velocity.x) > 10:
+        animation_name = walk_animation_name
     else:
-        if abs(velocity.x) > 10:
-            if animation_player.current_animation != "run":
-                animation_player.play("run")
-        else:
-            if animation_player.current_animation != "idle":
-                animation_player.play("idle")
+        animation_name = idle_animation_name
 
-# 受到伤害
-func take_damage(damage: int, damage_source: Node = null):
-    if is_dead or invincibility_timer.time_left > 0:
-        return
-    
-    current_health -= damage
-    health_changed.emit(current_health)
-    
-    if current_health <= 0:
-        die()
-    else:
-        enter_hurt_state(damage_source)
+    # 播放动画
+    if _animation_player.current_animation != animation_name:
+        _animation_player.play(animation_name)
 
-# 进入受伤状态
-func enter_hurt_state(damage_source: Node):
-    is_hurt = true
-    
-    # 计算击退方向
-    var knockback_direction = Vector2.ZERO
-    if damage_source:
-        knockback_direction = (global_position - damage_source.global_position).normalized()
-    else:
-        knockback_direction.x = -facing_direction
-        knockback_direction.y = -1
-    
-    # 设置击退速度
-    velocity = knockback_direction * 300
-    
-    # 启动计时器
-    hurt_timer.start(0.5)
-    invincibility_timer.start(1.0)
-    
-    # 播放受伤动画
-    animation_player.play("hurt")
-    
-    # 视觉效果
-    flash_white()
+# ===== 公共方法 =====
 
-# 应用击退效果
-func apply_knockback(delta):
-    velocity.y += GRAVITY * gravity_scale * delta
+func add_horizontal_force(force: float):
+    """添加水平推力"""
+    velocity.x += force
 
-# 角色死亡
-func die():
-    if is_dead:
-        return
-    
-    is_dead = true
-    current_health = 0
-    health_changed.emit(current_health)
-    
-    # 停止所有运动
-    velocity = Vector2.ZERO
-    
-    # 播放死亡动画
-    animation_player.play("death")
-    
-    # 禁用碰撞
-    collision_shape.disabled = true
-    
-    # 发出死亡信号
-    player_died.emit()
+func set_frozen(frozen: bool):
+    """设置是否冻结"""
+    set_process(not frozen)
+    set_physics_process(not frozen)
+    if frozen and _animation_player:
+        _animation_player.pause()
+    elif not frozen and _animation_player:
+        _animation_player.play()
 
-# 治疗角色
-func heal(amount: int):
-    current_health = min(current_health + amount, max_health)
-    health_changed.emit(current_health)
-    
-    # 治疗特效
-    create_heal_effect()
+# ===== 虚方法（可重写） =====
 
-# 重置角色状态
-func reset_character():
-    is_dead = false
-    is_hurt = false
-    can_double_jump = true
-    current_health = max_health
-    
-    velocity = Vector2.ZERO
-    collision_shape.disabled = false
-    
-    health_changed.emit(current_health)
-    animation_player.play("idle")
+func on_character_jumped():
+    """跳跃时调用 - 子类可重写"""
+    pass
 
-# 创建二段跳特效
-func create_double_jump_effect():
-    var effect_scene = preload("res://effects/DoubleJumpEffect.tscn")
-    var effect = effect_scene.instantiate()
-    get_tree().current_scene.add_child(effect)
-    effect.global_position = global_position
+func on_character_landed():
+    """着陆时调用 - 子类可重写"""
+    pass
 
-# 创建治疗特效
-func create_heal_effect():
-    var effect_scene = preload("res://effects/HealEffect.tscn")
-    var effect = effect_scene.instantiate()
-    get_tree().current_scene.add_child(effect)
-    effect.global_position = global_position
+# ===== 辅助方法 =====
 
-# 闪烁效果
-func flash_white():
-    sprite.modulate = Color.WHITE
-    await get_tree().create_timer(0.1).timeout
-    sprite.modulate = Color.WHITE
+func get_movement_input() -> float:
+    """获取移动输入"""
+    return Input.get_axis("move_left", "move_right")
 
-# 计时器回调函数
-func _on_hurt_timer_timeout():
-    is_hurt = false
+func is_moving() -> bool:
+    """是否正在移动"""
+    return abs(velocity.x) > 10
 
-func _on_invincibility_timer_timeout():
-    pass  # 无敌时间结束
-
-# 获取当前状态信息（用于调试）
-func get_debug_info() -> Dictionary:
-    return {
-        "velocity": velocity,
-        "is_grounded": is_grounded,
-        "can_double_jump": can_double_jump,
-        "current_health": current_health,
-        "is_hurt": is_hurt,
-        "is_dead": is_dead,
-        "facing_direction": facing_direction
-    }
+func get_facing_direction() -> int:
+    """获取朝向方向（1=右，-1=左）"""
+    return 1 if _facing_right else -1

@@ -1,549 +1,202 @@
-# Godot信号连接详细指导
+# 信号连接指导
 
-## 概述
+## 🔌 信号基础
 
-信号是Godot的核心特性之一，用于实现对象之间的通信。本指南提供了连接信号的详细步骤和最佳实践。
+### 什么是信号
+信号是Godot的观察者模式实现，允许节点之间解耦通信：
+- **发射信号**: 节点发出事件通知
+- **连接信号**: 其他节点监听并响应事件
+- **参数传递**: 信号可以携带数据
 
-## 理解信号
-
-### 什么是信号？
-
-信号是Godot的观察者模式实现，允许对象发出通知，其他对象可以"监听"这些通知并响应。
-
-### 信号的类型
-
-1. **内置信号**：引擎定义的信号
-2. **自定义信号**：用户定义的信号
-3. **信号参数**：信号可以携带数据
-
-## 连接信号的方法
-
-### 方法1：通过编辑器界面连接（推荐）
-
-#### 连接内置信号（以Button为例）
-
-1. **选择发出信号的节点**
-   ```
-   在场景树中选择Button节点
-   或在2D/3D视图中点击该节点
-   ```
-
-2. **打开节点面板**
-   - 在检查器右侧点击"节点"标签
-   - 或右键节点 → "连接信号"
-
-3. **找到目标信号**
-   ```
-   在信号列表中找到需要的信号：
-   ├─ button_down     # 鼠标按下
-   ├─ button_up       # 鼠标释放
-   ├─ pressed         # 点击（按下+释放）
-   ├─ toggled         # 切换状态（切换按钮）
-   └─ ...             # 其他信号
-   ```
-
-4. **连接信号**
-   - 双击信号名称（例如：pressed）
-   - 或选中信号后点击底部的"连接"按钮
-
-5. **选择接收对象**
-   - 选择要接收信号的节点
-   - 通常选择同一场景中的其他节点
-   - 或选择场景根节点
-
-6. **确认连接设置**
-   - **接收节点**：自动填充，可更改
-   - **接收方法**：自动生成，可修改
-   - **高级设置**：
-     - `一次性`：只触发一次后自动断开
-     - `延迟调用`：延迟一帧执行
-
-7. **完成连接**
-   - 点击"连接"按钮
-   - Godot会自动在接收节点的脚本中创建方法
-
-#### 示例：连接Button的pressed信号
-
-```
-1. 选择Button节点
-2. 打开节点面板
-3. 双击"pressed"信号
-4. 选择接收节点（例如UIManager）
-5. 方法名自动生成为：_on_button_pressed
-6. 点击"连接"
-```
-
-### 方法2：通过代码连接
-
-#### 基础语法
-
+### 内置信号
+大多数节点都有内置信号：
 ```gdscript
-# 发出信号
-signal_name.connect("method_name")
+# Timer 节点
+timeout # 定时器结束
 
-# 带参数的信号
-signal_name.connect("method_name", [args])
+# Button 节点
+pressed # 按钮按下
+button_up # 按钮释放
 
-# 使用lambda函数
-signal_name.connect(func(): print("Signal received"))
+# Body 节点
+body_entered # 物体进入
+body_exited # 物体离开
+
+# AnimationPlayer
+animation_finished # 动画结束
 ```
 
-#### 在_ready()中连接
+## 📝 定义自定义信号
 
+### 信号声明
 ```gdscript
-extends Node
+# 无参数信号
+signal game_over
 
-@onready var button: Button = $Button
-@onready var player: CharacterBody2D = $Player
-
-func _ready():
-    # 连接按钮点击
-    button.pressed.connect(_on_button_pressed)
-
-    # 连接玩家信号
-    player.health_changed.connect(_on_player_health_changed)
-
-func _on_button_pressed():
-    print("按钮被点击了")
-
-func _on_player_health_changed(new_health):
-    update_health_display(new_health)
-```
-
-#### 使用Callable包装器
-
-```gdscript
-func _ready():
-    # 使用Callable包装器
-    button.pressed.connect(Callable(self, "_on_button_pressed"))
-
-    # 使用lambda
-    timer.timeout.connect(func():
-        spawn_enemy()
-        timer.start()
-    )
-```
-
-### 方法3：通过拖拽连接
-
-1. **打开信号面板**
-   - 选择发出信号的节点
-   - 在检查器中打开"节点"标签
-
-2. **拖拽信号**
-   - 从信号列表拖拽到场景树中的接收节点
-   - 释放鼠标
-   - 自动创建连接
-
-## 创建自定义信号
-
-### 定义信号
-
-```gdscript
-# 在脚本中定义信号
+# 带参数信号
 signal health_changed(new_health: int)
-signal died
-signal item_collected(item_name: String, quantity: int)
+signal item_collected(item_name: String, value: int)
 
-# 带默认参数的信号
-signal score_updated(score: int, combo: int = 1)
+# 多参数信号
+signal player_stats_updated(health: int, mana: int, level: int)
 ```
 
-### 发出信号
-
+### 发射信号
 ```gdscript
-class_name Player
-extends CharacterBody2D
-
-# 定义信号
-signal health_changed(new_health: int)
-signal died
-signal level_up(new_level: int)
-
-func take_damage(damage: int):
-    current_health -= damage
-    # 发出信号
-    health_changed.emit(current_health)
+func take_damage(amount: int):
+    current_health -= amount
+    health_changed.emit(current_health)  # 发射信号
 
     if current_health <= 0:
-        died.emit()
-
-func gain_experience(exp: int):
-    experience += exp
-    if experience >= next_level_exp:
-        level += 1
-        level_up.emit(level)
+        game_over.emit()  # 发射游戏结束信号
 ```
 
-### 连接自定义信号
+## 🔗 连接信号的方式
 
+### 1. 编辑器连接
+1. 选择节点
+2. 在检查器中找到"节点"标签
+3. 双击要连接的信号
+4. 选择目标节点和方法
+5. 点击"连接"
+
+### 2. 代码连接
 ```gdscript
-extends Node
-
-@onready var player: Player = $Player
-@onready var health_bar: ProgressBar = $UI/HealthBar
-@onready var game_over_screen: Control = $UI/GameOver
-
+# 连接到当前节点的方法
 func _ready():
-    # 连接玩家信号
-    player.health_changed.connect(_on_player_health_changed)
-    player.died.connect(_on_player_died)
-    player.level_up.connect(_on_player_level_up)
+    $Timer.timeout.connect(_on_timer_timeout)
+    $Button.pressed.connect(_on_button_pressed)
 
-func _on_player_health_changed(new_health: int):
-    health_bar.value = new_health
-
-func _on_player_died():
-    game_over_screen.show()
-    get_tree().paused = true
-
-func _on_player_level_up(new_level: int):
-    show_level_up_effect()
-    print("恭喜升级到等级 %d!" % new_level)
-```
-
-## 常见信号示例
-
-### Button信号
-```gdscript
-# 按钮节点
-@onready var start_button: Button = $UI/StartButton
-
+# 连接到其他节点
 func _ready():
-    # 各种按钮信号
-    start_button.pressed.connect(_on_start_button_pressed)
-    start_button.button_down.connect(_on_button_down)
-    start_button.button_up.connect(_on_button_up)
-```
+    $Timer.timeout.connect(UIManager.show_time_up)
+    $Player.health_changed.connect($HealthBar.update_health)
 
-### Timer信号
-```gdscript
-# 计时器节点
-@onready var spawn_timer: Timer = $SpawnTimer
-@onready var countdown_timer: Timer = $CountdownTimer
-
+# 使用lambda连接（不推荐，难以调试）
 func _ready():
-    spawn_timer.timeout.connect(_spawn_enemy)
-    countdown_timer.timeout.connect(_on_countdown_finished)
-
-    # 配置计时器
-    spawn_timer.wait_time = 2.0
-    countdown_timer.one_shot = true
+    $Button.pressed.connect(func(): print("Button clicked"))
 ```
 
-### Area2D信号
+### 3. 使用组连接
 ```gdscript
-# 区域节点（用于拾取物品）
-@onready var pickup_area: Area2D = $PickupArea
+# 将多个敌人添加到组
+for enemy in enemies:
+    enemy.add_to_group("enemies")
+    enemy.died.connect(_on_enemy_died)
 
+# 使用组信号
 func _ready():
-    pickup_area.body_entered.connect(_on_body_entered)
-    pickup_area.area_entered.connect(_on_area_entered)
-
-func _on_body_entered(body: Node2D):
-    if body is Player:
-        collect_item()
-
-func _on_area_entered(area: Area2D):
-    # 处理与其他区域的交互
-    pass
+    for enemy in get_tree().get_nodes_in_group("enemies"):
+        enemy.health_changed.connect(check_all_enemies_defeated)
 ```
 
-### AnimationPlayer信号
+## 📋 信号处理方法命名规范
+
+### 推荐命名格式
 ```gdscript
-# 动画节点
-@onready var animation_player: AnimationPlayer = $AnimationPlayer
+# 格式：_on_[发射节点名称]_[信号名称]
+func _on_Timer_timeout():
+    print("Timer finished")
 
-func _ready():
-    # 动画开始时
-    animation_player.animation_started.connect(_on_animation_started)
+func _on_Button_pressed():
+    print("Button was pressed")
 
-    # 动画结束时
-    animation_player.animation_finished.connect(_on_animation_finished)
+func _on_Player_health_changed(new_health):
+    print(f"Player health: {new_health}")
 
-    # 特定动画的信号
-    animation_player.animation_changed.connect(_on_animation_changed)
-
-func _on_animation_finished(anim_name: StringName):
-    if anim_name == "jump":
-        is_jumping = false
-    elif anim_name == "attack":
-        can_attack = true
+func _on_Enemy_died():
+    print("An enemy died")
 ```
 
-### TreeItem信号（UI）
+### 使用信号参数
 ```gdscript
-# 列表控件
-@onready var inventory_list: ItemList = $UI/InventoryList
+# 声明带参数的信号
+signal score_changed(new_score: int, multiplier: float)
 
-func _ready():
-    inventory_list.item_selected.connect(_on_item_selected)
-    inventory_list.item_activated.connect(_on_item_activated)
-    inventory_list.multi_selected.connect(_on_multi_selected)
+# 发射时传递参数
+func add_score(points: int):
+    var final_score = points * score_multiplier
+    score += final_score
+    score_changed.emit(score, score_multiplier)
+
+# 接收时使用参数
+func _on_GameManager_score_changed(new_score: int, multiplier: float):
+    $ScoreLabel.text = "Score: %d (x%.1f)" % [new_score, multiplier]
 ```
 
-## 断开信号
+## 🚀 高级用法
 
-### 使用代码断开
+### 1. 条件信号连接
 ```gdscript
-func _ready():
-    # 连接信号
-    button.pressed.connect(_on_button_pressed)
+func connect_signals():
+    if player_has_ability:
+        $Player.power_up_collected.connect(_on_power_up_collected)
 
-func cleanup():
-    # 断开特定信号
-    button.pressed.disconnect(_on_button_pressed)
-
-    # 断开所有连接（危险操作）
-    # button.pressed.disconnect_all()
+    if debug_mode:
+        $Player.health_changed.connect(debug_log_health)
 ```
 
-### 使用队列断开
+### 2. 临时信号连接
 ```gdscript
-func _exit_tree():
-    # 节点退出时自动清理信号连接
-    if is_instance_valid(button):
-        button.pressed.disconnect(_on_button_pressed)
-```
+# 连接并在完成时断开
+func play_cutscene():
+    var cutscene = cutscene_scene.instantiate()
+    add_child(cutscene)
 
-## 信号连接的最佳实践
-
-### 1. 命名规范
-```gdscript
-# 好的命名
-_on_button_pressed
-_on_player_health_changed
-_on_timer_timeout
-
-# 避免的命名
-pressed_button  # 容易混淆
-button_action  # 不够具体
-handle_timer   # 太通用
-```
-
-### 2. 在_ready()中连接
-```gdscript
-# 正确：在_ready()中连接
-func _ready():
-    timer.timeout.connect(_on_timer_timeout)
-
-# 错误：在_init()中连接（节点可能未准备好）
-func _init():
-    # 节点引用可能为null
-    timer.timeout.connect(_on_timer_timeout)  # 错误！
-```
-
-### 3. 使用@onready
-```gdscript
-# 推荐：使用@onready
-@onready var timer: Timer = $Timer
-
-func _ready():
-    timer.timeout.connect(_on_timer_timeout)
-
-# 可选：手动查找节点
-func _ready():
-    var timer = get_node("Timer") as Timer
-    timer.timeout.connect(_on_timer_timeout)
-```
-
-### 4. 处理断开连接
-```gdscript
-# 检查连接是否存在
-func _ready():
-    if not timer.timeout.is_connected(_on_timer_timeout):
-        timer.timeout.connect(_on_timer_timeout)
-
-# 安全断开
-func cleanup():
-    if timer and timer.timeout.is_connected(_on_timer_timeout):
-        timer.timeout.disconnect(_on_timer_timeout)
-```
-
-### 5. 信号参数的类型提示
-```gdscript
-# 好的做法：明确类型
-signal health_changed(new_health: int)
-signal item_picked_up(item: Item)
-signal position_updated(pos: Vector2)
-
-# 在接收方法中使用类型
-func _on_health_changed(new_health: int):
-    # 类型安全
-    health_label.text = "Health: %d" % new_health
-```
-
-## 高级技巧
-
-### 1. 使用自定义回调
-```gdscript
-func _ready():
-    # 创建自定义回调
-    var custom_callback = func(data):
-        handle_data(data)
-        print("Data processed: " + str(data))
-
-    some_signal.connect(custom_callback)
-```
-
-### 2. 信号队列
-```gdscript
-# 延迟处理信号
-func _ready():
-    button.pressed.connect(_on_button_pressed, CONNECT_DEFERRED)
-
-func _on_button_pressed():
-    # 延迟一帧执行
-    print("Button clicked!")
-```
-
-### 3. 信号组
-```gdscript
-# 将多个信号连接到同一个方法
-func connect_multiple_buttons():
-    var buttons = [$UI/Button1, $UI/Button2, $UI/Button3]
-
-    for button in buttons:
-        button.pressed.connect(_on_any_button_pressed.bind(button))
-
-func _on_any_button_pressed(button: Button):
-    print("%s was clicked!" % button.name)
-```
-
-### 4. 信号过滤
-```gdscript
-func _ready():
-    # 使用组信号
-    enemy_group = get_tree().get_nodes_in_group("enemies")
-    for enemy in enemy_group:
-        enemy.died.connect(_on_enemy_died, CONNECT_ONE_SHOT)
-
-func _on_enemy_died():
-    # 每个敌人只触发一次
-    update_enemy_count()
-```
-
-## 调试信号连接
-
-### 查看连接的信号
-```gdscript
-func inspect_connections(node: Node):
-    # 打印节点的所有信号连接
-    var signal_list = node.get_signal_list()
-    for signal_info in signal_list:
-        var signal_name = signal_info.name
-        var connections = node.get_signal_connection_list(signal_name)
-        print("Signal %s has %d connections:" % [signal_name, connections.size()])
-        for connection in connections:
-            print("  - %s -> %s" % [connection.signal.get_name(), connection.callable.get_method()])
-```
-
-### 调试信号触发
-```gdscript
-func _ready():
-    # 添加调试信息
-    player.health_changed.connect(func(hp):
-        print("Debug: Health changed to %d" % hp)
-        _on_player_health_changed(hp)
+    # 连接完成信号
+    var connection = cutscene.finished.connect(
+        func():
+            cutscene.queue_free()
+            resume_game()
     )
+
+    # 确保断开连接
+    cutscene.tree_exiting.connect(connection.unbind.call())
 ```
 
-## 常见错误和解决方案
+### 3. 信号队列
+```gdsignal
+# 使用call_deferred延迟处理
+func _on_Enemy_died():
+    # 延迟处理，避免修改正在迭代的集合
+    update_enemy_count.call_deferred()
+```
 
-### 错误1：信号连接到不存在的方法
-**错误**：`E 0:00:00:0000] Method "nonexistent_method" not found in target`
-**解决**：确保接收方法存在且拼写正确
+## 🛠️ 调试信号
 
-### 错误2：重复连接信号
-**错误**：同一个信号被连接多次，导致多次触发
-**解决**：
+### 查看信号连接
 ```gdscript
-# 连接前检查
-if not signal.is_connected(method):
-    signal.connect(method)
+# 打印所有连接
+func print_signal_connections(node: Node):
+    for signal in node.get_signal_list():
+        var connections = node.get_signal_connection_list(signal.name)
+        if connections.size() > 0:
+            print(f"Signal '{signal.name}' has {connections.size()} connections:")
+            for conn in connections:
+                print(f"  - {conn.callable}")
 ```
 
-### 错误3：连接时节点未准备好
-**错误**：尝试在_init()中连接信号时节点引用为null
-**解决**：使用_ready()或@onready
+### 常见信号问题
+1. **信号未连接**: 检查_connect_是否在_ready_中执行
+2. **节点未就绪**: 使用@onready或在树中延迟连接
+3. **参数不匹配**: 确保信号和处理方法的参数一致
+4. **内存泄漏**: 临时连接记得断开
 
-### 错误4：忘记断开连接
-**错误**：内存泄漏或重复调用
-**解决**：在_exit_tree()中清理连接
+## 💡 最佳实践
 
-## 完整示例：信号驱动的游戏系统
+1. **优先使用内置信号**: 避免重复定义已有功能
+2. **合理设计信号粒度**: 不要过细或过粗
+3. **使用强类型**: 信号参数添加类型提示
+4. **及时断开连接**: 临时连接要记得清理
+5. **文档化信号**: 为自定义信号添加注释说明
 
-### Player.gd
 ```gdscript
-class_name Player
-extends CharacterBody2D
+## 玩家生命值变化时发射
+## @param new_health: 新的生命值 (0-100)
+signal health_changed(new_health: int)
 
-# 定义信号
-signal health_changed(current: int, max: int)
-signal died
-signal level_up(level: int)
-signal coin_collected(amount: int)
-
-@onready var health_component: Node = $HealthComponent
-@onready var audio_player: AudioStreamPlayer2D = $AudioPlayer
-
-func _ready():
-    health_component.health_changed.connect(_on_health_component_changed)
-
-func _on_health_component_changed(health: int, max_health: int):
-    # 转发信号
-    health_changed.emit(health, max_health)
-
-    if health <= 0:
-        died.emit()
-        play_death_sound()
-
-func play_death_sound():
-    audio_player.stream = load("res://sounds/death.wav")
-    audio_player.play()
+## 玩家获得新能力时发射
+## @param ability_name: 能力名称
+## @param ability_level: 能力等级
+signal ability_unlocked(ability_name: String, ability_level: int)
 ```
-
-### GameManager.gd
-```gdscript
-extends Node
-
-@onready var player: Player = $Player
-@onready var ui: Control = $UI
-@onready var spawner: Node = $EnemySpawner
-@onready var scene_tree: SceneTree = get_tree()
-
-func _ready():
-    # 连接所有游戏信号
-    connect_game_signals()
-
-func connect_game_signals():
-    # 玩家信号
-    player.health_changed.connect(_on_player_health_changed)
-    player.died.connect(_on_player_died)
-    player.level_up.connect(_on_player_level_up)
-    player.coin_collected.connect(_on_player_coin_collected)
-
-    # UI信号
-    ui.pause_button_pressed.connect(_on_pause_button_pressed)
-    ui.restart_button_pressed.connect(_on_restart_button_pressed)
-
-    # 其他信号
-    spawner.enemy_spawned.connect(_on_enemy_spawned)
-
-func _on_player_health_changed(current: int, max: int):
-    ui.update_health_bar(current, max)
-
-func _on_player_died():
-    ui.show_game_over_screen()
-    scene_tree.paused = true
-
-func _on_player_level_up(level: int):
-    ui.show_level_up_message(level)
-    player.restore_full_health()
-
-func _on_pause_button_pressed():
-    scene_tree.paused = not scene_tree.paused
-    ui.toggle_pause_menu()
-```
-
-通过遵循这些指导原则，你可以创建高效、可维护的信号系统，实现游戏对象之间的松耦合通信。记住，信号是Godot的强大特性，善用它们会让你的代码更加清晰和模块化！

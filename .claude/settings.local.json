@@ -30,7 +30,6 @@
       "mcp__godot__export_mesh_library",
       "mcp__godot__save_scene",
       "mcp__godot__get_uid",
-      "mcp__godot__update_project_uids",
       "Skill(godot-copilot)",
       "Skill(internal-comms)",
       "mcp__filesystem__read_text_file",
@@ -39,7 +38,10 @@
       "mcp__filesystem__move_file",
       "Bash(git fetch:*)"
     ],
-    "deny": [],
+    "deny": [
+      "mcp__godot__get_uid",
+      "mcp__godot__update_project_uids"
+    ],
     "ask": []
   }
 }
