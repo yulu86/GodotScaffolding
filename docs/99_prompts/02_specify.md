@@ -17,3 +17,15 @@
 ```bash
 /speckit.plan 001-character-movement Godot 4.5 + GDScript
 ```
+
+# 4. tasks
+
+```bash
+/speckit.tasks 001-character-movement
+```
+
+# 5. implement
+
+```bash
+/speckit.implement 001-character-movement
+```
