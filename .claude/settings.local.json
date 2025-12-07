@@ -31,12 +31,14 @@
       "mcp__godot__save_scene",
       "mcp__godot__get_uid",
       "Skill(godot-copilot)",
+      "Skill(game-planer)",
+      "Skill(skill-creator)",
       "Skill(internal-comms)",
       "mcp__filesystem__read_text_file",
       "mcp__filesystem__search_files",
       "mcp__filesystem__edit_file",
       "mcp__filesystem__move_file",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)"      
     ],
     "deny": [
       "mcp__godot__get_uid",
