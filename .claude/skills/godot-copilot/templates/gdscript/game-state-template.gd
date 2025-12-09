@@ -1,6 +1,11 @@
 extends Node
 ## 游戏状态管理器（Singleton模板）
-## 注意：Singleton文件禁止写 class_name
+##
+## ⚠️ 重要提醒：Singleton 文件禁止写 class_name！
+## Singleton 脚本通过文件名在项目中访问，不需要 class_name
+## 例如：game.gd → 在项目中直接通过 Game 访问（如果在 project.godot 中配置为 Game）
+##
+## 此模板文件不包含 class_name，这是正确的做法
 
 # 游戏状态枚举
 enum GameState {
