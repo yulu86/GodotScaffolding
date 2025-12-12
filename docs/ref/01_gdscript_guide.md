@@ -434,11 +434,11 @@ const MAX_PLAYERS = 4
 const GRAVITY = 9.81
 
 # 类名：PascalCase
-class_name PlayerController
+class_name Player
 extends Node
 
 # 文件名：snake_case.gd
-# player_controller.gd
+# player.gd
 # enemy_spawner.gd
 ```
 
