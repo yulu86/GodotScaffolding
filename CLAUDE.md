@@ -17,3 +17,4 @@
 - 建议优先选择AnimationPlayer节点，而不是AnimatedSprite2D节点，以提供更多灵活性
 - 需要在`项目设置`-`全局设置`中配置为singleton的.gd文件中禁止写`class_name`
 - gdscript不支持三元运算符 ?: 语法，需要使用 if...else 替代
+- 代码中禁止使用中文字符
