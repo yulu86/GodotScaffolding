@@ -3,6 +3,11 @@ class_name ComponentTemplate
 
 ## 组件模板
 ## 用于创建可重用的游戏组件
+##
+## ⚠️ 命名规范提醒：
+## 如果此脚本附加到场景文件，类名必须与场景文件名保持一致！
+## 例如：my_component.tscn → class_name MyComponent
+## 当前模板使用 ComponentTemplate 作为示例，实际使用时请修改为与场景文件名一致的类名
 
 # 导出配置 - 在编辑器中可设置
 @export var enabled: bool = true

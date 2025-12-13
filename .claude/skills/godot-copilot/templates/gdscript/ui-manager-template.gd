@@ -3,6 +3,11 @@ class_name UIManager
 
 ## UI管理器模板
 ## 管理游戏中的所有UI界面
+##
+## ⚠️ 命名规范提醒：
+## 如果此脚本附加到场景文件，类名必须与场景文件名保持一致！
+## 例如：ui_manager.tscn → class_name UiManager
+## 当前模板使用 UIManager 作为示例，实际使用时请修改为与场景文件名一致的类名
 
 # UI层级枚举
 enum UILayer {
