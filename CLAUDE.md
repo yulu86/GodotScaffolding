@@ -24,3 +24,5 @@
 - GUT测试执行必须使用命令行
 - windows环境下:
   godot命令对应的可执行文件 `E:\Steam\steamapps\common\Godot Engine\godot.windows.opt.tools.64.exe`，例如 ```godot -s addons/gut/gut_cmdln.gd -gexit``` -> ```E:\Steam\steamapps\common\Godot Engine\godot.windows.opt.tools.64.exe -s addons/gut/gut_cmdln.gd -gexit```
+- macOS环境下:
+  godot命令对应的可执行文件 `'/Users/xuyulu/Library/Application Support/Steam/steamapps/common/Godot Engine/Godot.app/Contents/MacOS/Godot'` ，例如 ```godot -s addons/gut/gut_cmdln.gd -gexit``` -> ```'/Users/xuyulu/Library/Application Support/Steam/steamapps/common/Godot Engine/Godot.app/Contents/MacOS/Godot' -s addons/gut/gut_cmdln.gd -gexit```
