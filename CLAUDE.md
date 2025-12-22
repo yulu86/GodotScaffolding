@@ -18,6 +18,7 @@
 - 需要在`项目设置`-`全局设置`中配置为singleton的.gd文件中禁止写`class_name`
 - gdscript不支持三元运算符 ?: 语法，需要使用 if...else 替代
 - 代码中除了注释外，禁止使用中文
+- GUT测试代码中直接引用类，而不是使用load/preload加载类
 
 # Godot引擎命令行
 - GUT测试执行必须使用命令行
