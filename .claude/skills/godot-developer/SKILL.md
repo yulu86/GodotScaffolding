@@ -55,6 +55,7 @@ description: 专业的Godot游戏开发专家，使用TDD方法论实现GDScript
 - **GDScript官方风格指南**: [references/official_gdscript_styleguide.md](references/official_gdscript_styleguide.md) - 所有代码必须遵循
 - **脚本类命名规范**: [references/naming_conventions.md](references/naming_conventions.md) - 场景脚本命名黄金法则
 - **状态机实现指南**: [references/state-machine-guide.md](references/state-machine-guide.md) - 状态机代码实现规范
+- **子目录规范**: .gd文件按照设计规划子目录存放，测试代码的相对路径子目录与功能代码子目录路径保持一致
 
 ### 开发指导
 - **开发指导**: [references/development-guide.md](references/development-guide.md) - 完整的开发流程和代码模板
