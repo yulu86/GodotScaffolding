@@ -1,11 +1,5 @@
 {
     "$schema": "https://opencode.ai/config.json",
-    "lsp": {
-        "gdscript-lsp": {
-            "command": ["nc", "127.0.0.1", "6005"],
-            "extensions": [".gd"]
-        }
-    },
     "mcp": {
         "godot": {
             "type": "local",
@@ -18,7 +12,7 @@
                 "GODOT_PATH": "${GODOT_HOME}"
             }
         },
-        "godot-lsp": {
+        "minimal-godot": {
             "type": "local",
             "command": [
                 "node",
