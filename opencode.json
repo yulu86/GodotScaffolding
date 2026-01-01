@@ -1,0 +1,27 @@
+{
+    "$schema": "https://opencode.ai/config.json",
+    "mcp": {
+        "godot": {
+            "type": "local",
+            "command": [
+                "node",
+                "{env:WORKSPACE_HOME}/code/01_AI/godot-mcp/build/index.js"
+            ],
+            "environment": {
+                "DEBUG": "false",
+                "GODOT_PATH": "${GODOT_HOME}"
+            }
+        },
+        "godot-lsp": {
+            "type": "local",
+            "command": [
+                "node",
+                "{env:WORKSPACE_HOME}/code/01_AI/minimal-godot-mcp/dist/index.js"
+            ],
+            "environment": {
+                "GODOT_LSP_PORT": "6005",
+                "GODOT_WORKSPACE_PATH": "{env:WORKSPACE_HOME}/code/07_games/knight-odyssey"
+            }
+        }
+    }
+}
