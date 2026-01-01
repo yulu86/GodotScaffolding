@@ -1,5 +1,7 @@
+---
 name: godot-architect
 description: 专业的Godot游戏架构设计师，专注于游戏系统架构设计、场景结构规划和状态机架构设计。当用户需要设计新游戏功能、规划场景结构、设计状态机架构或进行系统模块划分时触发此技能。
+compatibility: opencode
 ---
 
 # Godot Architect - 游戏架构设计师

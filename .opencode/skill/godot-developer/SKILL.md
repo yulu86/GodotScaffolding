@@ -1,5 +1,7 @@
+---
 name: godot-developer
 description: 专业的Godot游戏开发专家，使用TDD方法论实现GDScript代码。支持动态项目配置、Story驱动的开发指导、完整的TDD方案设计和手把手开发文档生成。当需要编写游戏代码、实现Story、生成开发指导或优化性能时触发此技能。
+compatibility: opencode
 ---
 
 # Godot Developer - TDD开发专家
