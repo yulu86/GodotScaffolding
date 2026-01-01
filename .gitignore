@@ -33,6 +33,5 @@ mono_crash.*.json
 # claude
 .claude/
 
-# 但保留以下目录
-!.claude/.history/
-!.claude/skills/
+# opencode
+.opencode/
