@@ -1,7 +1,7 @@
 # 1. 创建PRD
 
 ```
-ultrathink 请根据 docs/00_scratch/ 目录下的图片，设计2D平台跳跃游戏`骑士的奥德赛大冒险`，按照GDD模版，输出游戏需求GDD文档到 docs/01_GDD/01_游戏设计文档_骑士的奥德赛大冒险.md 
+请根据 docs/00_scratch/ 目录下的图片，设计2D平台跳跃游戏`骑士的奥德赛大冒险`，按照GDD模版，输出游戏需求GDD文档到 docs/01_GDD/01_游戏设计文档_骑士的奥德赛大冒险.md 
 要求:
 - 游戏平台：支持PC、Mac
 - 操作：支持键盘、Xbox手柄操作
@@ -16,7 +16,7 @@ ultrathink 请根据 docs/00_scratch/ 目录下的图片，设计2D平台跳跃�
 # 2. 架构设计
 
 ```
-ultrathink use context7 请输出游戏架构概要设计:
+use context7 请输出游戏架构概要设计:
 1. 读取`游戏需求GDD`，理解游戏需求
 3. 结合业界最佳实践中的成熟方案和合理的设计模式， 使用 `godot-architect`技能进行架构设计
 3. 委托 tech-docs-writer 输出详架构概要设计文档到 docs/02_arch/
@@ -33,7 +33,7 @@ ultrathink use context7 请输出游戏架构概要设计:
 # 3. sprint计划
 
 ```
-ultrathink 请根据游戏GDD文档和架构概要设计文档，创建sprint开发计划:
+请根据游戏GDD文档和架构概要设计文档，创建sprint开发计划:
 1. 读取游戏需求GDD和游戏架构概要设计，遵循相关设计
 2. 按照sprint开发方法论，支持迭代开发，分解story
 3. 按照story维度，按照story模版输出story文档，保存到 docs/03_sprint/02_stroy/ 
@@ -51,7 +51,7 @@ ultrathink 请根据游戏GDD文档和架构概要设计文档，创建sprint开
 # 4. Story手把手开发指导
 
 ```
-ultrathink 请分析并输出下一个待开发的Story的手把手开发指导:
+请分析并输出下一个待开发的Story的手把手开发指导:
 1. 读取backlog文档，获取下一个待开发的Story，并找我确认
 2. 等待我的确认后，按迭代开发的方式拆分成多个task
 3. 设计实现方案
@@ -80,7 +80,7 @@ ultrathink 请分析并输出下一个待开发的Story的手把手开发指导:
 请与我与我协同开发:
 1. 从 docs/04_hands_by_hands/ 下获取待开发的指导，并与我确认
 2. 等待我确认后，切换到开发分支
-3. 严格遵守`手把手开发指导`，使用`godot-developer`技能与我协同开发
+3. 严格遵守`手把手开发指导`，强制使用`godot-developer`技能与我协同开发
 要求：
 - A good strategy with GUT is to separate unit and integration tests into separate directory structures (such as res://test/unit and res://test/integration).
 约束：
