@@ -1,5 +1,5 @@
 # 代码开发
-- 在开发Godot项目时，强制使用`godot-copilot`技能与我进行协同开发
+- 在开发Godot项目时，强制使用`godot-developer`技能与我进行协同开发
 - 必须使用`context7`工具获取gdscript语法和godot引擎API/SDK文档，禁止在编码时出现语法错误
 
 # 项目目录规范
