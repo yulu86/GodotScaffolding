@@ -4,6 +4,12 @@
         "AGENTS.md",
         "CONTRIBUTING.md"
     ],
+    "permission": {
+        "skill": {
+            "godot-architect": "allow",
+            "godot-developer": "allow"
+        }
+    },
     "mcp": {
         "godot": {
             "type": "local",
