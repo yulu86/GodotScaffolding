@@ -30,8 +30,17 @@
             ],
             "environment": {
                 "GODOT_LSP_PORT": "6005",
-                "GODOT_WORKSPACE_PATH": "{env:WORKSPACE_HOME}/code/07_games/knight-odyssey"
+                "GODOT_WORKSPACE_PATH": "{env:WORKSPACE_HOME}/code/07_games/brave-legend"
             }
+        },
+        "filesystem": {
+            "type": "local",
+            "command": [
+                "npx",
+                "-y",
+                "@modelcontextprotocol/server-filesystem",
+                "{env:WORKSPACE_HOME}/code/07_games/brave-legend"
+            ]
         }
     }
 }
