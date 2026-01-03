@@ -19,7 +19,7 @@
             ],
             "environment": {
                 "DEBUG": "false",
-                "GODOT_PATH": "${GODOT_HOME}"
+                "GODOT_PATH": "{env:GODOT_HOME}"
             }
         },
         "minimal-godot": {
