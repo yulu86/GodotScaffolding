@@ -13,7 +13,12 @@
 - test：单元测试
 - addons：插件
 
+# 设计原则
+- 代码需要满足SOLID原则
+- 代码需要满足DRY原则
+
 # 实现原则
+- 必须使用godot-developer按照TDD微循环完成代码开发
 - 建议优先选择AnimationPlayer节点，而不是AnimatedSprite2D节点，以提供更多灵活性
 - 需要在`项目设置`-`全局设置`中配置为singleton的.gd文件中禁止写`class_name`
 - gdscript不支持三元运算符 ?: 语法，需要使用 if...else 替代
