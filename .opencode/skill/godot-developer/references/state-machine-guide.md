@@ -446,6 +446,437 @@ func get_state_history() -> Array[String]:
 - 实现线程安全的状态切换
 - 避免在状态更新过程中直接切换状态
 
+## 实际应用示例
+
+### 简化版状态机（适用于特定场景）
+
+对于游戏开发中的特定场景（如玩家控制器），可以使用简化版状态机实现，减少不必要的复杂性。
+
+#### 简化的状态基类
+
+```gdscript
+# state.gd - 简化的状态基类
+class_name State
+extends Node
+
+signal state_transition_requested(to_state: Enum)
+
+# 组件依赖
+var player: Player
+var sprite_2d: Sprite2D
+var animation_player: AnimationPlayer
+var state_machine: StateMachine
+
+# 时间管理
+var state_enter_time: int = 0
+const DEFAULT_DURATION: float = 0.1
+
+# 设置组件依赖
+func setup(player_components: PlayerComponents) -> void:
+    player = player_components.player
+    sprite_2d = player_components.sprite_2d
+    animation_player = player_components.animation_player
+    state_machine = player_components.state_machine
+
+func _ready() -> void:
+    state_enter_time = Time.get_ticks_msec()
+
+# 状态生命周期
+func enter() -> void:
+    pass
+
+func exit() -> void:
+    pass
+
+func update(delta: float) -> void:
+    pass
+
+func handle_input(event: InputEvent) -> void:
+    pass
+
+# 辅助方法
+func get_passed_time() -> int:
+    return Time.get_ticks_msec() - state_enter_time
+
+func get_direction() -> float:
+    return Input.get_axis("move_left", "move_right")
+
+func _is_time_valid(start_time: int, duration: float) -> bool:
+    if start_time == 0:
+        return false
+    var elapsed: float = (Time.get_ticks_msec() - start_time) / 1000.0
+    return elapsed < duration
+```
+
+#### 组件建造者模式
+
+```gdscript
+# player_components.gd - 组件容器
+class_name PlayerComponents
+extends RefCounted
+
+var player: Player
+var sprite_2d: Sprite2D
+var animation_player: AnimationPlayer
+var state_machine: StateMachine
+
+static func build() -> PlayerComponents:
+    return PlayerComponents.new()
+
+func set_player(value: Player) -> PlayerComponents:
+    player = value
+    return self
+
+func set_sprite_2d(value: Sprite2D) -> PlayerComponents:
+    sprite_2d = value
+    return self
+
+func set_animation_player(value: AnimationPlayer) -> PlayerComponents:
+    animation_player = value
+    return self
+
+func set_state_machine(value: StateMachine) -> PlayerComponents:
+    state_machine = value
+    return self
+```
+
+---
+
+## 模板方法模式
+
+### 概述
+
+模板方法模式允许在基类中定义算法的骨架，而将某些步骤延迟到子类实现。这在状态机中特别有用，可以将公共逻辑提取到中间层基类中。
+
+### 模板方法模式应用
+
+#### 中间层状态基类示例
+
+```gdscript
+# on_floor_state.gd - 地面状态基类
+class_name OnFloorState
+extends State
+
+# 土狼时间
+var _coyote_time_start: int = 0
+
+# 跳跃请求
+var _jump_request_time_start: int = 0
+
+# 模板方法：状态更新标准流程
+func update(delta: float) -> void:
+    _update_physics(delta)
+    
+    var direction: float = get_direction()
+    
+    if _should_jump(direction):
+        state_transition_requested.emit(PlayerStateFactory.PlayerState.JUMP)
+        return
+    
+    if _should_transition_idle(direction):
+        state_transition_requested.emit(PlayerStateFactory.PlayerState.IDLE)
+        return
+    
+    if _should_transition_run(direction):
+        state_transition_requested.emit(PlayerStateFactory.PlayerState.RUN)
+        return
+    
+    _handle_coyote_time()
+
+# 模板方法：输入处理标准流程
+func handle_input(event: InputEvent) -> void:
+    if event.is_action_pressed("jump"):
+        start_jump_request()
+
+# 钩子方法：子类可覆盖
+func _update_physics(_delta: float) -> void:
+    pass
+
+func _should_jump(_direction: float) -> bool:
+    var can_jump: bool = player.is_on_floor() or is_coyote_time_valid()
+    return can_jump and is_jump_request_valid()
+
+func _should_transition_idle(_direction: float) -> bool:
+    return false
+
+func _should_transition_run(_direction: float) -> bool:
+    return false
+
+func _handle_coyote_time() -> void:
+    # 土狼时间逻辑
+    pass
+
+# 辅助方法
+func start_coyote_time() -> void:
+    _coyote_time_start = Time.get_ticks_msec()
+
+func is_coyote_time_valid(duration: float = DEFAULT_DURATION) -> bool:
+    return _is_time_valid(_coyote_time_start, duration)
+
+func clear_coyote_time() -> void:
+    _coyote_time_start = 0
+
+func start_jump_request() -> void:
+    _jump_request_time_start = Time.get_ticks_msec()
+
+func is_jump_request_valid(duration: float = DEFAULT_DURATION) -> bool:
+    return _is_time_valid(_jump_request_time_start, duration)
+
+func clear_jump_request() -> void:
+    _jump_request_time_start = 0
+```
+
+#### 具体状态实现示例
+
+```gdscript
+# idle_state.gd - 待机状态
+class_name IdleState
+extends OnFloorState
+
+func enter() -> void:
+    super()
+    animation_player.play("idle")
+    clear_coyote_time()
+
+func _should_transition_run(direction: float) -> bool:
+    return not is_zero_approx(direction)
+```
+
+```gdscript
+# run_state.gd - 奔跑状态
+class_name RunState
+extends OnFloorState
+
+func enter() -> void:
+    super()
+    animation_player.play("running")
+
+func _update_physics(delta: float) -> void:
+    var direction: float = get_direction()
+    var acceleration: float = player.get_acceleration()
+    
+    player.velocity.x = move_toward(player.velocity.x, direction * player.RUN_SPEED, acceleration * delta)
+    player.velocity.y += player.gravity * delta
+    
+    if not is_zero_approx(direction):
+        player.sprite_2d.flip_h = direction < 0
+
+func _should_transition_idle(direction: float) -> bool:
+    return is_zero_approx(direction) and is_zero_approx(player.velocity.x)
+```
+
+### 模板方法模式的优势
+
+1. **代码复用**：公共逻辑集中在基类，避免重复
+2. **一致性**：所有子类遵循相同的流程
+3. **可维护性**：修改流程只需更新基类
+4. **扩展性**：子类只需覆盖必要的钩子方法
+
+---
+
+## 项目特定状态机
+
+### 玩家状态机示例
+
+#### 状态枚举
+
+```gdscript
+# player_state_factory.gd
+class_name PlayerStateFactory
+extends Node
+
+enum PlayerState {
+    IDLE,
+    RUN,
+    JUMP,
+    FALL,
+    LANDING
+}
+
+var states: Dictionary[PlayerState, Variant] = {
+    PlayerState.IDLE: IdleState,
+    PlayerState.RUN: RunState,
+    PlayerState.JUMP: JumpState,
+    PlayerState.FALL: FallState,
+    PlayerState.LANDING: LandingState
+}
+
+func get_state(player_state: PlayerState) -> State:
+    assert(states.has(player_state), "PlayerState NOT Found")
+    return states[player_state].new()
+```
+
+#### 状态机管理器
+
+```gdscript
+# player_state_machine.gd
+class_name PlayerStateMachine
+extends Node
+
+var _current_state: State
+var _current_state_enum: PlayerStateFactory.PlayerState
+var _player: Player
+var _state_factory: PlayerStateFactory
+
+func _ready() -> void:
+    _state_factory = PlayerStateFactory.new()
+    add_child(_state_factory)
+
+func set_player(player: Player) -> void:
+    _player = player
+
+func transition_to(to_state: PlayerStateFactory.PlayerState) -> void:
+    var player_components := build_player_components()
+    var new_state := _state_factory.get_state(to_state)
+    new_state.setup(player_components)
+    
+    if _current_state != null:
+        _current_state.exit()
+        if _current_state.state_transition_requested.is_connected(_on_state_transition_requested):
+            _current_state.state_transition_requested.disconnect(_on_state_transition_requested)
+        _current_state.queue_free()
+    
+    _current_state = new_state
+    _current_state_enum = to_state
+    add_child(_current_state)
+    _current_state.enter()
+    _current_state.state_transition_requested.connect(_on_state_transition_requested)
+
+func _on_state_transition_requested(to_state: PlayerStateFactory.PlayerState) -> void:
+    transition_to(to_state)
+
+func update(delta: float) -> void:
+    if _current_state != null:
+        _current_state.update(delta)
+
+func handle_input(event: InputEvent) -> void:
+    if _current_state != null:
+        _current_state.handle_input(event)
+
+func get_current_state_enum() -> PlayerStateFactory.PlayerState:
+    return _current_state_enum
+
+func build_player_components() -> PlayerComponents:
+    return PlayerComponents.build()\
+        .set_player(_player)\
+        .set_sprite_2d(_player.sprite_2d)\
+        .set_animation_player(_player.animation_player)\
+        .set_state_machine(self)
+```
+
+---
+
+## 最佳实践补充
+
+### 组件建造者模式
+
+使用建造者模式封装组件依赖，提供链式调用：
+
+```gdscript
+# ✅ 优势
+# 1. 清晰的 API：链式调用使代码更易读
+# 2. 类型安全：编译时检查参数类型
+# 3. 灵活性：可选组件可选择性设置
+
+var components = PlayerComponents.build()
+    .set_player(self)
+    .set_sprite_2d($Sprite2D)
+    .set_animation_player($AnimationPlayer)
+    .set_state_machine($PlayerStateMachine)
+```
+
+### 时间管理辅助方法
+
+统一的时间验证逻辑，避免重复代码：
+
+```gdscript
+# 在基类中提供统一的时间验证
+func _is_time_valid(start_time: int, duration: float) -> bool:
+    if start_time == 0:
+        return false
+    var elapsed: float = (Time.get_ticks_msec() - start_time) / 1000.0
+    return elapsed < duration
+
+# 在状态中使用
+func is_coyote_time_valid(duration: float = DEFAULT_DURATION) -> bool:
+    return _is_time_valid(_coyote_time_start, duration)
+
+func is_jump_request_valid(duration: float = DEFAULT_DURATION) -> bool:
+    return _is_time_valid(_jump_request_time_start, duration)
+```
+
+### 简化的状态转换流程
+
+对于不需要复杂验证的场景，可以使用简化的转换流程：
+
+```gdscript
+# 简化版：移除转换验证，直接转换
+func transition_to(to_state: Enum) -> void:
+    var new_state = state_factory.get_state(to_state)
+    new_state.setup(build_player_components())
+    
+    if current_state != null:
+        current_state.exit()
+        disconnect_signal(current_state)
+        current_state.queue_free()
+    
+    current_state = new_state
+    add_child(current_state)
+    current_state.enter()
+    connect_signal(current_state)
+```
+
+---
+
+## 对比说明
+
+### 通用模板 vs 简化版本
+
+| 特性 | 通用模板 | 简化版本 |
+|------|---------|---------|
+| **适用场景** | 需要高度灵活性和可扩展性的场景 | 特定游戏场景（如玩家控制器） |
+| **复杂度** | 高（包含调试、历史记录、验证等） | 低（专注核心功能） |
+| **状态数据** | StateData（通用数据类） | Components（特定组件类） |
+| **转换验证** | can_transition_to() | 无（或简单检查） |
+| **调试支持** | 完整（日志、历史、错误处理） | 基础（可选添加） |
+| **工厂模式** | RefCounted，_init() 注册 | Node，_ready() 注册 |
+| **模板方法** | 未明确定义 | 在中间层基类中实现 |
+| **学习曲线** | 陡峭 | 平缓 |
+
+### 选择建议
+
+#### 使用通用模板的场景
+
+1. **需要完整调试支持**：复杂状态机，需要详细的日志和历史记录
+2. **多状态机共享**：多个不同的状态机使用相同的框架
+3. **需要转换验证**：需要严格控制状态转换条件
+4. **团队协作**：大型项目，需要标准化的实现
+
+#### 使用简化版本的场景
+
+1. **玩家控制器**：平台游戏、动作游戏的角色控制
+2. **简单状态机**：状态数量少，转换逻辑简单
+3. **快速开发**：原型开发或小规模项目
+4. **性能敏感**：需要最小化运行时开销
+
+### 混合使用
+
+可以在同一个项目中混合使用两种方式：
+
+```gdscript
+# 复杂的状态机使用通用模板
+class_name AIStateMachine
+extends StateMachine
+# 完整的调试支持、转换验证
+
+# 简单的状态机使用简化版本
+class_name PlayerStateMachine
+extends Node
+# 专注于核心功能，使用模板方法模式
+```
+
+---
+
 ## 扩展指南
 
 ### 1. 状态插件系统
