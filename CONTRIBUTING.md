@@ -33,3 +33,6 @@
 # Godot引擎命令行
 - GUT测试执行必须使用命令行
 - 从环境变量`GODOT_HOME`获取godot命令对应的可执行文件，再执行命令。例如：假设`GODOT_HOME`环境变量的值为`C:\godot.windows.opt.tools.64.exe`，则命令```godot -s addons/gut/gut_cmdln.gd -gexit``` -> ```C:\godot.windows.opt.tools.64.exe -s addons/gut/gut_cmdln.gd -gexit```
+
+# 编码原则
+- 编辑`.gd`文件后，必须使用`minimal-godot` MCP 的`get_diagnostics`工具检查代码
