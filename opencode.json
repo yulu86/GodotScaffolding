@@ -41,17 +41,6 @@
                 "@modelcontextprotocol/server-filesystem",
                 "{env:WORKSPACE_HOME}/code/07_games/brave-legend"
             ]
-        },
-        "memory": {
-            "type": "local",
-            "command": [
-                "npx",
-                "-y",
-                "@modelcontextprotocol/server-memory"
-            ],
-            "environment": {
-                "MEMORY_FILE_PATH": "{env:WORKSPACE_HOME}/code/07_games/brave-legend/memory.jsonl"
-            }
         }
     }
 }
