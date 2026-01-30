@@ -11,7 +11,7 @@
         }
     },
     "mcp": {
-        "godot": {
+        "godot-mcp": {
             "type": "local",
             "command": [
                 "node",
@@ -31,6 +31,18 @@
             "environment": {
                 "GODOT_LSP_PORT": "6005",
                 "GODOT_WORKSPACE_PATH": "{env:WORKSPACE_HOME}/code/07_games/brave-legend"
+            }
+        },
+        "godot-ultimate": {
+            "type": "local",
+            "command": [
+                "node",
+                "{env:WORKSPACE_HOME}/code/01_AI/godot-mcp-ultimate/dist/index.js"
+            ],
+            "environment": {
+                "GODOT_PROJECT_PATH": "{env:WORKSPACE_HOME}/code/07_games/brave-legend",
+                "GODOT_PATH": "{env:GODOT_HOME}",
+                "GODOT_LSP_PORT": "6005"
             }
         },
         "filesystem": {
