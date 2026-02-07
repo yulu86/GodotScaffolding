@@ -38,4 +38,3 @@ mono_crash.*.json
 
 # sisyphus
 .sisyphus/
-opencode.json
