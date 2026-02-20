@@ -38,3 +38,7 @@ mono_crash.*.json
 
 # sisyphus
 .sisyphus/
+
+# epxort
+export_presets.cfg
+build/
