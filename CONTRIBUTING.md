@@ -108,6 +108,80 @@ addons/
 
 **纠正：停止 → 回滚 → 重新执行**
 
+## 🎮 Godot Skill 编排指南
+
+项目使用 6 个专业化 Godot 4.x Skill，各司其职、通过明确的工作流串联。
+
+### Skill 职责矩阵
+
+| Skill | 职责 | 可修改文件 | 不可修改 |
+|-------|------|-----------|---------|
+| `godot-init` | 项目初始化 | `project.godot`, `.gitignore`, `.mcp.json`, `AGENTS.md`, `src/autoload/*.gd` | 已初始化的项目 |
+| `godot-architect` | 架构设计（只读） | 无（仅输出设计文档） | 任何项目文件 |
+| `godot-developer` | TDD 代码实现 | `.gd` 脚本文件 | `.tscn`, `project.godot` |
+| `godot-scene` | 场景创建与修改 | `.tscn` 场景文件（通过 MCP） | `.gd` 业务逻辑 |
+| `godot-test` | GUT 测试编写 | `test/**/*.gd` | 功能代码 |
+| `godot-debug` | MCP 调试与诊断 | 无（只读诊断） | 任何项目文件 |
+
+### 适用场景速查
+
+| 场景 | 使用 Skill |
+|------|-----------|
+| 创建新 Godot 项目 | `godot-init` |
+| 设计新功能的系统架构 | `godot-architect` |
+| 设计状态机 | `godot-architect` → `godot-developer` |
+| 编写 GDScript 实现代码 | `godot-developer` |
+| 创建/修改场景 (.tscn) | `godot-scene` |
+| 添加节点、连接信号 | `godot-scene` |
+| 编写 GUT 单元测试 | `godot-test` |
+| 调试运行时错误 | `godot-debug` |
+| 截图验证 UI 布局 | `godot-debug` |
+| 代码检查与诊断 | `godot-debug` (`minimal-godot_get_diagnostics`) |
+
+### 标准开发工作流
+
+```mermaid
+flowchart LR
+    INIT["godot-init<br/>项目初始化"] --> ARCH["godot-architect<br/>架构设计"]
+    ARCH --> DEV["godot-developer<br/>TDD 实现"]
+    DEV <--> TEST["godot-test<br/>测试编写"]
+    DEV <--> SCENE["godot-scene<br/>场景构建"]
+    DEV <--> DEBUG["godot-debug<br/>调试诊断"]
+    TEST --> DEBUG
+```
+
+#### 典型功能开发流程
+
+```
+1. godot-architect  → 输出架构设计文档（模块划分、接口定义、状态机设计）
+2. godot-developer  → 基于设计文档，执行 TDD Red-Green-Refactor 循环
+   ├── godot-test   → Red 阶段：编写失败测试
+   ├── godot-developer → Green 阶段：最小实现
+   ├── godot-developer → Refactor 阶段：重构优化
+   └── godot-test   → Consolidate 阶段：强化测试覆盖
+3. godot-scene      → 创建/修改场景文件，配置节点和信号
+4. godot-debug      → 运行项目，捕获输出，验证功能正确性
+5. godot-developer  → 修复发现的问题，回到步骤2
+```
+
+#### TDD 微循环（P1-1 详解）
+
+```
+godot-test (编写测试) → godot-developer (实现代码) → minimal-godot_get_diagnostics (语法检查)
+                                                                    ↓
+                                                          godot-debug (运行验证)
+                                                                    ↓
+                                                          godot-developer (重构优化)
+```
+
+### Skill 间协作规则
+
+1. **设计先行**：新功能必须先经 `godot-architect` 设计，再由 `godot-developer` 实现
+2. **测试驱动**：实现代码前必须先由 `godot-test` 编写测试
+3. **场景分离**：`.tscn` 文件只通过 `godot-scene` 操作，`godot-developer` 禁止直接修改
+4. **证据优先**：调试时必须先由 `godot-debug` 捕获输出，再定位修复
+5. **单一职责**：每个 Skill 只做自己的事，不越界操作其他 Skill 的文件
+
 ## 📚 附录
 
 - **A-1** AGENTS.md 不重复 CONTRIBUTING.md 内容
