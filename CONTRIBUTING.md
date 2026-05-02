@@ -8,8 +8,15 @@
 ## 🔴 P1 - 强制规范
 
 ### 开发流程
-- **P1-1** 使用 `godot-developer` 技能 + TDD 微循环：`generate_test` → `godot-developer` 技能 → `lint_file` → `run_tests` → `minimal-godot_get_diagnostics`
-- **P1-2** 使用 `context7` 工具查询 API 文档：`context7_resolve-library-id` → `context7_query-docs` 或 `get_api_docs` / `search_docs`
+- **P1-1** 使用 `godot-developer` 技能 + TDD 微循环：
+  ```
+  godot-test (编写测试)
+    → godot-developer (实现代码)
+    → minimal-godot_get_diagnostics (语法检查)
+    → $GODOT_HOME -s addons/gut/gut_cmdln.gd -gexit (运行测试)
+    → godot-developer (重构优化)
+  ```
+- **P1-2** 使用 `context7` 工具查询 API 文档：`context7_resolve-library-id` → `context7_query-docs`
 
 ### 编码规范
 - **P1-3** 优先 AnimationPlayer 节点
@@ -22,23 +29,48 @@
 - **P1-8** GUT 测试必须使用命令行执行
 
 ### 代码检查
-- **P1-9** 编辑 .gd 后必须 `minimal-godot_get_diagnostics` 检查：`minimal-godot_get_diagnostics` → `lint_file` → `check_patterns` → `get_complexity`
+- **P1-9** 编辑 .gd 后必须检查：
+  ```
+  minimal-godot_get_diagnostics (GDScript 诊断)
+    → lsp_diagnostics (LSP 诊断)
+    → ast_grep_search (模式匹配检查)
+  ```
 - **P1-10** 检查未通过禁止提交
 
 ### 代码重构
-- **P1-11** 重构前分析：`get_complexity` → `find_duplication` → `analyze_dependencies` → `analyze_signal_flow`
+- **P1-11** 重构前分析：
+  ```
+  lsp_symbols (理解文件结构)
+    → lsp_find_references (查找所有引用)
+    → ast_grep_search (搜索代码模式)
+    → ast_grep_replace --dryRun (预览替换)
+  ```
 
 ### 新增功能
-- **P1-12** 功能开发流程：`invoke_agent(architect)` / `route_task` → `invoke_agent(data-manager)` → `generate_from_template` / `generate_feature` → `generate_test`
+- **P1-12** 功能开发流程：
+  ```
+  task(category="deep", load_skills=["godot-architect"]) (架构设计)
+    → task(category="deep", load_skills=["godot-developer"]) (TDD 实现)
+    → task(category="deep", load_skills=["godot-scene"]) (场景构建)
+    → task(category="deep", load_skills=["godot-debug"]) (运行验证)
+  ```
 
 ### 性能优化
-- **P1-13** 性能优化流程：`get_performance_guide` → `invoke_agent(performance)` → `complexity_heatmap` → `shader_performance` / `lint_shader`
+- **P1-13** 性能优化流程：
+  ```
+  minimal-godot_get_diagnostics (排除语法问题)
+    → minimal-godot_scan_workspace_diagnostics (全项目扫描)
+    → ast_grep_search (定位性能模式，如 _process 中的对象创建)
+    → godot-mcp_run_project + godot-mcp_get_debug_output (运行时分析)
+  ```
 
 ### UI 开发
-- **P1-14** UI 开发流程：`invoke_agent(ui-layout)` → `invoke_agent(ui-styling)` → `invoke_agent(ui-animation)`
-
-### 战斗系统
-- **P1-15** 战斗系统开发：`invoke_agent(battle-logic)` → `invoke_agent(battle-ai)` → `invoke_agent(battle-animation)`
+- **P1-14** UI 开发流程：
+  ```
+  task(category="visual-engineering", load_skills=["godot-scene"]) (场景构建与布局)
+    → task(category="deep", load_skills=["godot-developer"]) (脚本实现)
+    → godot-mcp_run_project + godot-mcp_get_debug_output (验证)
+  ```
 
 ## 🟡 P2 - 操作流程
 
@@ -49,12 +81,47 @@ scenes/ (.tscn，按模块分)
 scripts/ (.gd，按模块分)
 test/ (单元测试)
 addons/
+docs/ (设计文档，按阶段分)
 ```
 - **P2-1** 严禁在目录外存放资产/脚本/测试
 - **P2-2** 场景脚本按模块分目录
 
+### 文档目录结构
+```
+docs/
+├── 01_gdd/              # Game Design Document - 游戏设计文档
+│   ├── 01_游戏设计文档.md
+│   └── 02_功能需求_{功能名}.md
+├── 02_analysis/          # Analysis - 分析文档
+│   ├── 01_技术可行性分析_{主题}.md
+│   └── 02_性能需求分析.md
+├── 03_arch/              # Architecture - 架构设计
+│   ├── 01_架构概要设计.md
+│   ├── 02_模块设计_{模块名}.md
+│   └── 03_状态机设计_{名称}.md
+├── 04_sprint/            # Sprint - 迭代计划
+│   ├── 01_backlog.md
+│   ├── 02_story/
+│   │   └── {序号}_{Story名称}.md
+│   └── 03_plan/
+│       └── {序号}_Sprint{编号}.md
+├── 05_guide/             # Guide - 开发指导
+│   └── {序号}_{功能名}_开发指导.md
+└── 06_postmortem/        # Postmortem - 复盘总结
+    └── {序号}_{主题}_复盘.md
+```
+- **P2-9** 文档文件名格式：`{两位序号}_{中文名称}.md`，序号从 01 递增
+- **P2-10** 文档必须放在对应阶段目录中，禁止在 `docs/` 根目录直接放文件
+- **P2-11** `{xxx}` 为模板变量，使用时替换为实际内容；固定文档（如 `01_游戏设计文档.md`）不加后缀
+- **P2-12** 架构设计文档使用 mermaid 绘制图形
+
 ### Git 提交
-- **P2-3** 提交 .gd 后检查测试：`run_tests` → `get_test_coverage` → `validate_project` → `detect_dead_code`
+- **P2-3** 提交 .gd 后检查：
+  ```
+  minimal-godot_get_diagnostics (语法检查)
+    → $GODOT_HOME -s addons/gut/gut_cmdln.gd -gexit (运行测试)
+    → ast_grep_search (模式检查)
+  ```
 - **P2-4** 与用户确认后再执行
 - **P2-5** 修改测试必须用 `godot-developer`
 - **P2-6** .uid 文件必须提交（.tscn 除外）
@@ -65,44 +132,72 @@ addons/
 
 ## 🔧 可用工具
 
-### 专业代理（15）
-**架构**: `architect` 系统架构 | `data-manager` 数据架构
-**编码**: `code-quality` 代码质量
-**测试**: `testing` 测试工程
-**UI**: `ui-layout` 布局 | `ui-styling` 样式 | `ui-animation` 动画
-**战斗**: `battle-logic` 逻辑 | `battle-ai` AI | `battle-animation` 动画
-**系统**: `vera-ai` 伴侣 | `dialogue` 对话 | `quest` 任务
-**资源**: `sprite` 精灵 | `audio` 音频
-**优化**: `performance` 性能优化
+### Godot MCP（场景与调试）
+| 工具 | 用途 |
+|------|------|
+| `godot-mcp_run_project` | 运行项目并捕获输出 |
+| `godot-mcp_get_debug_output` | 获取当前调试输出 |
+| `godot-mcp_stop_project` | 停止运行中的项目 |
+| `godot-mcp_get_godot_version` | 获取 Godot 版本 |
+| `godot-mcp_list_projects` | 列出目录中的 Godot 项目 |
+| `godot-mcp_get_project_info` | 获取项目元数据 |
+| `godot-mcp_create_scene` | 创建新场景文件 |
+| `godot-mcp_add_node` | 向场景添加节点 |
+| `godot-mcp_load_sprite` | 加载精灵纹理 |
+| `godot-mcp_save_scene` | 保存场景文件 |
+| `godot-mcp_get_uid` | 获取文件 UID |
+| `godot-mcp_update_project_uids` | 更新项目 UID 引用 |
+| `godot-mcp_launch_editor` | 启动 Godot 编辑器 |
 
-### 分析与验证（6）
-`analyze_scene` 场景 | `analyze_dependencies` 依赖 | `analyze_resources` 资源 | `analyze_signal_flow` 信号 | `analyze_autoloads` Autoload | `analyze_shader` 着色器
+### Godot 诊断
+| 工具 | 用途 |
+|------|------|
+| `minimal-godot_get_diagnostics` | 检查单个 .gd 文件的错误/警告 |
+| `minimal-godot_scan_workspace_diagnostics` | 扫描全项目 .gd 文件（开销大，慎用） |
 
-### 着色器（5）
-`lint_shader` 检查 | `lint_all_shaders` 全项目 | `shader_performance` 性能 | `find_shaders` 查找 | `get_shader_docs` 文档
+### LSP（代码导航）
+| 工具 | 用途 |
+|------|------|
+| `lsp_goto_definition` | 跳转到符号定义 |
+| `lsp_find_references` | 查找符号所有引用 |
+| `lsp_symbols` | 获取文件符号 / 工作区搜索 |
+| `lsp_diagnostics` | LSP 级别的错误/警告 |
+| `lsp_prepare_rename` | 检查重命名是否安全 |
+| `lsp_rename` | 重命名符号（全工作区） |
 
-### 代码生成（5）
-`generate_from_template` 模板 | `generate_feature` 功能 | `generate_smart_code` 智能 | `smart_complete` 补全 | `auto_fix` 自动修复
+### AST 模式匹配
+| 工具 | 用途 |
+|------|------|
+| `ast_grep_search` | AST 感知的代码搜索（支持 25 种语言） |
+| `ast_grep_replace` | AST 感知的代码替换（默认 dry-run） |
 
-### 文档查询（6）
-`get_api_docs` API | `get_project_docs` 项目 | `search_docs` 搜索 | `get_common_pitfalls` 陷阱 | `get_game_patterns` 模式 | `get_performance_guide` 性能
+### API 文档查询
+| 工具 | 用途 |
+|------|------|
+| `context7_resolve-library-id` | 将库名解析为 Context7 兼容 ID |
+| `context7_query-docs` | 查询库的最新文档和代码示例 |
 
-### 调试工具（5）
-`find_symbol` 符号 | `find_references` 引用 | `go_to_definition` 跳转 | `document_symbols` 文档符号 | `workspace_symbols` 工作区符号
+### 任务委托
+```bash
+# 通用委托模式
+task(category="deep", load_skills=["godot-developer"], prompt="...", run_in_background=false)
+# 后台探索
+task(subagent_type="explore", load_skills=[], prompt="...", run_in_background=true)
+```
 
-### 项目健康（4）
-`env_doctor` 环境 | `project_health` 健康 | `find_unused_files` 未使用 | `analyze_assets` 资产
-
-### 任务路由（5）
-`route_task` 路由 | `invoke_agent` 调用 | `get_agent_info` 信息 | `list_agents` 列出 | `plan_collaboration` 协作
+| 参数 | 说明 |
+|------|------|
+| `category` | `visual-engineering` / `deep` / `quick` / `ultrabrain` 等 |
+| `load_skills` | 技能列表：`godot-architect`, `godot-developer`, `godot-scene`, `godot-test`, `godot-debug` |
+| `subagent_type` | `explore` / `librarian` / `oracle` / `metis` / `momus` |
 
 ## 📋 严重违规清单
 
 1. 未使用 `godot-developer` 技能
-2. 未使用 `context7` 查询 API
+2. 未使用 `context7_resolve-library-id` + `context7_query-docs` 查询 API
 3. Singleton 文件包含 `class_name`
 4. 代码含中文（除注释）
-5. 未通过 `get_diagnostics` 检查
+5. 未通过 `minimal-godot_get_diagnostics` 检查
 6. 违反目录结构
 7. 未提交 .uid 文件
 
