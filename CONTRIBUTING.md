@@ -3,7 +3,8 @@
 ## ⭐ P0 - 核心原则
 - **P0-1** 代码必须满足 SOLID + DRY 原则
 - **P0-2** 禁止语法错误
-- **P0-3** 代码除注释外禁止使用中文
+- **P0-3** 代码除注释外**禁止**使用中文
+- **P0-4** 思考过程和交流**必须**使用中文
 
 ## 🔴 P1 - 强制规范
 
@@ -49,7 +50,8 @@
 ### 新增功能
 - **P1-12** 功能开发流程：
   ```
-  task(category="deep", load_skills=["godot-architect"]) (架构设计)
+  task(category="deep", load_skills=["godot-ui-design"]) (界面设计，涉及 UI 时必须)
+    → task(category="deep", load_skills=["godot-architect"]) (架构设计)
     → task(category="deep", load_skills=["godot-developer"]) (TDD 实现)
     → task(category="deep", load_skills=["godot-scene"]) (场景构建)
     → task(category="deep", load_skills=["godot-debug"]) (运行验证)
@@ -64,10 +66,19 @@
     → godot-mcp_run_project + godot-mcp_get_debug_output (运行时分析)
   ```
 
-### UI 开发
-- **P1-14** UI 开发流程：
+### 游戏设计
+- **P1-14** 游戏设计阶段，UI 界面**必须**使用 `pencil` 工具设计：
   ```
-  task(category="visual-engineering", load_skills=["godot-scene"]) (场景构建与布局)
+  task(category="deep", load_skills=["godot-ui-design"]) (Pencil 界面设计)
+  ```
+- **P1-14a** 界面设计稿存放在 `docs/07_design/` 目录，格式为 `.pen` 文件
+- **P1-14b** 未经 pencil 设计的界面禁止进入开发阶段
+
+### UI 开发
+- **P1-15** UI 开发流程（须基于 pencil 设计稿）：
+  ```
+  pencil_batch_get (读取设计稿)
+    → task(category="visual-engineering", load_skills=["godot-scene"]) (场景构建与布局)
     → task(category="deep", load_skills=["godot-developer"]) (脚本实现)
     → godot-mcp_run_project + godot-mcp_get_debug_output (验证)
   ```
@@ -107,8 +118,10 @@ docs/
 │       └── {序号}_Sprint{编号}.md
 ├── 05_guide/             # Guide - 开发指导
 │   └── {序号}_{功能名}_开发指导.md
-└── 06_postmortem/        # Postmortem - 复盘总结
-    └── {序号}_{主题}_复盘.md
+├── 06_postmortem/        # Postmortem - 复盘总结
+│   └── {序号}_{主题}_复盘.md
+└── 07_design/            # Design - 界面设计稿
+    └── {序号}_{界面名}.pen
 ```
 - **P2-9** 文档文件名格式：`{两位序号}_{中文名称}.md`，序号从 01 递增
 - **P2-10** 文档必须放在对应阶段目录中，禁止在 `docs/` 根目录直接放文件
@@ -149,6 +162,21 @@ docs/
 | `godot-mcp_update_project_uids` | 更新项目 UID 引用 |
 | `godot-mcp_launch_editor` | 启动 Godot 编辑器 |
 
+### Pencil（界面设计）
+| 工具 | 用途 |
+|------|------|
+| `pencil_get_editor_state` | 获取编辑器状态和设计信息 |
+| `pencil_batch_design` | 批量设计操作（插入/复制/更新/替换/移动/删除） |
+| `pencil_batch_get` | 批量获取节点信息 |
+| `pencil_get_screenshot` | 获取节点截图验证 |
+| `pencil_export_nodes` | 导出节点为图片文件 |
+| `pencil_find_empty_space_on_canvas` | 查找画布空白区域 |
+| `pencil_get_guidelines` | 获取设计指南和样式 |
+| `pencil_get_variables` | 获取设计变量和主题 |
+| `pencil_set_variables` | 设置设计变量和主题 |
+| `pencil_open_document` | 打开 .pen 文件 |
+| `pencil_snapshot_layout` | 检查布局结构 |
+
 ### Godot 诊断
 | 工具 | 用途 |
 |------|------|
@@ -188,7 +216,7 @@ task(subagent_type="explore", load_skills=[], prompt="...", run_in_background=tr
 | 参数 | 说明 |
 |------|------|
 | `category` | `visual-engineering` / `deep` / `quick` / `ultrabrain` 等 |
-| `load_skills` | 技能列表：`godot-architect`, `godot-developer`, `godot-scene`, `godot-test`, `godot-debug` |
+| `load_skills` | 技能列表：`godot-architect`, `godot-developer`, `godot-scene`, `godot-test`, `godot-debug`, `godot-ui-design` |
 | `subagent_type` | `explore` / `librarian` / `oracle` / `metis` / `momus` |
 
 ## 📋 严重违规清单
@@ -200,18 +228,20 @@ task(subagent_type="explore", load_skills=[], prompt="...", run_in_background=tr
 5. 未通过 `minimal-godot_get_diagnostics` 检查
 6. 违反目录结构
 7. 未提交 .uid 文件
+8. UI 界面未使用 `pencil` 设计即进入开发
 
 **纠正：停止 → 回滚 → 重新执行**
 
 ## 🎮 Godot Skill 编排指南
 
-项目使用 6 个专业化 Godot 4.x Skill，各司其职、通过明确的工作流串联。
+项目使用 7 个专业化 Godot 4.x Skill，各司其职、通过明确的工作流串联。
 
 ### Skill 职责矩阵
 
 | Skill | 职责 | 可修改文件 | 不可修改 |
 |-------|------|-----------|---------|
 | `godot-init` | 项目初始化 | `project.godot`, `.gitignore`, `.mcp.json`, `AGENTS.md`, `src/autoload/*.gd` | 已初始化的项目 |
+| `godot-ui-design` | 界面设计（Pencil） | `docs/07_design/*.pen` | `.gd`, `.tscn`, `project.godot` |
 | `godot-architect` | 架构设计（只读） | 无（仅输出设计文档） | 任何项目文件 |
 | `godot-developer` | TDD 代码实现 | `.gd` 脚本文件 | `.tscn`, `project.godot` |
 | `godot-scene` | 场景创建与修改 | `.tscn` 场景文件（通过 MCP） | `.gd` 业务逻辑 |
@@ -220,9 +250,10 @@ task(subagent_type="explore", load_skills=[], prompt="...", run_in_background=tr
 
 ### 适用场景速查
 
-| 场景 | 使用 Skill |
-|------|-----------|
+| 场景 | 使用工具 |
+|------|---------|
 | 创建新 Godot 项目 | `godot-init` |
+| 设计游戏 UI 界面 | `godot-ui-design` |
 | 设计新功能的系统架构 | `godot-architect` |
 | 设计状态机 | `godot-architect` → `godot-developer` |
 | 编写 GDScript 实现代码 | `godot-developer` |
@@ -237,7 +268,8 @@ task(subagent_type="explore", load_skills=[], prompt="...", run_in_background=tr
 
 ```mermaid
 flowchart LR
-    INIT["godot-init<br/>项目初始化"] --> ARCH["godot-architect<br/>架构设计"]
+    INIT["godot-init<br/>项目初始化"] --> DESIGN["godot-ui-design<br/>界面设计"]
+    DESIGN --> ARCH["godot-architect<br/>架构设计"]
     ARCH --> DEV["godot-developer<br/>TDD 实现"]
     DEV <--> TEST["godot-test<br/>测试编写"]
     DEV <--> SCENE["godot-scene<br/>场景构建"]
@@ -248,15 +280,16 @@ flowchart LR
 #### 典型功能开发流程
 
 ```
-1. godot-architect  → 输出架构设计文档（模块划分、接口定义、状态机设计）
-2. godot-developer  → 基于设计文档，执行 TDD Red-Green-Refactor 循环
+1. godot-ui-design → 使用 Pencil 设计 UI 界面，输出 .pen 设计稿
+2. godot-architect  → 输出架构设计文档（模块划分、接口定义、状态机设计）
+3. godot-developer  → 基于设计文档，执行 TDD Red-Green-Refactor 循环
    ├── godot-test   → Red 阶段：编写失败测试
    ├── godot-developer → Green 阶段：最小实现
    ├── godot-developer → Refactor 阶段：重构优化
    └── godot-test   → Consolidate 阶段：强化测试覆盖
-3. godot-scene      → 创建/修改场景文件，配置节点和信号
-4. godot-debug      → 运行项目，捕获输出，验证功能正确性
-5. godot-developer  → 修复发现的问题，回到步骤2
+4. godot-scene      → 创建/修改场景文件，配置节点和信号
+5. godot-debug      → 运行项目，捕获输出，验证功能正确性
+6. godot-developer  → 修复发现的问题，回到步骤3
 ```
 
 #### TDD 微循环（P1-1 详解）
@@ -272,10 +305,11 @@ godot-test (编写测试) → godot-developer (实现代码) → minimal-godot_g
 ### Skill 间协作规则
 
 1. **设计先行**：新功能必须先经 `godot-architect` 设计，再由 `godot-developer` 实现
-2. **测试驱动**：实现代码前必须先由 `godot-test` 编写测试
-3. **场景分离**：`.tscn` 文件只通过 `godot-scene` 操作，`godot-developer` 禁止直接修改
-4. **证据优先**：调试时必须先由 `godot-debug` 捕获输出，再定位修复
-5. **单一职责**：每个 Skill 只做自己的事，不越界操作其他 Skill 的文件
+2. **界面必须设计**：涉及 UI 界面时，必须先由 `godot-ui-design` 设计，再进入后续流程
+3. **测试驱动**：实现代码前必须先由 `godot-test` 编写测试
+4. **场景分离**：`.tscn` 文件只通过 `godot-scene` 操作，`godot-developer` 禁止直接修改
+5. **证据优先**：调试时必须先由 `godot-debug` 捕获输出，再定位修复
+6. **单一职责**：每个 Skill 只做自己的事，不越界操作其他 Skill 的文件
 
 ## 📚 附录
 
