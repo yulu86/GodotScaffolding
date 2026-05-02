@@ -53,6 +53,14 @@
                 "@modelcontextprotocol/server-filesystem",
                 "{env:WORKSPACE_HOME}/code/07_games/brave-legend"
             ]
+        },
+        "pencil": {
+            "type": "local",
+            "command": [
+                "{env:PENCIL_PATH}",
+                "--app",
+                "visual_studio_code"
+            ]
         }
     }
 }
