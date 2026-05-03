@@ -39,3 +39,5 @@ mono_crash.*.json
 # epxort
 export_presets.cfg
 build/
+
+.env

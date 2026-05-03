@@ -13,7 +13,7 @@
 
 - **Task 完成通知**：每个 task（包含委托给子 agent 执行的 task）执行完成后，**必须**通过飞书（Lark）通知用户，报告任务结果
 - **长时间任务进度通知**：子 agent 执行的 background task，每超过 **3 分钟**未完成时，**必须**通过飞书通知用户一次，汇报当前进展状态（即使尚无最终结果）
-- 通知方式：使用 `lark-im` Skill 发送消息，飞书应用凭证从环境变量获取（`FEISHU_APP_ID`、`FEISHU_APP_SECRET`）
+- 通知方式：使用 `lark-im` Skill 发送消息，飞书应用凭证从`.env`文件中读取环境变量获取（`FEISHU_APP_ID`、`FEISHU_APP_SECRET`）
 
 ## 📂 宪法文件索引
 
@@ -26,3 +26,6 @@
 | [`04_详细设计.md`](constitutions/04_详细设计.md) | 详细设计 | UI 开发流程、场景开发人机协作模式 |
 | [`05_开发.md`](constitutions/05_开发.md) | 开发 | TDD 微循环、编码规范、重构、性能优化 |
 | [`06_测试.md`](constitutions/06_测试.md) | 测试 | GUT 测试规范、代码检查、覆盖率目标 |
+
+## 环境变量索引
+- [.env](.env)
