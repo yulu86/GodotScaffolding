@@ -216,7 +216,7 @@ task(subagent_type="explore", load_skills=[], prompt="...", run_in_background=tr
 | 参数 | 说明 |
 |------|------|
 | `category` | `visual-engineering` / `deep` / `quick` / `ultrabrain` 等 |
-| `load_skills` | 技能列表：`godot-architect`, `godot-developer`, `godot-scene`, `godot-test`, `godot-debug`, `godot-ui-design` |
+| `load_skills` | 技能列表：`godot-architect`, `godot-developer`, `godot-scene`, `godot-test`, `godot-debug`, `godot-ui-design`, `sprite-analyzer` |
 | `subagent_type` | `explore` / `librarian` / `oracle` / `metis` / `momus` |
 
 ## 📋 严重违规清单
@@ -234,7 +234,7 @@ task(subagent_type="explore", load_skills=[], prompt="...", run_in_background=tr
 
 ## 🎮 Godot Skill 编排指南
 
-项目使用 7 个专业化 Godot 4.x Skill，各司其职、通过明确的工作流串联。
+项目使用 8 个专业化 Godot 4.x Skill，各司其职、通过明确的工作流串联。
 
 ### Skill 职责矩阵
 
@@ -247,6 +247,7 @@ task(subagent_type="explore", load_skills=[], prompt="...", run_in_background=tr
 | `godot-scene` | 场景创建与修改 | `.tscn` 场景文件（通过 MCP） | `.gd` 业务逻辑 |
 | `godot-test` | GUT 测试编写 | `test/**/*.gd` | 功能代码 |
 | `godot-debug` | MCP 调试与诊断 | 无（只读诊断） | 任何项目文件 |
+| `sprite-analyzer` | 精灵图资源分析 | 分析输出文档（.md） | `.gd`, `.tscn` 项目文件 |
 
 ### 适用场景速查
 
@@ -263,12 +264,14 @@ task(subagent_type="explore", load_skills=[], prompt="...", run_in_background=tr
 | 调试运行时错误 | `godot-debug` |
 | 截图验证 UI 布局 | `godot-debug` |
 | 代码检查与诊断 | `godot-debug` (`minimal-godot_get_diagnostics`) |
+| 分析精灵图资源 | `sprite-analyzer` |
 
 ### 标准开发工作流
 
 ```mermaid
 flowchart LR
-    INIT["godot-init<br/>项目初始化"] --> DESIGN["godot-ui-design<br/>界面设计"]
+    INIT["godot-init<br/>项目初始化"] --> SPRITE["sprite-analyzer<br/>资源分析"]
+    SPRITE --> DESIGN["godot-ui-design<br/>界面设计"]
     DESIGN --> ARCH["godot-architect<br/>架构设计"]
     ARCH --> DEV["godot-developer<br/>TDD 实现"]
     DEV <--> TEST["godot-test<br/>测试编写"]
@@ -280,16 +283,17 @@ flowchart LR
 #### 典型功能开发流程
 
 ```
-1. godot-ui-design → 使用 Pencil 设计 UI 界面，输出 .pen 设计稿
-2. godot-architect  → 输出架构设计文档（模块划分、接口定义、状态机设计）
-3. godot-developer  → 基于设计文档，执行 TDD Red-Green-Refactor 循环
+1. sprite-analyzer → 分析精灵图资源，提取元数据和动画帧信息
+2. godot-ui-design → 使用 Pencil 设计 UI 界面，输出 .pen 设计稿
+3. godot-architect  → 输出架构设计文档（模块划分、接口定义、状态机设计）
+4. godot-developer  → 基于设计文档，执行 TDD Red-Green-Refactor 循环
    ├── godot-test   → Red 阶段：编写失败测试
    ├── godot-developer → Green 阶段：最小实现
    ├── godot-developer → Refactor 阶段：重构优化
    └── godot-test   → Consolidate 阶段：强化测试覆盖
-4. godot-scene      → 创建/修改场景文件，配置节点和信号
-5. godot-debug      → 运行项目，捕获输出，验证功能正确性
-6. godot-developer  → 修复发现的问题，回到步骤3
+5. godot-scene      → 创建/修改场景文件，配置节点和信号
+6. godot-debug      → 运行项目，捕获输出，验证功能正确性
+7. godot-developer  → 修复发现的问题，回到步骤4
 ```
 
 #### TDD 微循环（P1-1 详解）
@@ -304,12 +308,13 @@ godot-test (编写测试) → godot-developer (实现代码) → minimal-godot_g
 
 ### Skill 间协作规则
 
-1. **设计先行**：新功能必须先经 `godot-architect` 设计，再由 `godot-developer` 实现
-2. **界面必须设计**：涉及 UI 界面时，必须先由 `godot-ui-design` 设计，再进入后续流程
-3. **测试驱动**：实现代码前必须先由 `godot-test` 编写测试
-4. **场景分离**：`.tscn` 文件只通过 `godot-scene` 操作，`godot-developer` 禁止直接修改
-5. **证据优先**：调试时必须先由 `godot-debug` 捕获输出，再定位修复
-6. **单一职责**：每个 Skill 只做自己的事，不越界操作其他 Skill 的文件
+1. **资源先行**：涉及精灵图资源时，先由 `sprite-analyzer` 分析资源结构和动画帧信息
+2. **设计先行**：新功能必须先经 `godot-architect` 设计，再由 `godot-developer` 实现
+3. **界面必须设计**：涉及 UI 界面时，必须先由 `godot-ui-design` 设计，再进入后续流程
+4. **测试驱动**：实现代码前必须先由 `godot-test` 编写测试
+5. **场景分离**：`.tscn` 文件只通过 `godot-scene` 操作，`godot-developer` 禁止直接修改
+6. **证据优先**：调试时必须先由 `godot-debug` 捕获输出，再定位修复
+7. **单一职责**：每个 Skill 只做自己的事，不越界操作其他 Skill 的文件
 
 ## 📚 附录
 
