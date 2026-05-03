@@ -33,9 +33,6 @@ mono_crash.*.json
 # claude
 .claude/
 
-# opencode
-.opencode/
-
 # sisyphus
 .sisyphus/
 
