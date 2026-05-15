@@ -25,8 +25,9 @@
         "minimal-godot": {
             "type": "local",
             "command": [
-                "node",
-                "{env:WORKSPACE_HOME}/code/01_AI/minimal-godot-mcp/dist/index.js"
+                "npx",
+                "-y",
+                "@ryanmazzolini/minimal-godot-mcp"
             ],
             "environment": {
                 "GODOT_LSP_PORT": "6005",
