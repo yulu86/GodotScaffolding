@@ -14,8 +14,8 @@
         "godot-mcp": {
             "type": "local",
             "command": [
-                "node",
-                "{env:WORKSPACE_HOME}/code/01_AI/godot-mcp/build/index.js"
+                "npx",
+                "@coding-solo/godot-mcp"
             ],
             "environment": {
                 "DEBUG": "false",
