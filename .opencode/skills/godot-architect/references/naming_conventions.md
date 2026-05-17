@@ -96,11 +96,11 @@ class_name DialogParser
 
 ### 单例（Singleton）
 ```gdscript
-# 文件: game.gd (project.gdofiles 中配置为 AutoLoad)
+# 文件: game.gd (project.godot 中配置为 AutoLoad)
 extends Node
 # 禁止使用 class_name，直接通过文件名访问
 
-# 文件: audio_manager.gd (project.gdofiles 中配置为 AutoLoad)
+# 文件: audio_manager.gd (project.godot 中配置为 AutoLoad)
 extends Node
 # 禁止使用 class_name
 ```

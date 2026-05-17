@@ -92,7 +92,7 @@ class_name State
 extends Node
 
 # 状态转换信号（必须使用）
-signal state_transition_requested(to_state: Enum, state_data: StateData)
+signal state_transition_requested(to_state: int, state_data: StateData)  # to_state 实际类型为具体枚举，此处用 int 作为占位
 
 # 调试模式
 var debug_mode: bool = false
@@ -109,7 +109,8 @@ func setup(context_machine: Node, context_data: StateData, extra_context: Dictio
     state_data = context_data
     context = extra_context
 
-func transition_state(to_state: Enum, new_state_data: StateData = StateData.new()) -> void:
+# 注：Enum 为占位符，实际项目中替换为具体枚举类型（如 PlayerState、EnemyState）
+func transition_state(to_state: int, new_state_data: StateData = StateData.new()) -> void:
     """请求状态转换（必须使用信号）"""
     state_transition_requested.emit(to_state, new_state_data)
 
@@ -135,7 +136,7 @@ func input(event: InputEvent) -> void:
     """输入事件处理（子类可重写）"""
     pass
 
-func can_transition_to(state_type: Enum) -> bool:
+func can_transition_to(state_type: int) -> bool:  # int 占位，实际为具体枚举
     """检查是否可以转换到指定状态（子类必须重写）"""
     return true
 
@@ -187,7 +188,7 @@ extends RefCounted
 
 # 状态注册表（必须实现）
 var states: Dictionary = {}
-var default_state: Enum = null
+var default_state: int = 0  # int 占位，实际为具体枚举的默认值
 
 # 构造函数
 func _init():
@@ -199,13 +200,13 @@ func register_states() -> void:
     pass
 
 # 注册单个状态
-func register_state(state_type: Enum, state_class: GDScript) -> void:
+func register_state(state_type: int, state_class: GDScript) -> void:  # int 占位
     states[state_type] = state_class
     if default_state == null:
         default_state = state_type
 
 # 获取状态实例（必须实现）
-func get_fresh_state(state_type: Enum) -> State:
+func get_fresh_state(state_type: int) -> State:  # int 占位
     if not states.has(state_type):
         push_error("State type not registered: " + str(state_type))
         return get_default_state()
@@ -214,7 +215,7 @@ func get_fresh_state(state_type: Enum) -> State:
     return state_class.new()
 
 # 获取默认状态
-func get_default_state() -> State:
+func get_default_state() -> State:  # int 占位
     if default_state == null:
         push_error("No default state set")
         return null
@@ -231,7 +232,7 @@ extends Node
 # 状态机配置
 @export var debug_mode: bool = false
 @export var auto_start: bool = true
-@export var initial_state: Enum = null
+@export var initial_state: int = 0  # int 占位，实际为具体枚举的初始值
 
 # 当前状态
 var current_state: State = null
@@ -255,8 +256,7 @@ func setup_factory() -> void:
     state_factory = StateFactory.new()
 
 # 状态转换（核心方法，必须遵循规范）
-func switch_state(to_state: Enum, state_data: StateData = StateData.new()) -> bool:
-    """状态转换（严格遵循转换流程）"""
+func switch_state(to_state: int, state_data: StateData = StateData.new()) -> bool:  # int 占位
     var from_state_name = "Empty"
     
     # 验证状态数据
@@ -274,7 +274,9 @@ func switch_state(to_state: Enum, state_data: StateData = StateData.new()) -> bo
         from_state_name = current_state.name
         add_to_history(from_state_name)
         
-        # 清理旧状态（必须立即清理）
+        # 清理旧状态（必须立即清理，先断开信号）
+        if current_state.state_transition_requested.is_connected(switch_state):
+            current_state.state_transition_requested.disconnect(switch_state)
         current_state.queue_free()
     
     # 创建新状态
@@ -301,7 +303,7 @@ func switch_state(to_state: Enum, state_data: StateData = StateData.new()) -> bo
     return true
 
 # 辅助方法
-func get_state_name(state_type: Enum) -> String:
+func get_state_name(state_type: int) -> String:  # int 占位
     """获取状态名称"""
     return str(state_type)
 
@@ -347,7 +349,7 @@ call_deferred("add_child", current_state)
 #### 状态转换失败处理
 ```gdscript
 # 实现完善的错误处理机制
-func switch_state(to_state: Enum, state_data: StateData = StateData.new()) -> bool:
+func switch_state(to_state: int, state_data: StateData = StateData.new()) -> bool:  # 最佳实践示例，int 占位
     # 验证状态数据
     if not state_data.validate():
         handle_transition_failure("Invalid state data", to_state)
@@ -361,7 +363,7 @@ func switch_state(to_state: Enum, state_data: StateData = StateData.new()) -> bo
     # 执行转换...
     return True
 
-func handle_transition_failure(reason: String, to_state: Enum) -> void:
+func handle_transition_failure(reason: String, to_state: int) -> void:  # int 占位
     """处理状态转换失败"""
     push_error("State transition failed: " + reason)
     emit_signal("state_transition_failed", current_state.name, str(to_state), reason)

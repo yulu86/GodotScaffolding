@@ -2,7 +2,7 @@
 
 > **宪法级文档** - 本文是 Godot 官方的 GDScript 编码风格指南，所有 GDScript 代码必须严格遵循本指南。
 
-本文档提供了编写一致且可读的 GDScript 代码的推荐约定和规范，基于 Godot 官方文档（https://docs.godotengine.org/zh-cn/4.x/tutorials/scripting/gdscript/gdscript_styleguide.html）。
+本文档提供了编写一致且可读的 GDScript 代码的推荐约定和规范，基于 Godot 官方文档（https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_styleguide.html）。
 
 ## 目录
 - [命名规范](#命名规范)

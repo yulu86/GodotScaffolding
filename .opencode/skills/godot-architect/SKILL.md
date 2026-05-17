@@ -32,26 +32,26 @@ compatibility: opencode
 
 ### 3. 场景架构
 - 设计场景树层级
-- 选择合适的节点类型（参见 godot-scene skill）
+- 选择合适的节点类型（参见 godot-best-practices skill）
 - 规划场景组织和组合方式
 - 定义场景创建指导步骤
 
 ### 4. 输出设计文档
 - 完整的架构文档
-- 面向 `godot-developer` 的详细实现指导
+- 面向 `godot-best-practices` 的详细实现指导
 - 清晰的职责边界和接口定义
 
 ## 参考文档
 
 ### 状态机设计（核心规范）
-- **State Machine Guide**: [references/state-machine-guide.md](references/state-machine-guide.md) — 完整的状态机架构设计指南（899 行）
+- **State Machine Guide**: [references/state-machine-guide.md](references/state-machine-guide.md) — 完整的状态机架构设计指南（468 行）
 
 ### 编码规范（跨技能通用）
 - **Naming Conventions**: [references/naming_conventions.md](references/naming_conventions.md) — 项目专属命名规则（强制遵守）
 - **GDScript Style Guide**: [references/official_gdscript_styleguide.md](references/official_gdscript_styleguide.md) — Godot 官方编码标准
 
 ### 场景设计
-关于详细的场景创建工作流、节点选择指南和信号连接模式，请参考 `godot-scene` 技能，其包含：
+关于详细的场景创建工作流、节点选择指南和信号连接模式，请参考 `godot-best-practices` 技能，其包含：
 - 节点类型选择指南
 - 场景创建步骤
 - 信号连接模式
@@ -61,7 +61,7 @@ compatibility: opencode
 ### 职责边界
 - **负责**：架构设计、系统规划、状态机设计
 - **不负责**：代码实现、测试编写、性能优化
-- **交接至**：`godot-developer` 负责实现，`godot-scene` 负责场景创建
+- **交接至**：`godot-best-practices` 负责实现
 
 ### 设计原则
 1. **单一职责**：每个模块处理一个明确的功能
