@@ -1,19 +1,11 @@
 # 🏛️ 项目宪法
 
-> 详细规则已拆分至 `constitutions/` 目录下各阶段独立文件。
-> 本文件仅作为索引入口。
+> 本文档为项目最高优先级指令，不可协商、不可绕过。
 
-## ⚖️ 宪法加载规则
+## ⚖️ 适用规则
 
-- **每次执行任务前**，必须识别当前任务所处的开发阶段，加载对应的宪法文件并**强制遵守**
-- `00_核心原则.md` 在所有阶段都**必须加载**
-- 阶段识别参照下表，跨阶段任务须同时加载所有涉及的宪法文件
-
-## 🔔 任务通知规则
-
-- **Task 完成通知**：每个 task（包含委托给子 agent 执行的 task）执行完成后，**必须**通过飞书（Lark）通知用户，报告任务结果
-- **长时间任务进度通知**：子 agent 执行的 background task，每超过 **3 分钟**未完成时，**必须**通过飞书通知用户一次，汇报当前进展状态（即使尚无最终结果）
-- 通知方式：使用 `lark-im` Skill 发送消息，飞书应用凭证从`.env`文件中读取环境变量获取（`FEISHU_APP_ID`、`FEISHU_APP_SECRET`）
+- **每次执行任务前**，必须识别当前任务所处的开发阶段，遵守对应阶段的规则
+- 本文档所有规则在所有阶段都**必须遵守**
 
 ## 环境变量索引
 - [.env](.env)
@@ -51,10 +43,10 @@
 
 ### 生成物检视
 
-- **P1-13** 所有文档和代码生成后，**必须**创建新的子 agent（`task(category="deep", ...)`）对生成物进行独立检视，并针对检视发现的问题进行修改修正。检视内容包括但不限于：
+- **P1-13** 所有文档和代码生成后，**必须**创建新的子 agent（`task(subagent_type="general")`）对生成物进行独立检视，并针对检视发现的问题进行修改修正。检视内容包括但不限于：
   - 文档：命名规范、目录位置、标题层级、mermaid 图形正确性、上游关联完整性
   - 代码：语法正确性、SOLID/DRY 合规、目录规范、`minimal-godot_get_diagnostics` 诊断通过
-  - 设计稿（.pen）：节点层级合理性、布局无溢出/重叠、组件引用有效、变量/主题一致性、`pencil_get_screenshot` 截图验证视觉正确性
+
 
 ## 🟡 P2 - 操作流程
 
@@ -90,7 +82,7 @@ docs/ (设计文档，按阶段分)
 | 迭代计划 | Sprint 计划 | `{序号}_Sprint{编号}.md` | `docs/04_sprint/03_plan/` |
 | 开发指导 | 功能开发指导 | `{序号}_{功能名}_开发指导.md` | `docs/05_guide/` |
 | 复盘总结 | 复盘文档 | `{序号}_{主题}_复盘.md` | `docs/06_postmortem/` |
-| 界面设计 | 界面设计稿 | `{序号}_{界面名}.pen` | `docs/07_design/` |
+
 
 - **P2-10** 文档文件名格式：`{两位序号}_{中文名称}.md`，序号从 01 递增
 - **P2-11** 文档必须放在对应阶段目录中，禁止在 `docs/` 根目录直接放文件
@@ -224,21 +216,6 @@ docs/ (设计文档，按阶段分)
 | `godot-ultimate_godot_plan_collaboration` | 多代理协作规划 |
 | `godot-ultimate_godot_route_task` | 智能任务路由 |
 
-### Pencil（界面设计）
-| 工具 | 用途 |
-|------|------|
-| `pencil_get_editor_state` | 获取编辑器状态和设计信息 |
-| `pencil_batch_design` | 批量设计操作（插入/复制/更新/替换/移动/删除） |
-| `pencil_batch_get` | 批量获取节点信息 |
-| `pencil_get_screenshot` | 获取节点截图验证 |
-| `pencil_export_nodes` | 导出节点为图片文件 |
-| `pencil_find_empty_space_on_canvas` | 查找画布空白区域 |
-| `pencil_get_guidelines` | 获取设计指南和样式 |
-| `pencil_get_variables` | 获取设计变量和主题 |
-| `pencil_set_variables` | 设置设计变量和主题 |
-| `pencil_open_document` | 打开 .pen 文件 |
-| `pencil_snapshot_layout` | 检查布局结构 |
-
 ### Godot 诊断
 | 工具 | 用途 |
 |------|------|
@@ -258,26 +235,6 @@ docs/ (设计文档，按阶段分)
 | `zai-mcp-server_ui_diff_check` | 对比 UI 差异 |
 | `zai-mcp-server_analyze_image` | 通用图片分析 |
 | `zai-mcp-server_analyze_video` | 视频内容分析 |
-
-### 网络搜索（tavily-mcp）
-| 工具 | 用途 |
-|------|------|
-| `tavily-mcp_tavily_search` | 网络搜索 |
-| `tavily-mcp_tavily_research` | 综合研究（多源信息汇总） |
-| `tavily-mcp_tavily_extract` | 从 URL 提取内容 |
-| `tavily-mcp_tavily_crawl` | 爬取网站内容 |
-| `tavily-mcp_tavily_map` | 映射网站结构 |
-
-### 浏览器调试（chrome-devtools）
-| 工具 | 用途 |
-|------|------|
-| `chrome-devtools_navigate_page` | 导航到指定 URL |
-| `chrome-devtools_take_screenshot` | 页面/元素截图 |
-| `chrome-devtools_take_snapshot` | 获取页面文本快照 |
-| `chrome-devtools_evaluate_script` | 执行 JavaScript |
-| `chrome-devtools_list_console_messages` | 列出控制台消息 |
-| `chrome-devtools_list_network_requests` | 列出网络请求 |
-| `chrome-devtools_lighthouse_audit` | Lighthouse 审计 |
 
 ### API 文档查询
 | 工具 | 用途 |
@@ -330,7 +287,8 @@ task(subagent_type="explore", prompt="...")
 |------|-----------|
 | 创建/修改功能前探索需求 | `brainstorming` |
 | 多步骤任务编写计划 | `writing-plans` |
-| 编写实现代码 | `test-driven-development` → `godot-best-practices` |
+| 架构设计完成后编写行为规格 | BDD（Given/When/Then） |
+| 编写实现代码 | BDD → TDD Red → TDD Green（`godot-best-practices`）→ TDD Refactor（`godot-gdscript-patterns`） |
 | 遇到 Bug 或异常行为 | `systematic-debugging` |
 | 设计新功能的系统架构 | `godot-architect` |
 | 设计状态机 | `godot-architect` |
@@ -349,9 +307,10 @@ task(subagent_type="explore", prompt="...")
 flowchart LR
     SPRITE["sprite-analyzer<br/>资源分析"] --> UI["godot-ui<br/>界面设计"]
     UI --> ARCH["godot-architect<br/>架构设计"]
-    ARCH --> DEV["godot-best-practices<br/>编码实现"]
-    DEV --> PAT["godot-gdscript-patterns<br/>模式优化"]
-    PAT --> DEBUG["诊断验证<br/>MCP 工具"]
+    ARCH --> BDD["BDD<br/>行为规格"]
+    BDD --> TDD["TDD Red/Green<br/>godot-best-practices"]
+    TDD --> REFAC["TDD Refactor<br/>godot-gdscript-patterns"]
+    REFAC --> DEBUG["诊断验证<br/>MCP 工具"]
 ```
 
 #### 典型功能开发流程
@@ -360,20 +319,23 @@ flowchart LR
 1. sprite-analyzer       → 分析精灵图资源，提取元数据和动画帧信息
 2. godot-ui              → 指导 UI 界面设计（Control 节点、主题、布局）
 3. godot-architect       → 输出架构设计文档（模块划分、接口定义、状态机设计）
-4. godot-best-practices  → 遵循最佳实践编写 GDScript 代码
-5. godot-gdscript-patterns → 应用设计模式优化（信号模式、状态机、对象池）
-6. MCP 工具验证          → godot-ultimate_godot_lint_file / validate_project / run_tests
-7. 诊断检查              → minimal-godot_get_diagnostics 确保无语法错误
+4. BDD                   → 编写行为规格（Given/When/Then），定义验收标准
+5. TDD Red               → 根据行为规格编写失败的测试用例
+6. TDD Green             → godot-best-practices + godot-gdscript-patterns 编写最小实现使测试通过
+7. TDD Refactor          → 重构代码，确保测试仍通过
+8. MCP 工具验证          → godot-ultimate_godot_lint_file / validate_project / run_tests
+9. 诊断检查              → minimal-godot_get_diagnostics 确保无语法错误
 ```
 
 ### Skill 间协作规则
 
-1. **架构先行**：新功能必须先经 `godot-architect` 设计，再由 `godot-best-practices` 实现
-2. **UI 独立**：涉及 UI 界面时，必须先由 `godot-ui` 指导设计
-3. **模式驱动**：实现代码时参考 `godot-gdscript-patterns` 中的设计模式
-4. **资源先行**：涉及精灵图资源时，先由 `sprite-analyzer` 分析资源结构
-5. **单一职责**：每个 Skill 只做自己的事，不越界操作
-6. **MCP 验证**：代码完成后必须使用 MCP 工具进行 Lint、验证和测试
+1. **架构先行**：新功能必须先经 `godot-architect` 设计，再编写行为规格
+2. **BDD 定义行为**：架构设计完成后，使用 Given/When/Then 编写行为规格，定义验收标准
+3. **TDD 驱动实现**：行为规格 → TDD Red（编写失败测试）→ TDD Green（`godot-best-practices` 最小实现）→ TDD Refactor（`godot-gdscript-patterns` 模式优化）
+4. **UI 独立**：涉及 UI 界面时，必须先由 `godot-ui` 指导设计
+5. **资源先行**：涉及精灵图资源时，先由 `sprite-analyzer` 分析资源结构
+6. **单一职责**：每个 Skill 只做自己的事，不越界操作
+7. **MCP 验证**：代码完成后必须使用 MCP 工具进行 Lint、验证和测试
 
 ## 📚 附录
 
