@@ -43,3 +43,5 @@ build/
 tmp/
 
 .env
+
+**/superpowers/
