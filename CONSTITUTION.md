@@ -34,6 +34,7 @@
 | `GODOT_HOME` | Godot 编辑器可执行文件路径 | 操作系统环境变量 |
 | `FEISHU_APP_ID` | 飞书应用 ID | [.env](.env) |
 | `FEISHU_APP_SECRET` | 飞书应用 Secret | [.env](.env) |
+| `FEISHU_USER_ID` | 用户 open_id（`ou_` 开头） | [.env](.env) |
 
 > 若 `.env` 不存在或变量缺失，**必须**先提醒用户配置，再继续执行依赖该变量的规则。
 
@@ -66,6 +67,10 @@
 - **P0-5** 【触发时机：用户任务开始前】**必须**从 `docs/06_postmortem/MEMORY.md` 读取经验教训，避免重犯。文件不存在时跳过
 - **P0-6** 【触发时机：用户任务完成后】**必须**事后总结经验教训，保存到 `docs/06_postmortem/MEMORY.md`（**禁止**输出重复的经验）。刷新 MEMORY.md 时**必须**使用 `[Skill] summarize` 对当前对话进行摘要提炼
 - **P0-7** 【触发时机：P0-6 完成后】**必须**使用 `[Skill] lark-im` 通过飞书通知用户任务完成状态（包含任务名称、完成结果、关键变更摘要）。凭证从环境变量 `FEISHU_APP_ID` 和 `FEISHU_APP_SECRET` 获取。若凭证缺失，跳过通知并在回复中说明
+  ```bash
+  # 发送飞书通知命令
+  lark-cli im +messages-send --user-id "$FEISHU_USER_ID" --text "<消息内容>" --as bot
+  ```
 - **P0-8** 【触发时机：每次代码变更后】测试覆盖率**不得低于** 80%，通过 `[MCP] godot-ultimate_godot_get_test_coverage` 验证。初始化阶段（无测试文件时）豁免
 
 ## P1 - 跨阶段规范
