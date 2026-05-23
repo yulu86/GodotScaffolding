@@ -116,13 +116,14 @@
 assets/ (fonts, music, sounds, sprites)
 scenes/ (.tscn，按模块分)
 scripts/ (.gd，按模块分)
-test/ (单元测试)
+test/unit/ (单元测试)
+test/integration/ (集成测试)
 addons/
 docs/ (设计文档，按阶段分)
 ```
 
 - **P2-1** 严禁在目录外存放资产/脚本/测试
-- **P2-2** 场景、脚本、测试按模块分目录，且同一模块的子目录相对路径**必须**保持一致。例如模块 `player` 的文件分别存放于 `scenes/player/`、`scripts/player/`、`test/player/`
+- **P2-2** 场景、脚本、测试按模块分目录，且同一模块的子目录相对路径**必须**保持一致。例如模块 `player` 的文件分别存放于 `scenes/player/`、`scripts/player/`、`test/unit/player/`、`test/integration/player/`
 
 ### 文档交付件规则
 
