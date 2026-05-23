@@ -4,12 +4,6 @@
         "AGENTS.md",
         "CONSTITUTION.md"
     ],
-    "permission": {
-        "skill": {
-            "godot-architect": "allow",
-            "godot-developer": "allow"
-        }
-    },
     "mcp": {
         "godot-mcp": {
             "type": "local",
