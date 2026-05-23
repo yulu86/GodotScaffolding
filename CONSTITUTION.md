@@ -175,10 +175,11 @@ docs/ (设计文档，按阶段分)
 - **P2-12** 修改测试必须使用 `[Skill] godot-best-practices`
 - **P2-13** .uid 文件必须提交（.tscn 除外）
 - **P2-14** 缺少 .uid 时提醒用户生成
+- **P2-15** 编写 `.gd` 代码或修改 `godot.project` 文件后，**必须**通过 `[MCP] godot-mcp_launch_editor` 重新加载当前项目，以便 Godot 自动生成 `.uid` 文件并检查配置是否能正常加载
 
 ### 命令行
 
-- **P2-15** 使用 `$GODOT_HOME` 环境变量：`$GODOT_HOME -s addons/gut/gut_cmdln.gd -gexit`
+- **P2-16** 使用 `$GODOT_HOME` 环境变量：`$GODOT_HOME -s addons/gut/gut_cmdln.gd -gexit`
 
 ## 严重违规清单
 
