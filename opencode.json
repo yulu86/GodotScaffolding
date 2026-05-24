@@ -4,6 +4,40 @@
         "AGENTS.md",
         "CONSTITUTION.md"
     ],
+    "permission": {
+        "skill": {
+            "brainstorming": "allow",
+            "caveman": "allow",
+            "dispatching-parallel-agents": "allow",
+            "executing-plans": "allow",
+            "find-skills": "allow",
+            "finishing-a-development-branch": "allow",
+            "frontend-design": "allow",
+            "grill-me": "allow",
+            "handoff": "allow",
+            "mcp-builder": "allow",
+            "receiving-code-review": "allow",
+            "requesting-code-review": "allow",
+            "skill-creator": "allow",
+            "skill-vetter": "allow",
+            "subagent-driven-development": "allow",
+            "summarize": "allow",
+            "systematic-debugging": "allow",
+            "test-driven-development": "allow",
+            "using-git-worktrees": "allow",
+            "using-superpowers": "allow",
+            "verification-before-completion": "allow",
+            "write-a-skill": "allow",
+            "writing-plans": "allow",
+            "writing-skills": "allow",
+            "godot-architect": "allow",
+            "godot-best-practices": "allow",
+            "godot-gdscript-patterns": "allow",
+            "godot-ui": "allow",
+            "sprite-analyzer": "allow",
+            "*": "ask"
+        }
+    },
     "mcp": {
         "godot-mcp": {
             "type": "local",
