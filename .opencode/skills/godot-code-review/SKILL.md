@@ -27,8 +27,8 @@ description: >
 对每个文件执行：
 
 ```
-a. 在编辑器中打开当前文件
-b. 关闭之前打开的其他文件（避免文件过多）
+a. 在 VSCode 中打开当前文件前，先关闭其他已打开的代码文件（保持工作区整洁，避免文件过多干扰检视）
+b. 在 VSCode 中打开当前文件
 c. 展示变更摘要（文件路径、变更内容、设计意图）
 d. 暂停执行，等待用户确认或提出修改意见
 e. 用户确认后继续下一个文件
@@ -52,6 +52,7 @@ e. 用户确认后继续下一个文件
 
 - 汇总本次检视中用户提出的所有修改意见及处理结果
 - 列出经验教训（命名歧义、遗漏注释、参数遮蔽等）
+- 使用 `[Skill] summarize` 对检视过程进行摘要提炼
 - 将经验教训保存到 `docs/06_postmortem/MEMORY.md`
 - 提取可通用的规则，更新 `CONSTITUTION.md`
 
@@ -61,24 +62,32 @@ e. 用户确认后继续下一个文件
 
 ### 代码规范
 
-- [ ] 命名是否精确反映实际用途（枚举/变量不包含未使用的概念）
-- [ ] 参数名是否与节点内置属性冲突（`name`、`position`、`scale` 等）
-- [ ] 信号是否有 `##` 注释说明用途
-- [ ] 枚举值及其含义是否有注释
-- [ ] 方法是否有注释说明用途
+- [ ] **P0-3** 代码除注释外无中文
+- [ ] **P0-4b** 方法（`func`）有 `##` 注释说明用途
+- [ ] **P0-4b** 枚举（`enum`）及其枚举值有 `##` 注释说明含义
+- [ ] **P0-4b** 信号（`signal`）有 `##` 注释说明用途
+- [ ] **P0-4c** 参数名不与节点内置属性冲突（`name`、`position`、`scale` 等）
+- [ ] **P0-4e** 枚举和变量命名精确反映实际用途，不含未使用的概念
 - [ ] 不可达代码已删除（如 match 全覆盖后多余的 return）
 - [ ] 浮点值默认设置是否合理（如音频默认音量）
 
 ### 设计规范
 
-- [ ] 复用实例模式中，生命周期入口方法是否调用 `_reset()` 重置状态
-- [ ] Autoload/Singleton 是否无 `class_name`
-- [ ] 非 Singleton 脚本是否定义了 `class_name`
+- [ ] **P0-4d** 复用实例模式中，生命周期入口方法（如 `enter()`）调用 `_reset()` 重置状态
+- [ ] **P1-12** Autoload/Singleton 无 `class_name`；非 Singleton 脚本定义了 `class_name`
+- [ ] **P1-12** 通过 `class_name` 进行类型引用，未使用 `preload`/`load` 后的变量名作类型别名
 - [ ] 信号驱动通信，非直接调用
 - [ ] 依赖注入而非硬编码
+
+### 自动化验证（.gd 文件专属）
+
+- [ ] `[MCP] minimal-godot_get_diagnostics` 诊断通过（无语法错误、类型错误）
+- [ ] `[MCP] godot-ultimate_godot_lint_file` lint 通过
+- [ ] `[MCP] godot-ultimate_godot_check_patterns` 模式检查通过
 
 ### 测试规范
 
 - [ ] 使用 `add_child_autoqfree` 代替 `add_child` + `queue_free`
 - [ ] 浮点比较使用 `assert_almost_eq` 而非 `assert_eq`
 - [ ] 测试覆盖所有 BDD 场景
+- [ ] **P1-6c** 集成测试存在于 `test/integration/{模块}/` 目录
