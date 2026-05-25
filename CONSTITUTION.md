@@ -190,19 +190,22 @@ docs/ (设计文档，按阶段分)
 - **P2-12** 修改测试必须使用 `[Skill] godot-best-practices`
 - **P2-13** .uid 文件必须提交（.tscn 除外）
 - **P2-14** 缺少 .uid 时提醒用户生成
-- **P2-15** 编写 `.gd` 代码或修改 `godot.project` 文件后，**必须**先关闭所有正在运行的 Godot 编辑器实例，然后通过 `[MCP] godot-mcp_launch_editor` 重新加载当前项目，以便 Godot 自动生成 `.uid` 文件、刷新 LSP 缓存和索引、并检查配置是否能正常加载。关闭方法：
-  ```powershell
-  # 关闭所有 Godot 编辑器进程（Windows）
-  Get-Process -Name "Godot*" -ErrorAction SilentlyContinue | Stop-Process -Force
-  ```
-  ```bash
-  # 关闭所有 Godot 编辑器进程（macOS）
-  pkill -f "Godot"
-  ```
+- **P2-15** 编写 `.gd` 代码或修改 `godot.project` 文件后，**必须**先关闭所有正在运行的 Godot 编辑器实例（见 P2-17），然后重新加载当前项目（见 P2-17），以便 Godot 自动生成 `.uid` 文件、刷新 LSP 缓存和索引、并检查配置是否能正常加载
 
 ### 命令行
 
 - **P2-16** 使用 `$GODOT_HOME` 环境变量：`$GODOT_HOME -s addons/gut/gut_cmdln.gd -gexit`
+- **P2-17** Godot 编辑器操作方法：
+  - **关闭编辑器**：
+    - Windows PowerShell：`Get-Process -Name "Godot*" -ErrorAction SilentlyContinue | Stop-Process -Force`
+    - macOS/Linux：`pkill -f "Godot"`
+  - **打开编辑器**（按优先级排序）：
+    1. **MCP 工具**（推荐）：`[MCP] godot-mcp_launch_editor`（传入 `projectPath` 参数）
+    2. **CLI 命令**（Windows PowerShell）：`& $env:GODOT_HOME --path <项目路径>`
+    3. **CLI 命令**（macOS/Linux）：`$GODOT_HOME --path <项目路径>`
+  - **无头模式打开项目**（不渲染，仅加载索引）：
+    - Windows PowerShell：`& $env:GODOT_HOME --editor --path <项目路径>`
+    - macOS/Linux：`$GODOT_HOME --editor --path <项目路径>`
 
 ## 严重违规清单
 
