@@ -27,11 +27,12 @@ description: >
 对每个文件执行：
 
 ```
-a. 在 VSCode 中打开当前文件前，先关闭其他已打开的代码文件（保持工作区整洁，避免文件过多干扰检视）
-b. 在 VSCode 中打开当前文件
-c. 展示变更摘要（文件路径、变更内容、设计意图）
-d. 暂停执行，等待用户确认或提出修改意见
-e. 用户确认后继续下一个文件
+a. 使用 Bash 执行：code --reuse-active "{文件绝对路径}"
+   - macOS / Windows 均使用 code 命令（需在 VSCode 中执行 "Shell Command: Install 'code' command in PATH"）
+   - --reuse-active 复用当前活动标签页，避免多标签堆积
+b. 展示变更摘要（文件路径、变更内容、设计意图）
+c. 暂停执行，等待用户确认或提出修改意见
+d. 用户确认后继续下一个文件
 ```
 
 **摘要格式：**

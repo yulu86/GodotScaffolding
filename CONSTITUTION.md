@@ -192,6 +192,24 @@ docs/ (设计文档，按阶段分)
 - **P2-14** 缺少 .uid 时提醒用户生成
 - **P2-15** 编写 `.gd` 代码或修改 `godot.project` 文件后，**必须**通过重新加载当前项目（见 P2-17）来刷新自动生成的 `.uid` 文件、LSP 缓存和索引，并检查配置是否能正常加载。重新加载前**必须**确保只有 1 个 Godot 编辑器实例在运行
 
+### Godot 开发经验
+
+- **P2-18** 内存管理：`Resource`（含 `RefCounted`）子类**禁止**调用 `.free()`，由引用计数自动释放；`Node` 子类**必须**调用 `.free()` 或 `queue_free()`
+- **P2-19** `class_name` 缓存管理：新增或移动含 `class_name` 的 `.gd` 文件后，**必须**更新 `.godot/global_script_class_cache.cfg` 并用 `--editor` 模式重载项目。未更新缓存会导致 "Identifier not declared" 或 "Class X hides a global script class" 错误
+- **P2-20** 场景文件 (.tscn) 手写规则：
+  - 场景骨架（节点树 + 脚本挂载 + 碰撞形状 + 信号连接）可手写
+  - 视觉资源（SpriteFrames / TileSet / 材质）**必须**在 Godot 编辑器中创建
+  - 子场景根节点路径用 `"."` 而非父节点名
+- **P2-21** 状态模式选型：状态基类用 `Resource`（轻量、无需场景树），状态机管理器用 `Node`（可挂载为子节点）
+- **P2-22** GUT 单元测试模式：
+  - `load("res://...")` + `script.new()` 可独立测试脚本的常量和纯逻辑方法
+  - `@onready` 变量在 `script.new()` 模式下**不会执行**，测试中需手动赋值（如 `player.animated_sprite = AnimatedSprite2D.new()`）
+  - `CharacterBody2D.move_and_slide()` 需要物理空间（场景树），纯 `script.new()` 实例**禁止**调用；依赖物理引擎的方法用集成测试验证
+  - `AnimatedSprite2D.new()` 默认只有 `"default"` 空动画，测试中需用 `SpriteFrames.add_animation()` 预注册所需动画名
+  - `GUT` 的 `-gdir` 参数**不会递归**搜索子目录，需显式指定每个测试目录
+- **P2-23** 测试分层策略：单元测试只验证纯逻辑（速度设置、状态切换、属性变更）；依赖场景树的行为（动画播放、物理碰撞、输入检测）用集成测试（场景实例化 + `add_child`）验证
+- **P2-24** LSP/Diagnostics 需要编辑器以 GUI 模式运行（非 headless `--editor`），运行 `[MCP] minimal-godot_get_diagnostics` 前确认编辑器已启动；若 LSP 不可用，应先启动编辑器再重试
+
 ### 命令行
 
 - **P2-16** 使用 `$GODOT_HOME` 环境变量：`$GODOT_HOME -s addons/gut/gut_cmdln.gd -gexit`

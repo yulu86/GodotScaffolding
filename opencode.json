@@ -34,6 +34,7 @@
             "godot-best-practices": "allow",
             "godot-gdscript-patterns": "allow",
             "godot-ui": "allow",
+            "godot-code-review": "allow",
             "sprite-analyzer": "allow",
             "*": "ask"
         }
