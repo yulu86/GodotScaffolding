@@ -27,9 +27,8 @@ description: >
 对每个文件执行：
 
 ```
-a. 使用 Bash 执行：code --reuse-active "{文件绝对路径}"
+a. 使用 Bash 执行：code "{文件绝对路径}"
    - macOS / Windows 均使用 code 命令（需在 VSCode 中执行 "Shell Command: Install 'code' command in PATH"）
-   - --reuse-active 复用当前活动标签页，避免多标签堆积
 b. 展示变更摘要（文件路径、变更内容、设计意图）
 c. 暂停执行，等待用户确认或提出修改意见
 d. 用户确认后继续下一个文件
