@@ -93,6 +93,11 @@
 
 - **P1-6b** Story 文档**必须**使用 BDD（行为驱动开发）方法编写，采用 Given-When-Then 格式描述行为场景。每个 Story 必须包含至少一个行为场景作为验收标准
 - **P1-6c** 每个 Story 开发**必须**编写对应的集成测试用例，存放在 `test/integration/{模块}/` 目录下，无集成测试的 Story 不得标记为已完成
+- **P1-6e** 【触发时机：Story 标记为已完成前】**必须**使用 `[Skill] godot-static-analysis` 对该 Story 涉及的所有代码文件执行静态分析，确保整体质量达到**优秀**级别。若未达成，**必须**按以下循环迭代直至达标：
+  1. 使用 `[Skill] test-driven-development` 对未达标项进行 TDD 重构（Red → Green → Refactor）
+  2. 补充测试用例覆盖重构涉及的逻辑，运行 `[MCP] godot-ultimate_godot_run_tests` 确保全部通过
+  3. 重新执行 `[Skill] godot-static-analysis` 检查
+  4. 若仍未达标，回到步骤 1 继续
 
 ### 功能开发全流程
 
