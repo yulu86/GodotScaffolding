@@ -1,7 +1,7 @@
 ﻿---
 description: "代码与设计一致性检查员：对比代码实现与设计文档，输出一致性报告和差异清单"
 mode: subagent
-model: deepseek/deepseek-chat
+model: zhipuai-coding-plan/glm-5.1
 temperature: 0.1
 hidden: true
 tools:

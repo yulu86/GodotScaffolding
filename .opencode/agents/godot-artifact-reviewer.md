@@ -1,7 +1,7 @@
 ﻿---
 description: "生成物独立检视员：对文档和代码生成物进行独立检视并修正"
 mode: subagent
-model: deepseek/deepseek-chat
+model: opencode/minimax-m3-free
 temperature: 0.1
 hidden: true
 tools:
