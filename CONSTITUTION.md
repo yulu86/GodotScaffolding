@@ -15,7 +15,7 @@
 |------|------|------|
 | 用户任务 | 用户发出的一次完整请求，从接收到最终交付 | "实现玩家移动功能"、"修复 #3 bug" |
 | Story | Sprint 中的一个用户故事，包含多个 agent_task | "Story 01: 玩家基础移动" |
-| agent_task | Story 内的一个 subagent 执行单元 | `task(subagent_type="general", ...)` |
+| agent_task | Story 内的一个子代理执行单元 | `@godot-developer`、`@godot-reviewer` |
 | 任务完成 | 所有代码已写入、测试通过、lint 通过、用户已确认 | — |
 
 ### 开发阶段
@@ -46,7 +46,37 @@
 |------|------|------|
 | `[MCP]` | Godot MCP 工具 | `minimal-godot_get_diagnostics`、`godot-ultimate_godot_lint_file` |
 | `[Skill]` | OpenCode Skill，通过 `skill` 工具加载 | `sprite-analyzer`、`lark-im` |
+| `[Agent]` | OpenCode 子代理，通过 `task()` 或 `@` 调用 | `@godot-developer`、`@godot-reviewer` |
 | `[CLI]` | 命令行命令，通过 Bash 工具执行 | `$GODOT_HOME -s addons/gut/gut_cmdln.gd` |
+
+### 子代理清单
+
+> 子代理配置文件位于 `.opencode/agents/`，均为 `hidden: true`，仅通过主代理 `task()` 调度调用。
+
+| # | 名称 | 模型 | 分类 | 使用的 Skill | 工具权限 | 职责 |
+|---|------|------|------|-------------|---------|------|
+| 1 | `godot-ui-designer` | `zhipuai-coding-plan/glm-5.1` | 核心开发 | `godot-ui` | 只读 + 文档写入 | Godot UI 场景设计（Control 节点、布局、样式） |
+| 2 | `godot-architect` | `deepseek/deepseek-reasoner` | 核心开发 | `godot-architect` | 只读 + 文档写入 | 系统架构设计、模块划分、状态机设计 |
+| 3 | `godot-developer` | `zhipuai-coding-plan/glm-5.1` | 核心开发 | `godot-best-practices`、`godot-gdscript-patterns`、`test-driven-development` | 全部工具 | TDD 编码实现（Red→Green→Refactor） |
+| 4 | `godot-reviewer` | `deepseek/deepseek-chat` | 质量保障 | `godot-code-review` | 只读 | 逐文件代码检视，输出变更摘要和审查意见 |
+| 5 | `godot-consistency-checker` | `deepseek/deepseek-chat` | 质量保障 | `godot-best-practices` | 只读 | 对比代码与设计文档，输出一致性报告和差异清单 |
+| 6 | `godot-static-analyzer` | `zhipuai-coding-plan/glm-5.1` | 质量保障 | `godot-static-analysis`、`test-driven-development`、`godot-best-practices` | 读写 + bash | 静态分析 + TDD 迭代重构直至质量达标 |
+| 7 | `godot-artifact-reviewer` | `deepseek/deepseek-chat` | 文档验收 | — | 读写 | 对文档/代码生成物进行独立检视并修正 |
+
+#### 子代理调度关系
+
+```
+build (主代理，zhipuai-coding-plan/glm-5.1)
+  ├─ [Agent] godot-ui-designer       → P1-15 UI 设计环节
+  ├─ [Agent] godot-architect         → P1-15 架构设计环节
+  ├─ [Agent] godot-developer         → P1-15S S3-S5 TDD 编码
+  ├─ [Agent] godot-reviewer          → P1-15S S11 代码检视
+  ├─ [Agent] godot-consistency-checker → P1-15S S6/S12 一致性检查
+  ├─ [Agent] godot-static-analyzer   → P1-15S S9 静态分析
+  ├─ [Agent] godot-artifact-reviewer → P1-22 生成物检视
+  ├─ explore (内置)                  → 快速代码搜索
+  └─ general (内置)                  → 通用多步骤任务
+```
 
 ---
 
@@ -138,7 +168,7 @@
 
 #### 设计文档对比
 
-- **P1-11** 【触发时机：Story 标记为已完成前】**必须**创建子 agent（`task(subagent_type="general")`）逐项对比代码实现与该 Story 关联的设计文档（模块设计、状态机设计、功能需求等），输出差异清单。差异包括：设计文档中定义但代码未实现的功能、代码中存在但设计文档未描述的功能、实现方式与设计文档描述不一致的部分。所有差异**必须**与用户确认处理方案后方可标记 Story 为已完成
+- **P1-11** 【触发时机：Story 标记为已完成前】**必须**创建子代理（`[Agent] godot-consistency-checker`）逐项对比代码实现与该 Story 关联的设计文档（模块设计、状态机设计、功能需求等），输出差异清单。差异包括：设计文档中定义但代码未实现的功能、代码中存在但设计文档未描述的功能、实现方式与设计文档描述不一致的部分。所有差异**必须**与用户确认处理方案后方可标记 Story 为已完成
 
 #### 静态分析与经验归档
 
@@ -151,7 +181,7 @@
 
 ### 代码与设计一致性检查
 
-- **P1-14** 【触发时机：每个 agent_task 代码实现完成后，进入下一个 agent_task 前】**必须**创建子 agent（`task(subagent_type="general")`）对比本次代码变更与对应的设计文档（模块设计、状态机设计、功能需求等），输出一致性报告。报告内容包括：
+- **P1-14** 【触发时机：每个 agent_task 代码实现完成后，进入下一个 agent_task 前】**必须**创建子代理（`[Agent] godot-consistency-checker`）对比本次代码变更与对应的设计文档（模块设计、状态机设计、功能需求等），输出一致性报告。报告内容包括：
   1. **已实现且一致**：代码实现与设计文档描述完全匹配的功能项
   2. **设计文档中有但未实现**：设计文档中定义但代码中遗漏的功能项
   3. **代码中有但设计文档未描述**：代码中额外添加但设计文档未涉及的功能项
@@ -168,10 +198,10 @@
 
 - **P1-15** 代码开发**必须**使用 TDD（测试驱动开发）方式：先编写失败测试（Red） → 编写最小实现使测试通过（Green） → 重构代码（Refactor）。**禁止**先写实现代码再补测试。功能开发流程：
   ```
-  task(subagent_type="general") (使用 [Skill] godot-ui 指导 UI 设计)
-    → task(subagent_type="general") (使用 [Skill] godot-architect 架构设计)
+  task(@godot-ui-designer) (使用 [Skill] godot-ui 指导 UI 设计)
+    → task(@godot-architect) (使用 [Skill] godot-architect 架构设计)
     → [MCP] godot-mcp：AI 使用 MCP 工具创建场景基本框架
-    → task(subagent_type="general") (使用 [Skill] godot-best-practices + godot-gdscript-patterns 实现)
+    → task(@godot-developer) (使用 [Skill] godot-best-practices + godot-gdscript-patterns 实现)
     → [MCP] godot-ultimate_godot_lint_file / run_tests (验证)
     → [MCP] minimal-godot_get_diagnostics (最终诊断)
   ```
@@ -184,16 +214,16 @@
 |------|------|---------|---------|
 | **S1** | 开发前准备 | P0-13、P1-1 | 读取 `MEMORY.md` 经验教训 → 输出 Story 概要（名称、目标、涉及文件/模块、关键实现要点、预估工作量） → **暂停等待用户确认** |
 | **S2** | 梳理验收标准 | P0-12、P1-10 | 列出所有 BDD 场景（Given-When-Then），确保每条验收标准有对应测试用例。不够具体时**必须**先与用户澄清 |
-| **S3** | 编写失败测试（红） | P0-11 | 先编写单元测试和集成测试框架（`test/unit/` + `test/integration/`），确保测试失败 |
-| **S4** | 编写最小实现（绿） | P0-11 | 写最少的代码使测试通过。使用 `[Skill] godot-best-practices` + `[Skill] godot-gdscript-patterns` 指导实现 |
-| **S5** | 重构代码（重构） | P0-11 | 优化代码结构，保持测试通过。遵循 SOLID + DRY 原则 |
-| **S6** | 代码与设计一致性检查 | P1-14 | 创建子 agent 对比代码变更与设计文档，输出一致性报告（已实现/未实现/额外实现/实现不一致）。存在差异时**暂停**，由用户决定处理方案 |
+| **S3** | 编写失败测试（红） | P0-11 | `[Agent] godot-developer` 先编写单元测试和集成测试框架（`test/unit/` + `test/integration/`），确保测试失败 |
+| **S4** | 编写最小实现（绿） | P0-11 | `[Agent] godot-developer` 写最少的代码使测试通过。使用 `[Skill] godot-best-practices` + `[Skill] godot-gdscript-patterns` 指导实现 |
+| **S5** | 重构代码（重构） | P0-11 | `[Agent] godot-developer` 优化代码结构，保持测试通过。遵循 SOLID + DRY 原则 |
+| **S6** | 代码与设计一致性检查 | P1-14 | `[Agent] godot-consistency-checker` 对比代码变更与设计文档，输出一致性报告（已实现/未实现/额外实现/实现不一致）。存在差异时**暂停**，由用户决定处理方案 |
 | **S7** | 验收标准覆盖分析 | P1-9 | 逐项对比验收标准与测试用例，输出覆盖分析表。补充缺失测试并重新运行全部测试 |
 | **S8** | 运行全部测试 | P1-7 | `[MCP] godot-ultimate_godot_run_tests` 确保全部通过 |
-| **S9** | 静态分析 | P1-12 | `[Skill] godot-static-analysis` 检查，未达标则回到 S5 迭代 TDD 重构循环 |
+| **S9** | 静态分析 | P1-12 | `[Agent] godot-static-analyzer` 执行静态分析，未达标则回到 S5 迭代 TDD 重构循环 |
 | **S10** | 诊断检查 | P2-10 | `[MCP] minimal-godot_get_diagnostics` 确保无语法错误 |
-| **S11** | 代码检视 | P1-6 | 逐文件展示变更摘要（文件路径、变更内容、设计意图），和用户一起逐个文件进行代码检视(use godot-code-review)，用户逐项确认或提出修改意见 |
-| **S12** | 设计文档对比 | P1-11 | 创建子 agent 逐项对比代码实现与设计文档，输出差异清单，用户确认处理方案 |
+| **S11** | 代码检视 | P1-6 | `[Agent] godot-reviewer` 逐文件展示变更摘要（文件路径、变更内容、设计意图），和用户一起逐个文件进行代码检视，用户逐项确认或提出修改意见 |
+| **S12** | 设计文档对比 | P1-11 | `[Agent] godot-consistency-checker` 逐项对比代码实现与设计文档，输出差异清单，用户确认处理方案 |
 | **S13** | 经验教训归档 | P1-13 | 将代码检视和静态检查中的问题总结为经验教训，追加到 `docs/06_postmortem/MEMORY.md` |
 | **S14** | 更新 Backlog | P1-4 | 将该 Story 标记为已完成 |
 | **S15** | Git 提交 | P1-5、P2-10、P2-12 | 确保工作区干净，与用户确认后执行 git commit |
@@ -226,7 +256,7 @@
 
 ### 生成物检视
 
-- **P1-22** 所有文档和代码生成后，**必须**创建新的子 agent（`task(subagent_type="general")`）对生成物进行独立检视，并针对检视发现的问题进行修改修正。检视内容包括但不限于：
+- **P1-22** 所有文档和代码生成后，**必须**创建子代理（`[Agent] godot-artifact-reviewer`）对生成物进行独立检视，并针对检视发现的问题进行修改修正。检视内容包括但不限于：
   - 文档：命名规范、目录位置、标题层级、mermaid 图形正确性、上游关联完整性
   - 代码：语法正确性、SOLID/DRY 合规、目录规范、`[MCP] minimal-godot_get_diagnostics` 诊断通过
 
