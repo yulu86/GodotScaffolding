@@ -16,6 +16,7 @@
 | 用户任务 | 用户发出的一次完整请求，从接收到最终交付 | "实现玩家移动功能"、"修复 #3 bug" |
 | Story | Sprint 中的一个用户故事，包含多个 agent_task | "Story 01: 玩家基础移动" |
 | agent_task | Story 内的一个子代理执行单元 | `@godot-developer`、`@godot-reviewer` |
+| 功能测试 | 通过按键模拟和截图验证，对游戏进行端到端验证的测试 | 模拟按住方向键验证玩家移动 |
 | 任务完成 | 所有代码已写入、测试通过、lint 通过、用户已确认 | — |
 
 ### 开发阶段
@@ -53,15 +54,16 @@
 
 > 子代理配置文件位于 `.opencode/agents/`，均为 `hidden: true`，仅通过主代理 `task()` 调度调用。
 
-| # | 名称 | 模型 | 分类 | 使用的 Skill | 工具权限 | 职责 |
-|---|------|------|------|-------------|---------|------|
-| 1 | `godot-ui-designer` | `zhipuai-coding-plan/glm-5.1` | 核心开发 | `godot-ui` | 只读 + 文档写入 | Godot UI 场景设计（Control 节点、布局、样式） |
-| 2 | `godot-architect` | `deepseek/deepseek-reasoner` | 核心开发 | `godot-architect` | 只读 + 文档写入 | 系统架构设计、模块划分、状态机设计 |
-| 3 | `godot-developer` | `zhipuai-coding-plan/glm-5.1` | 核心开发 | `godot-best-practices`、`godot-gdscript-patterns`、`test-driven-development` | 全部工具 | TDD 编码实现（Red→Green→Refactor） |
-| 4 | `godot-reviewer` | `deepseek/deepseek-chat` | 质量保障 | `godot-code-review` | 只读 | 逐文件代码检视，输出变更摘要和审查意见 |
-| 5 | `godot-consistency-checker` | `deepseek/deepseek-chat` | 质量保障 | `godot-best-practices` | 只读 | 对比代码与设计文档，输出一致性报告和差异清单 |
-| 6 | `godot-static-analyzer` | `zhipuai-coding-plan/glm-5.1` | 质量保障 | `godot-static-analysis`、`test-driven-development`、`godot-best-practices` | 读写 + bash | 静态分析 + TDD 迭代重构直至质量达标 |
-| 7 | `godot-artifact-reviewer` | `deepseek/deepseek-chat` | 文档验收 | — | 读写 | 对文档/代码生成物进行独立检视并修正 |
+| # | 名称 | 分类 | 使用的 Skill | 工具权限 | 职责 |
+|---|------|------|-------------|---------|------|
+| 1 | `godot-ui-designer` | 核心开发 | `godot-ui` | 只读 + 文档写入 | Godot UI 场景设计（Control 节点、布局、样式） |
+| 2 | `godot-architect` | 核心开发 | `godot-architect` | 只读 + 文档写入 | 系统架构设计、模块划分、状态机设计 |
+| 3 | `godot-developer` | 核心开发 | `godot-best-practices`、`godot-gdscript-patterns`、`test-driven-development` | 全部工具 | TDD 编码实现（Red→Green→Refactor） |
+| 4 | `godot-reviewer` | 质量保障 | `godot-code-review` | 只读 | 逐文件代码检视，输出变更摘要和审查意见 |
+| 5 | `godot-consistency-checker` | 质量保障 | `godot-best-practices` | 只读 | 对比代码与设计文档，输出一致性报告和差异清单 |
+| 6 | `godot-static-analyzer` | 质量保障 | `godot-static-analysis`、`test-driven-development`、`godot-best-practices` | 读写 + bash | 静态分析 + TDD 迭代重构直至质量达标 |
+| 7 | `godot-artifact-reviewer` | 文档验收 | — | 读写 | 对文档/代码生成物进行独立检视并修正 |
+| 8 | `godot-functional-tester` | 质量保障 | — | bash + 写入 | 通过按键模拟和截图验证，执行端到端功能测试 |
 
 #### 子代理调度关系
 
@@ -73,6 +75,7 @@ build (主代理，zhipuai-coding-plan/glm-5.1)
   ├─ [Agent] godot-reviewer          → P1-15S S11 代码检视
   ├─ [Agent] godot-consistency-checker → P1-15S S6/S12 一致性检查
   ├─ [Agent] godot-static-analyzer   → P1-15S S9 静态分析
+  ├─ [Agent] godot-functional-tester → P1-15S S8.5 功能测试
   ├─ [Agent] godot-artifact-reviewer → P1-22 生成物检视
   ├─ explore (内置)                  → 快速代码搜索
   └─ general (内置)                  → 通用多步骤任务
@@ -220,6 +223,7 @@ build (主代理，zhipuai-coding-plan/glm-5.1)
 | **S6** | 代码与设计一致性检查 | P1-14 | `[Agent] godot-consistency-checker` 对比代码变更与设计文档，输出一致性报告（已实现/未实现/额外实现/实现不一致）。存在差异时**暂停**，由用户决定处理方案 |
 | **S7** | 验收标准覆盖分析 | P1-9 | 逐项对比验收标准与测试用例，输出覆盖分析表。补充缺失测试并重新运行全部测试 |
 | **S8** | 运行全部测试 | P1-7 | `[MCP] godot-ultimate_godot_run_tests` 确保全部通过 |
+| **S8.5** | 功能测试 | P1-7.5 | `[Agent] godot-functional-tester` 通过按键模拟和截图验证，对游戏进行端到端功能测试，确保验收场景在运行时环境下表现正确 |
 | **S9** | 静态分析 | P1-12 | `[Agent] godot-static-analyzer` 执行静态分析，未达标则回到 S5 迭代 TDD 重构循环 |
 | **S10** | 诊断检查 | P2-10 | `[MCP] minimal-godot_get_diagnostics` 确保无语法错误 |
 | **S11** | 代码检视 | P1-6 | `[Agent] godot-reviewer` 逐文件展示变更摘要（文件路径、变更内容、设计意图），和用户一起逐个文件进行代码检视，用户逐项确认或提出修改意见 |
@@ -270,12 +274,13 @@ scenes/ (.tscn，按模块分)
 scripts/ (.gd，按模块分)
 test/unit/ (单元测试)
 test/integration/ (集成测试)
+test/functional/ (功能测试)
 addons/
 docs/ (设计文档，按阶段分)
 ```
 
 - **P2-1** 严禁在目录外存放资产/脚本/测试
-- **P2-2** 场景、脚本、测试按模块分目录，且同一模块的子目录相对路径**必须**保持一致。例如模块 `player` 的文件分别存放于 `scenes/player/`、`scripts/player/`、`test/unit/player/`、`test/integration/player/`
+- **P2-2** 场景、脚本、测试按模块分目录，且同一模块的子目录相对路径**必须**保持一致。例如模块 `player` 的文件分别存放于 `scenes/player/`、`scripts/player/`、`test/unit/player/`、`test/integration/player/`、`test/functional/player/`
 
 ### 文档交付件规则
 
@@ -392,13 +397,19 @@ docs/ (设计文档，按阶段分)
   - `GUT` 的 `-gdir` 参数**不会递归**搜索子目录，需显式指定每个测试目录
 - **P2-23** 测试分层策略：单元测试只验证纯逻辑（速度设置、状态切换、属性变更）；依赖场景树的行为（动画播放、物理碰撞、输入检测）用集成测试（场景实例化 + `add_child`）验证
 
+#### 功能测试
+
+- **P2-24** 功能测试分层策略：单元测试和集成测试无法验证的运行时行为（按键响应、画面渲染、场景切换效果、实际游戏手感），**必须**通过功能测试（`[Agent] godot-functional-tester`）进行端到端验证。功能测试脚本继承 `SceneTree`，通过 `Input.parse_input_event()` 模拟按键输入，通过 `get_viewport().get_texture().get_image()` 截图验证
+- **P2-25** 功能测试脚本存放于 `test/functional/{模块}/` 目录，命名格式：`test_{功能名}_functional.gd`。截图存放于 `test/functional/screenshots/` 目录
+- **P2-26** 功能测试执行顺序：**必须**在单元测试（S8）全部通过后执行（S8.5），不得跳过。功能测试失败时，**必须**将缺陷交由 `[Agent] godot-developer` 修复后重新执行全部测试流程（从 S8 开始）
+
 #### LSP 与诊断
 
-- **P2-24** LSP/Diagnostics 需要编辑器以 GUI 模式运行（非 headless `--editor`），运行 `[MCP] minimal-godot_get_diagnostics` 前确认编辑器已启动；若 LSP 不可用，应先启动编辑器再重试
+- **P2-27** LSP/Diagnostics 需要编辑器以 GUI 模式运行（非 headless `--editor`），运行 `[MCP] minimal-godot_get_diagnostics` 前确认编辑器已启动；若 LSP 不可用，应先启动编辑器再重试
 
 #### 碰撞配置
 
-- **P2-25** 碰撞层/掩码解耦：`collision_layer` 和 `collision_mask` **禁止**在 GDScript 代码中硬编码赋值（如 `_ready()` 中设置），**必须**在场景文件（`.tscn`）的节点属性中配置。代码与碰撞配置解耦，便于不同场景复用同一脚本。代码中**仅允许**读取碰撞层值用于运行时判断（如 `get_collision_layer()` 检查）
+- **P2-28** 碰撞层/掩码解耦：`collision_layer` 和 `collision_mask` **禁止**在 GDScript 代码中硬编码赋值（如 `_ready()` 中设置），**必须**在场景文件（`.tscn`）的节点属性中配置。代码与碰撞配置解耦，便于不同场景复用同一脚本。代码中**仅允许**读取碰撞层值用于运行时判断（如 `get_collision_layer()` 检查）
 
 ## 严重违规清单
 
