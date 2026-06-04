@@ -1,7 +1,7 @@
 ---
 description: "Godot 功能测试员：通过按键模拟和截图验证，对游戏进行端到端功能测试"
 mode: subagent
-model: opencode/minimax-m3-free
+model: zhipuai-coding-plan/glm-4.6V
 temperature: 0.1
 hidden: true
 tools:
@@ -58,53 +58,7 @@ steps: 50
 
 ## 按键模拟方法
 
-### 方式一：通过 GDScript 脚本模拟（推荐）
-
-编写临时测试脚本，通过 Godot 的 `Input.parse_input_event()` 模拟按键：
-
-```gdscript
-# 功能测试辅助脚本模板
-extends SceneTree
-
-var test_results: Array = []
-
-## 模拟按键按下
-func simulate_action(action_name: String, duration_msec: int = 16) -> void:
-    var event := InputEventAction.new()
-    event.action = action_name
-    event.pressed = true
-    Input.parse_input_event(event)
-    await OS.delay_msec(duration_msec)
-    event.pressed = false
-    Input.parse_input_event(event)
-
-## 模拟方向键持续按住
-func simulate_direction(action_name: String, hold_frames: int) -> void:
-    for i in hold_frames:
-        var event := InputEventAction.new()
-        event.action = action_name
-        event.pressed = true
-        Input.parse_input_event(event)
-        await get_tree().process_frame
-    var release := InputEventAction.new()
-    release.action = action_name
-    release.pressed = false
-    Input.parse_input_event(release)
-
-## 截图保存当前画面
-func take_screenshot(name: String) -> String:
-    var path := "user://screenshot_%s.png" % name
-    var img := get_viewport().get_texture().get_image()
-    img.save_png(path)
-    return path
-```
-
-执行方式：
-```powershell
-& $env:GODOT_HOME -s scripts/test/functional/{test_file}.gd --path <项目路径>
-```
-
-### 方式二：通过 Godot MCP 运行项目
+### 通过 Godot MCP 运行项目
 
 使用 `[MCP] godot-mcp_run_project` 启动游戏，配合截图工具验证。
 

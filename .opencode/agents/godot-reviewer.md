@@ -1,7 +1,7 @@
 ﻿---
 description: "Godot 代码检视员：逐文件检视代码变更，输出变更摘要和审查意见"
 mode: subagent
-model: opencode/minimax-m3-free
+model: zhipuai-coding-plan/glm-5-turbo
 temperature: 0.1
 hidden: true
 tools:
