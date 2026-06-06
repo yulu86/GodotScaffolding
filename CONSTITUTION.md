@@ -358,9 +358,7 @@ docs/ (设计文档，按阶段分)
 
 - **P2-16** 使用 `$GODOT_HOME` 环境变量：`$GODOT_HOME -s addons/gut/gut_cmdln.gd -gexit`
 - **P2-17** Godot 编辑器操作方法：
-  - **关闭编辑器**：
-    - Windows PowerShell：`Get-Process -Name "Godot*" -ErrorAction SilentlyContinue | Stop-Process -Force`
-    - macOS/Linux：`pkill -f "Godot"`
+  - **保持运行**：编辑器启动后**禁止关闭**，需保持运行以维持 LSP 服务和诊断功能。整个开发会话期间编辑器应始终处于打开状态
   - **打开编辑器**（按优先级排序）：
     1. **MCP 工具**（推荐）：`[MCP] godot-mcp_launch_editor`（传入 `projectPath` 参数）
     2. **CLI 命令**（Windows PowerShell）：`& $env:GODOT_HOME --path <项目路径>`
@@ -374,7 +372,7 @@ docs/ (设计文档，按阶段分)
 #### 内存与缓存管理
 
 - **P2-18** 内存管理：`Resource`（含 `RefCounted`）子类**禁止**调用 `.free()`，由引用计数自动释放；`Node` 子类**必须**调用 `.free()` 或 `queue_free()`
-- **P2-19** `class_name` 缓存管理：新增或移动含 `class_name` 的 `.gd` 文件后，**必须**更新 `.godot/global_script_class_cache.cfg` 并用 `--editor` 模式重载项目。未更新缓存会导致 "Identifier not declared" 或 "Class X hides a global script class" 错误
+- **P2-19** `class_name` 缓存管理：新增或移动含 `class_name` 的 `.gd` 文件后，**必须**通过 Godot 编辑器重载项目（见 P2-17）来刷新缓存。未刷新缓存会导致 "Identifier not declared" 或 "Class X hides a global script class" 错误。**禁止**手动修改 `.godot/` 目录下的任何文件（见 P2-29）
 
 #### 场景文件
 
@@ -410,6 +408,10 @@ docs/ (设计文档，按阶段分)
 #### 碰撞配置
 
 - **P2-28** 碰撞层/掩码解耦：`collision_layer` 和 `collision_mask` **禁止**在 GDScript 代码中硬编码赋值（如 `_ready()` 中设置），**必须**在场景文件（`.tscn`）的节点属性中配置。代码与碰撞配置解耦，便于不同场景复用同一脚本。代码中**仅允许**读取碰撞层值用于运行时判断（如 `get_collision_layer()` 检查）
+
+#### .godot 目录
+
+- **P2-29** `.godot/` 目录下的所有文件（包括 `.uid`、缓存、索引等）由 Godot 编辑器自动生成和管理，**禁止**手动创建、修改或删除。如需刷新，**必须**通过 Godot 编辑器重载项目（见 P2-17）实现
 
 ## 严重违规清单
 
