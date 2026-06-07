@@ -156,13 +156,18 @@ docs/               (按阶段分，见 1.8)
 | 时机 | ID | 动作 |
 |------|-----|------|
 | 任务开始前 | **P0-13** | 读取 `docs/06_postmortem/MEMORY.md`（不存在则跳过） |
-| 任务完成后 | **P0-14** | `[Agent] notifier` 提炼经验 → 追加到 `MEMORY.md`（**禁止**重复） |
-| P0-14 后 | **P0-15** | `[Agent] notifier` 飞书通知完成状态。凭证缺失则跳过并说明 |
+| 任务完成后 | **P0-14** | 主代理提炼经验 → 追加到 `MEMORY.md`（**禁止**重复） |
+| P0-14 后 | **P0-15** | 主代理 `[Skill: lark-im]` 飞书通知完成状态。凭证缺失则跳过并说明 |
 | 代码变更后 | **P0-16** | 测试覆盖率 ≥ 80%（`[MCP] godot-ultimate_godot_get_test_coverage`），初始化阶段豁免 |
 
 ### 2.5 任务执行
 
-- **P0-17** 任务执行**必须优先**调度子代理（见 1.5），禁止主代理直接执行子代理职责范围内的工作。仅在无对应子代理或子代理无法完成时，主代理方可直接处理
+- **P0-17** 子代理调度策略：
+  - **默认**：主代理直接执行所有任务，加载对应 Skill 完成工作
+  - **使用子代理的条件**（满足任一即可）：
+    1. **可并行**：多个任务无依赖关系，并行调度可显著降低总执行时长
+    2. **不同模型**：子代理配置了与主代理不同的 model，能提供差异化能力
+  - 不满足上述条件时，主代理加载对应 Skill 直接执行，禁止不必要的子代理调度
 
 ---
 
@@ -175,23 +180,23 @@ docs/               (按阶段分，见 1.8)
 | 步骤 | 名称 | 负责方 | 关键动作 |
 |------|------|--------|---------|
 | S1 | 开发前准备 | 主代理 | 读 `MEMORY.md` → 输出 Story 概要 → **暂停等用户确认** |
-| S1.5 | 设计文档 | `[Agent] architect` | 输出模块设计 + 状态机设计到 `docs/03_arch/` → **暂停等用户确认** |
+| S1.5 | 设计文档 | 主代理 `[Skill: architect]` | 输出模块设计 + 状态机设计到 `docs/03_arch/` → **暂停等用户确认** |
 | S2 | 梳理 AC | 主代理 | 列出所有 BDD 场景（Given-When-Then），不具体时先与用户澄清 |
-| S3 | Red | `[Agent] developer` | 逐类写单元 + 集成测试，确保失败 |
-| S4 | Green | `[Agent] developer` | 最小实现使测试通过（`godot-best-practices` + `gdscript-patterns`） |
-| S5 | Refactor | `[Agent] developer` | 优化结构保持测试通过 → 回 S3 直到所有类完成 |
-| S6 | 一致性检查 | `[Agent] consistency-checker` | 代码↔设计文档对比 → 有差异**暂停**等用户决定 |
+| S3 | Red | 主代理 `[Skill: best-practices + gdscript-patterns]` | 逐类写单元 + 集成测试，确保失败 |
+| S4 | Green | 主代理 `[Skill: best-practices + gdscript-patterns]` | 最小实现使测试通过 |
+| S5 | Refactor | 主代理 `[Skill: best-practices + gdscript-patterns]` | 优化结构保持测试通过 → 回 S3 直到所有类完成 |
+| S6 | 一致性检查 | 主代理 `[Skill: best-practices]` | 代码↔设计文档对比 → 有差异**暂停**等用户决定 |
 | S7 | AC 覆盖分析 | 主代理 | 逐项对比 AC 与测试，补充缺失测试 |
 | S8 | 全量测试 | `[MCP]` | `godot-ultimate_godot_run_tests` 全部通过 |
-| S8.5 | 功能测试 | `[Agent] functional-tester` | 按键模拟 + 截图验证端到端行为 |
-| S9 | 静态分析 | `[Agent] static-analyzer` | 质量须达优秀，未达标回 S5 迭代重构 |
+| S8.5 | 功能测试 | 主代理 | 按键模拟 + 截图验证端到端行为 |
+| S9 | 静态分析 | 主代理 `[Skill: static-analysis + tdd + best-practices]` | 质量须达优秀，未达标回 S5 迭代重构 |
 | S10 | 诊断检查 | `[MCP]` | `minimal-godot_get_diagnostics` 无语法错误 |
-| S11 | 代码检视 | `[Agent] reviewer` | 逐文件展示变更 → 和用户一起检视 |
-| S12 | 设计对比 | `[Agent] consistency-checker` | 代码↔设计文档差异清单 → 用户确认处理方案 |
+| S11 | 代码检视 | 主代理 `[Skill: code-review]` | 逐文件展示变更 → 和用户一起检视 |
+| S12 | 设计对比 | 主代理 `[Skill: best-practices]` | 代码↔设计文档差异清单 → 用户确认处理方案 |
 | S13 | 经验归档 | 主代理 | 检视 + 静态检查问题 → 追加到 `MEMORY.md` |
 | S14 | 更新 Backlog | 主代理 | `docs/04_sprint/01_backlog.md` 标记已完成 |
 | S15 | Git 提交 | 主代理 | 工作区干净 + 用户确认 → commit |
-| S16 | 收尾通知 | `[Agent] notifier` | 经验归档 + 飞书通知 |
+| S16 | 收尾通知 | 主代理 `[Skill: lark-im]` | 经验归档 + 飞书通知 |
 
 **约束**：Story 间**必须**暂停等用户确认（P1-2）；每 Story 完成后游戏**必须**可运行且有可玩内容（P1-3）。
 
@@ -214,7 +219,7 @@ docs/               (按阶段分，见 1.8)
 
 - **P1-6** 代码编写完成后、测试通过前：AI 逐文件展示变更摘要，和用户一起检视
 - **P1-10** Story 文档**必须** BDD（Given-When-Then），至少一个场景
-- **P1-11** Story 标记已完成前：`[Agent] consistency-checker` 对比代码↔设计文档，差异等用户确认
+- **P1-11** Story 标记已完成前：主代理 `[Skill: best-practices]` 对比代码↔设计文档，差异等用户确认
 - **P1-12** 静态分析须达优秀，未达标则循环：`TDD 重构 → 补充测试 → 重新分析` 直到达标
 - **P1-13** 检视和静态检查问题 → 经验教训追加到 `MEMORY.md`（**禁止**重复）
 - **P1-14** 每个 agent_task 完成后：一致性报告（已实现/未实现/额外/不一致），第 2/3/4 类**暂停**等用户决定：① 补代码对齐设计 ② 更新设计反映代码 ③ 确认偏差并记录
@@ -222,10 +227,10 @@ docs/               (按阶段分，见 1.8)
 ### 3.5 功能开发流程（P1-15）
 
 ```
-[Agent] godot-ui-designer [Skill: godot-ui]
-  → [Agent] godot-architect [Skill: godot-architect]
+主代理 [Skill: godot-ui]
+  → 主代理 [Skill: godot-architect]
   → [MCP] godot-mcp_* 场景骨架
-  → [Agent] godot-developer [Skill: best-practices + gdscript-patterns]
+  → 主代理 [Skill: best-practices + gdscript-patterns]
   → [MCP] lint + run_tests
   → [MCP] minimal-godot_get_diagnostics
 ```
@@ -242,12 +247,12 @@ docs/               (按阶段分，见 1.8)
 
 - **P1-23** Skill 映射见 [1.6 Skill 分工矩阵]
 - **P1-24** `.gd` 与 `.tscn` 是独立职责，**禁止**混合处理
-- **P1-25** `[Agent] godot-developer` **必须**同时加载 `godot-best-practices` + `godot-gdscript-patterns`
+- **P1-25** 主代理执行 TDD 编码时**必须**同时加载 `godot-best-practices` + `godot-gdscript-patterns`
 
 ### 3.8 其他
 
 - **P1-21** 精灵图分析结果**必须**保存到 `docs/02_analysis/`（`{序号}_资源分析_{名}.md`），后续引用文档禁止重复分析
-- **P1-22** 生成物**必须**经 `[Agent] artifact-reviewer` 独立检视（文档：命名/目录/标题/mermaid/关联；代码：语法/SOLID·DRY/诊断）
+- **P1-22** 生成物**必须**经独立检视（文档：命名/目录/标题/mermaid/关联；代码：语法/SOLID·DRY/诊断）。可并行时调度 `[Agent] artifact-reviewer`
 
 ---
 
@@ -267,6 +272,7 @@ docs/               (按阶段分，见 1.8)
 - **P2-7** 架构/流程/状态**必须**用 mermaid 绘图
 - **P2-8** 文档须：结构化标题（不跳级）、可追溯、图表优先、具体可执行、自包含
 - **P2-9** 输出前自检：命名 ✓ 目录 ✓ 标题 ✓ mermaid ✓ 上游关联 ✓
+- **P2-9.5** 设计文档**禁止**包含完整实现代码，**仅**定义：类名、方法签名（参数+返回值）、signal 签名、类间调用关系、职责描述。伪代码仅用于说明复杂算法逻辑
 
 ### 4.3 Git 提交
 
@@ -282,8 +288,10 @@ docs/               (按阶段分，见 1.8)
 - **P2-16** 测试命令：`$GODOT_HOME -s addons/gut/gut_cmdln.gd -gexit`
 - **P2-17** 编辑器管理：
   - **单实例**：同时只允许 1 个（检测：`Get-Process "Godot*"` / 关闭：`Stop-Process "Godot*" -Force`）
-  - **常驻运行**：启动后禁止关闭，维持 LSP/诊断
-  - **启动优先级**：`[MCP] godot-mcp_launch_editor` > `& $env:GODOT_HOME --path <项目>`
+  - **启动策略**：需要编辑器时先检测是否已运行（`Get-Process "Godot*"`），已运行则直接使用，未运行则异步启动（`Start-Process`），**不阻塞等待**
+  - **启动超时**：启动后最多轮询等待 **30 秒**（每 5 秒检测一次进程），超时仍未检测到进程则**放弃启动**，继续任务并提示用户手动启动
+  - **LSP 降级**：编辑器不可用时跳过 `get_diagnostics`，改用 `scan_workspace_diagnostics`（不依赖 LSP），并在最终报告中标注"编辑器未启动，诊断可能不完整"
+  - **启动优先级**：`[MCP] godot-mcp_launch_editor` > `Start-Process $env:GODOT_HOME --path <项目>`
   - **无头模式**：`& $env:GODOT_HOME --editor --path <项目>`（仅加载索引）
 
 ### 4.5 Godot 技术约束
@@ -301,7 +309,7 @@ docs/               (按阶段分，见 1.8)
 - **P2-23** 分层：单元 = 纯逻辑；集成 = 场景树依赖（动画/碰撞/输入）
 - **P2-24** 功能测试：继承 `SceneTree`，`Input.parse_input_event()` 模拟，`get_viewport().get_texture().get_image()` 截图
 - **P2-25** 存放：`test/functional/{模块}/test_{名}_functional.gd`，截图 `test/functional/screenshots/`
-- **P2-26** 功能测试**必须**在 S8 后执行；失败则交 `[Agent] developer` 修复，从 S8 重跑
+- **P2-26** 功能测试**必须**在 S8 后执行；失败则主代理修复，从 S8 重跑
 - **P2-27** LSP 需 GUI 模式编辑器，`get_diagnostics` 前确认编辑器已启动
 
 ---

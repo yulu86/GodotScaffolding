@@ -9,9 +9,7 @@ tools:
   edit: true
   write: true
 permission:
-  bash:
-    "lark-cli*": allow
-    "*": deny
+  bash: allow
   edit:
     "docs/06_postmortem/**": allow
   webfetch: deny

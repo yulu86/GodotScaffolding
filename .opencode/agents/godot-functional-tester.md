@@ -9,10 +9,7 @@ tools:
   edit: false
   write: true
 permission:
-  bash:
-    "*": ask
-    "git diff*": allow
-    "git status*": allow
+  bash: allow
   edit:
     "*": deny
   webfetch: deny

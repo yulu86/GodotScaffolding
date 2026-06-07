@@ -5,12 +5,11 @@ model: zhipuai-coding-plan/glm-5.1
 temperature: 0.1
 hidden: true
 tools:
-  bash: false
+  bash: true
   edit: false
   write: false
 permission:
-  bash:
-    "*": deny
+  bash: allow
   edit:
     "*": deny
   webfetch: deny

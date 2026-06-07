@@ -5,12 +5,11 @@ model: zhipuai-coding-plan/glm-5.1
 temperature: 0.3
 hidden: true
 tools:
-  bash: false
+  bash: true
   edit: true
   write: true
 permission:
-  bash:
-    "*": deny
+  bash: allow
   edit:
     "docs/**": allow
     ".opencode/**": deny

@@ -9,10 +9,7 @@ tools:
   edit: true
   write: true
 permission:
-  bash:
-    "*": ask
-    "git status*": allow
-    "git diff*": allow
+  bash: allow
   edit:
     "scripts/**": allow
     "scenes/**": allow
