@@ -1,7 +1,7 @@
 ---
 description: "Godot 功能测试员：通过按键模拟和截图验证，对游戏进行端到端功能测试"
 mode: subagent
-model: zhipuai-coding-plan/glm-4.6V
+model: zhipuai-coding-plan/glm-5-turbo
 temperature: 0.1
 hidden: true
 tools:
