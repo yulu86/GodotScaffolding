@@ -69,14 +69,14 @@
 ```
 build (主代理)
   ├─ godot-ui-designer         → P1-15 UI 设计 / P1-15S 场景设计
-  ├─ godot-architect           → P1-15 架构设计 / P1-15S S1.5
-  ├─ godot-developer           → P1-15S S3-S5 TDD 编码
-  ├─ godot-reviewer            → P1-15S S11 代码检视
-  ├─ godot-consistency-checker → P1-15S S6/S12 一致性检查
-  ├─ godot-static-analyzer     → P1-15S S9 静态分析
-  ├─ godot-functional-tester   → P1-15S S8.5 功能测试
+  ├─ godot-architect           → P1-15 架构设计 / P1-15S S2
+  ├─ godot-developer           → P1-15S S5-S7 TDD 编码
+  ├─ godot-reviewer            → P1-15S S14 代码检视
+  ├─ godot-consistency-checker → P1-15S S8/S15 一致性检查
+  ├─ godot-static-analyzer     → P1-15S S13 静态分析
+  ├─ godot-functional-tester   → P1-15S S12 功能测试
   ├─ godot-artifact-reviewer   → P1-22 生成物检视
-  ├─ godot-notifier            → P0-14/P0-15/S16 收尾通知
+  ├─ godot-notifier            → P0-14/P0-15/S20 收尾通知
   ├─ explore (内置)            → 快速代码搜索
   └─ general (内置)            → 通用多步骤任务
 ```
@@ -175,28 +175,31 @@ docs/               (按阶段分，见 1.8)
 
 ### 3.1 Story 标准流程（P1-15S）
 
-> **必须**严格按 S1→S16 顺序执行，不得跳步或调换，除非用户明确指示。
+> **必须**严格按 S1→S21 顺序执行，不得跳步或调换，除非用户明确指示。
 
-| 步骤 | 名称 | 负责方 | 关键动作 |
-|------|------|--------|---------|
+| 步骤 | 名称 | 代理 | 关键动作 |
+|------|------|------|--------|
 | S1 | 开发前准备 | 主代理 | 读 `MEMORY.md` → 输出 Story 概要 → **暂停等用户确认** |
-| S1.5 | 设计文档 | 主代理 `[Skill: architect]` | 输出模块设计 + 状态机设计到 `docs/03_arch/` → **暂停等用户确认** |
-| S2 | 梳理 AC | 主代理 | 列出所有 BDD 场景（Given-When-Then），不具体时先与用户澄清 |
-| S3 | Red | 主代理 `[Skill: best-practices + gdscript-patterns]` | 逐类写单元 + 集成测试，确保失败 |
-| S4 | Green | 主代理 `[Skill: best-practices + gdscript-patterns]` | 最小实现使测试通过 |
-| S5 | Refactor | 主代理 `[Skill: best-practices + gdscript-patterns]` | 优化结构保持测试通过 → 回 S3 直到所有类完成 |
-| S6 | 一致性检查 | 主代理 `[Skill: best-practices]` | 代码↔设计文档对比 → 有差异**暂停**等用户决定 |
-| S7 | AC 覆盖分析 | 主代理 | 逐项对比 AC 与测试，补充缺失测试 |
-| S8 | 全量测试 | `[MCP]` | `godot-ultimate_godot_run_tests` 全部通过 |
-| S8.5 | 功能测试 | 主代理 | 按键模拟 + 截图验证端到端行为 |
-| S9 | 静态分析 | 主代理 `[Skill: static-analysis + tdd + best-practices]` | 质量须达优秀，未达标回 S5 迭代重构 |
-| S10 | 诊断检查 | `[MCP]` | `minimal-godot_get_diagnostics` 无语法错误 |
-| S11 | 代码检视 | 主代理 `[Skill: code-review]` | 逐文件展示变更 → 和用户一起检视 |
-| S12 | 设计对比 | 主代理 `[Skill: best-practices]` | 代码↔设计文档差异清单 → 用户确认处理方案 |
-| S13 | 经验归档 | 主代理 | 检视 + 静态检查问题 → 追加到 `MEMORY.md` |
-| S14 | 更新 Backlog | 主代理 | `docs/04_sprint/01_backlog.md` 标记已完成 |
-| S15 | Git 提交 | 主代理 | 工作区干净 + 用户确认 → commit |
-| S16 | 收尾通知 | 主代理 `[Skill: lark-im]` | 经验归档 + 飞书通知 |
+| S2 | 设计文档 | `godot-architect` | 输出模块设计 + 状态机设计到 `docs/03_arch/` → **暂停等用户确认** |
+| S3 | 梳理 AC | 主代理 | 列出所有 BDD 场景（Given-When-Then），不具体时先与用户澄清 |
+| S4 | 依赖分析与执行规划 | 主代理 | 将 AC 拆解为 agent_task → 分析任务间依赖关系 → 按依赖最少优先排序 → 输出依赖拓扑图（mermaid DAG）→ 标注可并行任务组（每组**最多 4 个**并行 task）→ **暂停等用户确认** |
+| S5 | Red | `godot-developer` | 按依赖拓扑顺序逐类执行：依赖最少优先；**同一依赖层级内无相互依赖的 task 可并行调度，并行度上限 4**（子代理执行，遵循 P0-17） |
+| S6 | Green | `godot-developer` | 同 S5 并行策略，最小实现使测试通过 |
+| S7 | Refactor | `godot-developer` | 同 S5 并行策略，优化结构保持测试通过 → 回 S5 直到所有类完成 |
+| S8 | 场景搭建 | `godot-ui-designer` | AI 通过 MCP 搭建 .tscn 主体框架（节点树、脚本绑定、属性配置等） → 输出详细操作指导 → **暂停等用户完成**可视化操作（sprite 位置、碰撞形状/位置、动画配置等） |
+| S9 | 一致性检查 | `godot-consistency-checker` | 代码↔设计文档 + 场景结构对比 → 有差异**暂停**等用户决定 |
+| S10 | AC 覆盖分析 | 主代理 | 逐项对比 AC 与测试，补充缺失测试 |
+| S11 | 全量测试 | 主代理 | `godot-ultimate_godot_run_tests` 全部通过 |
+| S12 | 功能测试 | `godot-functional-tester` | 按键模拟 + 截图验证端到端行为 |
+| S13 | 静态分析 | `godot-static-analyzer` | 质量须达优秀，未达标回 S7 迭代重构 |
+| S14 | 诊断检查 | 主代理 | `minimal-godot_get_diagnostics` 无语法错误 |
+| S15 | 代码检视 | `godot-reviewer` | 总结开发内容 → 在编辑器中逐个打开文件，说明职责、修改关键点、检视关键点 → **暂停等用户检视结果** |
+| S16 | 设计对比 | `godot-consistency-checker` | 代码↔设计文档差异清单 → 用户确认处理方案 |
+| S17 | 经验归档 | 主代理 | 检视 + 静态检查问题 → 追加到 `MEMORY.md` |
+| S18 | 更新 Backlog | 主代理 | `docs/04_sprint/01_backlog.md` 标记已完成 |
+| S19 | Git 提交 | 主代理 | 工作区干净 + 用户确认 → commit |
+| S20 | 收尾通知 | `godot-notifier` | 经验归档 + 飞书通知 |
+| S21 | 场景可视化验收 | 主代理 | 用户完成可视化操作后，AI 验收 .tscn 配置正确性 → 不符预期则指导修正 → **暂停等用户确认** |
 
 **约束**：Story 间**必须**暂停等用户确认（P1-2）；每 Story 完成后游戏**必须**可运行且有可玩内容（P1-3）。
 
@@ -309,7 +312,7 @@ docs/               (按阶段分，见 1.8)
 - **P2-23** 分层：单元 = 纯逻辑；集成 = 场景树依赖（动画/碰撞/输入）
 - **P2-24** 功能测试：继承 `SceneTree`，`Input.parse_input_event()` 模拟，`get_viewport().get_texture().get_image()` 截图
 - **P2-25** 存放：`test/functional/{模块}/test_{名}_functional.gd`，截图 `test/functional/screenshots/`
-- **P2-26** 功能测试**必须**在 S8 后执行；失败则主代理修复，从 S8 重跑
+- **P2-26** 功能测试**必须**在 S11 后执行；失败则主代理修复，从 S11 重跑
 - **P2-27** LSP 需 GUI 模式编辑器，`get_diagnostics` 前确认编辑器已启动
 
 ---
