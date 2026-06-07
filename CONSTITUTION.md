@@ -257,6 +257,28 @@ build (主代理，zhipuai-coding-plan/glm-5.1)
 
 - **P1-20** GDScript 文件**必须**定义 `class_name`（Autoload/Singleton 除外），并通过 `class_name` 进行类型引用，**禁止**使用 `preload`/`load` 后的变量名作为类型别名
 
+#### Skill 分工规则
+
+- **P1-23** Skill 与开发任务的映射**必须**严格遵循下表，**禁止**跨域使用不匹配的 Skill：
+
+  | 开发任务 | **必须**使用的 Skill | **禁止**用于 |
+  |---------|---------------------|------------|
+  | GDScript 代码编写（逻辑、算法、状态机实现） | `godot-best-practices` + `godot-gdscript-patterns` | Scene 节点树搭建、UI 布局设计 |
+  | UI 场景设计（Control 节点、布局、主题、样式） | `godot-ui` | 非 UI 的 GDScript 逻辑代码 |
+  | 系统架构设计（模块划分、状态机架构、场景树规划） | `godot-architect` | 代码实现（仅输出设计文档） |
+  | 非 UI 场景骨架搭建（Player、Enemy 等游戏节点树） | `[MCP] godot-mcp_*` 工具 | — |
+  | 代码检视 | `godot-code-review` | — |
+  | 静态分析与代码度量 | `godot-static-analysis` | — |
+  | 精灵图资源分析 | `sprite-analyzer` | — |
+
+- **P1-24** GDScript 代码开发（`.gd` 文件）和 Scene 场景开发（`.tscn` 文件）是**独立职责**，**禁止**在同一个 Skill 中混合处理：
+  - `.gd` 文件的编写、重构、测试 → `godot-best-practices` + `godot-gdscript-patterns`
+  - `.tscn` UI 场景的节点树、布局、样式 → `godot-ui`
+  - `.tscn` 非UI 场景的骨架搭建 → `[MCP] godot-mcp_*` 工具
+  - 架构设计（产出设计文档） → `godot-architect`（**禁止**输出代码）
+
+- **P1-25** `[Agent] godot-developer` 执行编码任务时，**必须**同时加载 `godot-best-practices` 和 `godot-gdscript-patterns` 两个 Skill，**禁止**只加载其中一个
+
 ### 资源分析文档化
 
 - **P1-21** 使用 `[Skill] sprite-analyzer` 分析游戏图片资源后，**必须**将分析结果以文档形式保存到 `docs/02_analysis/` 目录（命名格式：`{序号}_资源分析_{资源名}.md`），后续开发中**必须**直接引用该文档，禁止重复分析同一资源
