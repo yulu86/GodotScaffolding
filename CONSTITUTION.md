@@ -383,6 +383,9 @@ docs/ (设计文档，按阶段分)
 
 - **P2-16** 使用 `$GODOT_HOME` 环境变量：`$GODOT_HOME -s addons/gut/gut_cmdln.gd -gexit`
 - **P2-17** Godot 编辑器操作方法：
+  - **唯一实例**：同一时刻**必须**只有 1 个 Godot 编辑器实例在运行。启动编辑器前**必须**先检查是否有已运行的实例，若发现已有实例在运行，**必须**先关闭已有实例后再启动新实例。多实例同时运行会导致 LSP 缓存冲突、`.uid` 文件竞态写入和诊断信息不一致
+    - Windows PowerShell：`Get-Process -Name "Godot*" -ErrorAction SilentlyContinue`（检测）/ `Stop-Process -Name "Godot*" -Force`（关闭）
+    - macOS/Linux：`pgrep -f "Godot"`（检测）/ `pkill -f "Godot"`（关闭）
   - **保持运行**：编辑器启动后**禁止关闭**，需保持运行以维持 LSP 服务和诊断功能。整个开发会话期间编辑器应始终处于打开状态
   - **打开编辑器**（按优先级排序）：
     1. **MCP 工具**（推荐）：`[MCP] godot-mcp_launch_editor`（传入 `projectPath` 参数）
