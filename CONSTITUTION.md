@@ -56,10 +56,10 @@
 |------|------|-------|------|------|
 | `godot-ui-designer` | 开发 | `godot-ui` | 只读+文档 | UI 场景设计 |
 | `godot-architect` | 开发 | `godot-architect` | 只读+文档 | 架构设计（仅文档，禁止输出代码） |
-| `godot-developer` | 开发 | `best-practices`+`gdscript-patterns`+`tdd` | 全部 | TDD 编码（Red→Green→Refactor） |
+| `godot-developer` | 开发 | `godot-best-practices`+`godot-gdscript-patterns`+`tdd` | 全部 | TDD 编码（Red→Green→Refactor） |
 | `godot-reviewer` | 质量 | `godot-code-review` | 只读 | 逐文件代码检视 |
 | `godot-consistency-checker` | 质量 | `godot-best-practices` | 只读 | 代码↔设计文档一致性检查 |
-| `godot-static-analyzer` | 质量 | `static-analysis`+`tdd`+`best-practices` | 读写+bash | 静态分析 + TDD 重构循环 |
+| `godot-static-analyzer` | 质量 | `godot-static-analysis`+`tdd`+`godot-best-practices` | 读写+bash | 静态分析 + TDD 重构循环 |
 | `godot-artifact-reviewer` | 验收 | — | 读写 | 生成物独立检视 |
 | `godot-functional-tester` | 质量 | — | bash+写 | 按键模拟+截图功能测试 |
 | `godot-notifier` | 验收 | `lark-im` | bash+写 | 经验归档 + 飞书收尾通知 |
@@ -68,15 +68,15 @@
 
 ```
 build (主代理)
-  ├─ godot-ui-designer         → P1-15 UI 设计 / P1-15S 场景设计
+  ├─ godot-ui-designer         → P1-15S S8 场景搭建
   ├─ godot-architect           → P1-15 架构设计 / P1-15S S2
   ├─ godot-developer           → P1-15S S5-S7 TDD 编码
-  ├─ godot-reviewer            → P1-15S S14 代码检视
-  ├─ godot-consistency-checker → P1-15S S8/S15 一致性检查
+  ├─ godot-reviewer            → P1-15S S15 代码检视
+  ├─ godot-consistency-checker → P1-15S S9/S16 一致性检查
   ├─ godot-static-analyzer     → P1-15S S13 静态分析
   ├─ godot-functional-tester   → P1-15S S12 功能测试
   ├─ godot-artifact-reviewer   → P1-22 生成物检视
-  ├─ godot-notifier            → P0-14/P0-15/S20 收尾通知
+  ├─ godot-notifier            → S21 收尾通知
   ├─ explore (内置)            → 快速代码搜索
   └─ general (内置)            → 通用多步骤任务
 ```
@@ -102,6 +102,7 @@ scripts/{模块}/     (.gd)
 test/unit/{模块}/        (单元测试)
 test/integration/{模块}/  (集成测试)
 test/functional/{模块}/   (功能测试)
+test/functional/screenshots/ (功能测试截图)
 addons/
 docs/               (按阶段分，见 1.8)
 ```
@@ -147,7 +148,7 @@ docs/               (按阶段分，见 1.8)
 
 ### 2.3 TDD 流程
 
-- **P0-11** 修改 `.gd` **必须** Red→Green→Refactor，**禁止**先实现后补测试。适用于**所有**阶段
+- **P0-11** 修改 `.gd` **必须** Red→Green→Refactor，**禁止**先实现后补测试。适用于**所有**阶段。每步（Red/Green/Refactor）完成后**必须**运行当前类测试确认结果
 - **P0-11.5** **逐类循环**：按依赖排序（最少依赖优先），每次只做一个类的完整 Red→Green→Refactor 循环
 - **P0-12** 写测试前**必须**先梳理所有 BDD 验收场景，确保每条 AC 有 ≥1 个测试覆盖；AC 不具体时先与用户澄清
 
@@ -158,7 +159,7 @@ docs/               (按阶段分，见 1.8)
 | 任务开始前 | **P0-13** | 读取 `docs/06_postmortem/MEMORY.md`（不存在则跳过） |
 | 任务完成后 | **P0-14** | 主代理提炼经验 → 追加到 `MEMORY.md`（**禁止**重复） |
 | P0-14 后 | **P0-15** | 主代理 `[Skill: lark-im]` 飞书通知完成状态。凭证缺失则跳过并说明 |
-| 代码变更后 | **P0-16** | 测试覆盖率 ≥ 80%（`[MCP] godot-ultimate_godot_get_test_coverage`），初始化阶段豁免 |
+| 代码变更后 | **P0-16** | 测试覆盖率 ≥ 80%（`[MCP] godot-ultimate_godot_get_test_coverage`），初始化阶段豁免。工具不可用时手动统计 |
 
 ### 2.5 任务执行
 
@@ -191,15 +192,15 @@ docs/               (按阶段分，见 1.8)
 | S10 | AC 覆盖分析 | 主代理 | 逐项对比 AC 与测试，补充缺失测试 |
 | S11 | 全量测试 | 主代理 | `godot-ultimate_godot_run_tests` 全部通过 |
 | S12 | 功能测试 | `godot-functional-tester` | 按键模拟 + 截图验证端到端行为 |
-| S13 | 静态分析 | `godot-static-analyzer` | 质量须达优秀，未达标回 S7 迭代重构 |
+| S13 | 静态分析 | `godot-static-analyzer` | 质量须达优秀，未达标回 S7 迭代重构（S7→S8→…→S13 循环直到达标） |
 | S14 | 诊断检查 | 主代理 | `minimal-godot_get_diagnostics` 无语法错误 |
 | S15 | 代码检视 | `godot-reviewer` | 总结开发内容 → 在编辑器中逐个打开文件，说明职责、修改关键点、检视关键点 → **暂停等用户检视结果** |
 | S16 | 设计对比 | `godot-consistency-checker` | 代码↔设计文档差异清单 → 用户确认处理方案 |
-| S17 | 经验归档 | 主代理 | 检视 + 静态检查问题 → 追加到 `MEMORY.md` |
-| S18 | 更新 Backlog | 主代理 | `docs/04_sprint/01_backlog.md` 标记已完成 |
-| S19 | Git 提交 | 主代理 | 工作区干净 + 用户确认 → commit |
-| S20 | 收尾通知 | `godot-notifier` | 经验归档 + 飞书通知 |
-| S21 | 场景可视化验收 | 主代理 | 用户完成可视化操作后，AI 验收 .tscn 配置正确性 → 不符预期则指导修正 → **暂停等用户确认** |
+| S17 | 场景可视化验收 | 主代理 | 用户完成可视化操作后，AI 验收 .tscn 配置正确性 → 不符预期则指导修正 → **暂停等用户确认** |
+| S18 | 经验归档 | 主代理 | 检视 + 静态检查问题 → 追加到 `MEMORY.md` |
+| S19 | 更新 Backlog | 主代理 | `docs/04_sprint/01_backlog.md` 标记已完成 |
+| S20 | Git 提交 | 主代理 | 工作区干净 + 用户确认 → commit |
+| S21 | 收尾通知 | `godot-notifier` | 经验归档 + 飞书通知 |
 
 **约束**：Story 间**必须**暂停等用户确认（P1-2）；每 Story 完成后游戏**必须**可运行且有可玩内容（P1-3）。
 
@@ -220,9 +221,9 @@ docs/               (按阶段分，见 1.8)
 
 ### 3.4 检视与一致性
 
-- **P1-6** 代码编写完成后、测试通过前：AI 逐文件展示变更摘要，和用户一起检视
+- **P1-6** S15 代码检视：AI 逐文件展示变更摘要，与用户一起检视
 - **P1-10** Story 文档**必须** BDD（Given-When-Then），至少一个场景
-- **P1-11** Story 标记已完成前：主代理 `[Skill: best-practices]` 对比代码↔设计文档，差异等用户确认
+- **P1-11** Story 标记已完成前：S16 `godot-consistency-checker` 对比代码↔设计文档，差异等用户确认
 - **P1-12** 静态分析须达优秀，未达标则循环：`TDD 重构 → 补充测试 → 重新分析` 直到达标
 - **P1-13** 检视和静态检查问题 → 经验教训追加到 `MEMORY.md`（**禁止**重复）
 - **P1-14** 每个 agent_task 完成后：一致性报告（已实现/未实现/额外/不一致），第 2/3/4 类**暂停**等用户决定：① 补代码对齐设计 ② 更新设计反映代码 ③ 确认偏差并记录
@@ -230,12 +231,11 @@ docs/               (按阶段分，见 1.8)
 ### 3.5 功能开发流程（P1-15）
 
 ```
-主代理 [Skill: godot-ui]
-  → 主代理 [Skill: godot-architect]
-  → [MCP] godot-mcp_* 场景骨架
-  → 主代理 [Skill: best-practices + gdscript-patterns]
-  → [MCP] lint + run_tests
-  → [MCP] minimal-godot_get_diagnostics
+主代理 [Skill: godot-architect]                        (S2 设计文档)
+  → 主代理 [Skill: best-practices + gdscript-patterns]  (S5-S7 TDD 编码)
+  → 主代理 [Skill: godot-ui] + [MCP] godot-mcp_*        (S8 场景搭建)
+  → [MCP] lint + run_tests                              (S11 全量测试)
+  → [MCP] minimal-godot_get_diagnostics                 (S14 诊断检查)
 ```
 
 ### 3.6 场景规范
@@ -300,15 +300,14 @@ docs/               (按阶段分，见 1.8)
 ### 4.5 Godot 技术约束
 
 - **P2-18** `Resource`/`RefCounted` **禁止** `.free()`；`Node` **必须** `.free()`/`queue_free()`
-- **P2-19** 新增/移动含 `class_name` 的 `.gd` 后**必须**重载项目刷新缓存；**禁止**手动改 `.godot/`
+- **P2-19** 新增/移动含 `class_name` 的 `.gd` 后**必须**重载项目刷新缓存；`.godot/` 目录**禁止**手动操作，刷新通过编辑器重载
 - **P2-20** .tscn 手写规则：骨架可手写；视觉资源（SpriteFrames/TileSet/材质）**必须**编辑器创建；子场景根路径用 `"."`
 - **P2-21** 状态模式选型：状态基类用 `Resource`，状态机管理器用 `Node`
 - **P2-28** 碰撞层/掩码**禁止**代码硬编码，**必须**在 .tscn 属性配置；代码仅允许读取
-- **P2-29** `.godot/` 目录**禁止**手动操作，刷新通过编辑器重载
 
 ### 4.6 测试技术
 
-- **P2-22** GUT 单元测试：`load()` + `.new()` 测试纯逻辑；`@onready` 需手动赋值；`move_and_slide()` 等物理方法**禁止**在 `.new()` 模式调用用集成测试；`AnimatedSprite2D.new()` 需预注册动画名；`-gdir` 不递归需显式指定目录
+- **P2-22** GUT 单元测试：`load()` + `.new()` 测试纯逻辑；`@onready` 需手动赋值；`move_and_slide()` 等物理方法**禁止**在 `.new()` 模式调用，**应使用**集成测试；`AnimatedSprite2D.new()` 需预注册动画名；`-gdir` 不递归需显式指定目录
 - **P2-23** 分层：单元 = 纯逻辑；集成 = 场景树依赖（动画/碰撞/输入）
 - **P2-24** 功能测试：继承 `SceneTree`，`Input.parse_input_event()` 模拟，`get_viewport().get_texture().get_image()` 截图
 - **P2-25** 存放：`test/functional/{模块}/test_{名}_functional.gd`，截图 `test/functional/screenshots/`
