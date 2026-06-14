@@ -1,7 +1,7 @@
 ﻿---
 description: "Godot 静态分析员：执行代码静态分析，TDD 迭代重构直至质量达标"
 mode: subagent
-model: zhipuai-coding-plan/glm-5.1
+model: zhipuai-coding-plan/glm-5.2
 temperature: 0.1
 hidden: true
 tools:

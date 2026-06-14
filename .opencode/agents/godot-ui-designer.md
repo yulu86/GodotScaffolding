@@ -1,7 +1,7 @@
 ﻿---
 description: "Godot UI 设计师：负责 UI 场景设计、布局规划、样式方案，输出 UI 设计文档"
 mode: subagent
-model: zhipuai-coding-plan/glm-5.1
+model: zhipuai-coding-plan/glm-5.2
 temperature: 0.3
 hidden: true
 tools:

@@ -1,7 +1,7 @@
 ﻿---
 description: "Godot TDD 开发者：负责 TDD 编码实现（Red→Green→Refactor），编写测试和功能代码"
 mode: subagent
-model: zhipuai-coding-plan/glm-5.1
+model: zhipuai-coding-plan/glm-5.2
 temperature: 0.2
 hidden: true
 tools:

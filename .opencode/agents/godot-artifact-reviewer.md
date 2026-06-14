@@ -1,7 +1,7 @@
 ﻿---
 description: "生成物独立检视员：对文档和代码生成物进行独立检视并修正"
 mode: subagent
-model: zhipuai-coding-plan/glm-5.1
+model: zhipuai-coding-plan/glm-5.2
 temperature: 0.1
 hidden: true
 tools:
