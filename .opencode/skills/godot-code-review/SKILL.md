@@ -74,8 +74,8 @@ description: >
 ### 设计规范
 
 - [ ] **P0-4d** 复用实例模式中，生命周期入口方法（如 `enter()`）调用 `_reset()` 重置状态
-- [ ] **P1-12** Autoload/Singleton 无 `class_name`；非 Singleton 脚本定义了 `class_name`
-- [ ] **P1-12** 通过 `class_name` 进行类型引用，未使用 `preload`/`load` 后的变量名作类型别名
+- [ ] **P1-14** Autoload/Singleton 无 `class_name`；非 Singleton 脚本定义了 `class_name`
+- [ ] **P1-14** 通过 `class_name` 进行类型引用，未使用 `preload`/`load` 后的变量名作类型别名
 - [ ] 信号驱动通信，非直接调用
 - [ ] 依赖注入而非硬编码
 
@@ -90,4 +90,4 @@ description: >
 - [ ] 使用 `add_child_autoqfree` 代替 `add_child` + `queue_free`
 - [ ] 浮点比较使用 `assert_almost_eq` 而非 `assert_eq`
 - [ ] 测试覆盖所有 BDD 场景
-- [ ] **P1-6c** 集成测试存在于 `test/integration/{模块}/` 目录
+- [ ] **P1-11c** 集成测试存在于 `test/integration/{模块}/` 目录
