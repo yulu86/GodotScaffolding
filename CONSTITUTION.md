@@ -39,6 +39,8 @@
 | `FEISHU_USER_ID` | 用户 open_id（`ou_` 开头） | `.env` |
 
 > `.env` 缺失时**必须**先提醒用户配置。
+>
+> 注：`GODOT_HOME` 为系统级 OS 环境变量（Godot 编辑器路径，非 `.env`）；`FEISHU_*` 类凭证从 `.env` 读取。
 
 ### 1.4 工具标注
 
@@ -63,21 +65,22 @@
 | `godot-static-analyzer` | 质量 | `godot-static-analysis`+`tdd`+`godot-best-practices` | 读写+bash | 静态分析 + TDD 重构循环 |
 | `godot-artifact-reviewer` | 验收 | — | 读写 | 生成物独立检视 |
 | `godot-functional-tester` | 质量 | — | bash+写 | 按键模拟+截图功能测试 |
-| `godot-notifier` | 验收 | `lark-im` | bash+写 | 经验归档 + 飞书收尾通知 |
+| `godot-notifier` | 验收 | `lark-im` | bash+写 | 飞书收尾通知 |
 
 **调度关系**：
 
 ```
-build (主代理)
-  ├─ godot-ui-designer         → P1-15S S8 场景搭建
-  ├─ godot-architect           → P1-15 架构设计 / P1-15S S2
-  ├─ godot-developer           → P1-15S S5-S7 TDD 编码
-  ├─ godot-reviewer            → P1-15S S15 代码检视
-  ├─ godot-consistency-checker → P1-15S S9/S16 一致性检查
-  ├─ godot-static-analyzer     → P1-15S S13 静态分析
-  ├─ godot-functional-tester   → P1-15S S12 功能测试
+build (主代理，默认直接执行并加载对应 Skill)
+  │  满足 P0-17 条件（可并行 / 不同模型）时，按需调度下列子代理：
+  ├─ godot-ui-designer         → S8 UI 设计方案（只读，不落地）
+  ├─ godot-architect           → P1-15 架构设计 / S2 设计文档（仅文档，不输出代码）
+  ├─ godot-developer           → S5-S7 TDD 编码
+  ├─ godot-reviewer            → S15 代码检视
+  ├─ godot-consistency-checker → S9/S16 一致性检查
+  ├─ godot-static-analyzer     → S13 静态分析
+  ├─ godot-functional-tester   → S12 功能测试
   ├─ godot-artifact-reviewer   → P1-22 生成物检视
-  ├─ godot-notifier            → S21 收尾通知
+  ├─ godot-notifier            → S21 飞书收尾通知（不含经验归档，归档由主代理在 S18 完成）
   ├─ explore (内置)            → 快速代码搜索
   └─ general (内置)            → 通用多步骤任务
 ```
@@ -159,7 +162,7 @@ docs/               (按阶段分，见 1.8)
 |------|-----|------|
 | 任务开始前 | **P0-13** | 读取 `docs/06_postmortem/MEMORY.md`（不存在则跳过） |
 | 任务完成后 | **P0-14** | 主代理提炼经验 → 追加到 `MEMORY.md`（**禁止**重复） |
-| P0-14 后 | **P0-15** | 主代理 `[Skill: lark-im]` 飞书通知完成状态。凭证缺失则跳过并说明 |
+| P0-14 后 | **P0-15** | 主代理 `[Skill: lark-im]` 飞书通知**任务级**完成状态（轻量；Story 级正式收尾通知见 S21）。凭证缺失则跳过并说明 |
 | 代码变更后 | **P0-16** | 测试覆盖率 ≥ 80%（`[MCP] godot-ultimate_godot_get_test_coverage`），初始化阶段豁免。工具不可用时手动统计 |
 
 ### 2.5 任务执行
@@ -180,6 +183,8 @@ docs/               (按阶段分，见 1.8)
 > **必须**严格按 S1→S21 顺序执行，不得跳步或调换，除非用户明确指示。
 >
 > **确认模式**（见 P1-26）：默认 `连续式`——S1 开发范围总结为硬性暂停点，确认通过后 S2→S3→S4 文档准备阶段连续产出，仅在 S4 末尾统一确认一次；S15 代码检视为**硬性暂停点**，必须用户逐文件参与；S17 场景验收默认截图自动比对。用户可切换为 `交互式`（每个确认点单独暂停）。
+>
+> **执行者约定**：下表"代理"列指该步骤的**专业 Skill / 职责归属**，非固定执行人。实际执行者遵循 **P0-17**：默认由主代理加载对应 Skill 直接执行；仅当满足"可并行"或"不同模型"条件时，才调度对应子代理。冲突一律以 P0-17 为准。
 
 | 步骤 | 名称 | 代理 | 关键动作 |
 |------|------|------|--------|
@@ -190,7 +195,7 @@ docs/               (按阶段分，见 1.8)
 | S5 | Red | `godot-developer` | **先输出测试用例表格再写测试代码**：① 对当前类按依赖拓扑顺序逐类输出测试用例表（列：场景分类 | 场景描述 | 是否正常场景 | 输入 | 期望输出 | 测试方法名），**必须**覆盖正常和异常场景 ② 按表格逐个编写测试代码，依赖最少优先；**同一依赖层级内无相互依赖的 task 可并行调度，并行度上限 4**（子代理执行，遵循 P0-17） |
 | S6 | Green | `godot-developer` | 同 S5 并行策略，最小实现使测试通过 |
 | S7 | Refactor | `godot-developer` | 同 S5 并行策略，优化结构保持测试通过 → 回 S5 直到所有类完成 |
-| S8 | 场景搭建 | `godot-ui-designer` | AI 通过 MCP 搭建 .tscn 主体框架（节点树、脚本绑定、属性配置等） → 输出详细操作指导 → **暂停等用户完成**可视化操作（sprite 位置、碰撞形状/位置、动画配置等） |
+| S8 | 场景搭建 | `godot-ui-designer` 出方案 | godot-ui-designer 输出 UI 设计方案/操作指导（权限只读，不直接落地） → **主代理**通过 MCP 搭建 .tscn 主体框架（节点树、脚本绑定、属性配置等） → **暂停等用户完成**可视化操作（sprite 位置、碰撞形状/位置、动画配置等） |
 | S9 | 一致性检查 | `godot-consistency-checker` | 代码↔设计文档 + 场景结构对比 → 有差异**暂停**等用户决定 |
 | S10 | AC 覆盖分析 | 主代理 | 逐项对比 AC 与测试，补充缺失测试 |
 | S11 | 全量测试 | 主代理 | `godot-ultimate_godot_run_tests` 全部通过 |
@@ -203,7 +208,7 @@ docs/               (按阶段分，见 1.8)
 | S18 | 经验归档 | 主代理 | 检视 + 静态检查问题 → 追加到 `MEMORY.md` |
 | S19 | 更新 Backlog | 主代理 | `docs/04_sprint/01_backlog.md` 标记已完成 |
 | S20 | Git 提交 | 主代理 | 工作区干净 → commit |
-| S21 | 收尾通知 | `godot-notifier` | 经验归档 + 飞书通知 |
+| S21 | 收尾通知 | 主代理（默认） | 飞书 Story 收尾通知（经验归档已在 S18 由主代理完成；通知执行遵循 P0-17，满足条件时可调度 `godot-notifier`） |
 
 **约束**：Story 间**必须**暂停等用户确认（P1-2）；每 Story 完成后游戏**必须**可运行且有可玩内容（P1-3）。
 
@@ -225,7 +230,7 @@ docs/               (按阶段分，见 1.8)
 - **P1-7** 标记已完成前：全量测试通过 + 逐项验证 AC，两者均通过方可标记
 - **P1-7.5** 每 AC **必须**有功能测试（`test/functional/{模块}/`），按键模拟 + 截图验证，一一对应
 - **P1-8** 每 Story **必须**有集成测试（`test/integration/{模块}/`）
-- **P1-9** 代码开发完成后、检视前：输出 AC 覆盖分析表（AC → 覆盖状态 → 测试方法名），补充缺失测试
+- **P1-9** 代码开发与场景搭建完成后、检视前（即 S10 时点）：输出 AC 覆盖分析表（AC → 覆盖状态 → 测试方法名），补充缺失测试
 
 ### 3.4 检视与一致性
 
@@ -237,6 +242,8 @@ docs/               (按阶段分，见 1.8)
 - **P1-14** 每个 agent_task 完成后：一致性报告（已实现/未实现/额外/不一致），第 2/3/4 类**暂停**等用户决定：① 补代码对齐设计 ② 更新设计反映代码 ③ 确认偏差并记录
 
 ### 3.5 功能开发流程（P1-15）
+
+> **P1-15 与 P1-15S 的关系**：P1-15 是功能开发的**总流程大纲**（架构→TDD→场景→测试→诊断）；P1-15S（见 3.1）是 P1-15 中"迭代开发"环节在单个 Story 内部的 **21 步细化**。本节为大纲，执行细节以 P1-15S 为准。
 
 ```
 主代理 [Skill: godot-architect]                        (S2 设计文档)
@@ -263,7 +270,7 @@ docs/               (按阶段分，见 1.8)
 ### 3.8 其他
 
 - **P1-21** 精灵图分析结果**必须**保存到 `docs/02_analysis/`（`{序号}_资源分析_{名}.md`），后续引用文档禁止重复分析
-- **P1-22** 生成物**必须**经独立检视（文档：命名/目录/标题/mermaid/关联；代码：语法/SOLID·DRY/诊断）。可并行时调度 `[Agent] artifact-reviewer`
+- **P1-22** 生成物**必须**经独立检视（文档：命名/目录/标题/mermaid/关联；代码：语法/SOLID·DRY/诊断）。S15（代码检视）/S16（设计对比）是其代码/设计维度的具体落地，P1-22 额外覆盖文档检视等场景。可并行时调度 `[Agent] artifact-reviewer`
 
 ---
 
@@ -296,14 +303,14 @@ docs/               (按阶段分，见 1.8)
 
 ### 4.4 Godot 编辑器
 
-- **P2-16** 测试命令：`$GODOT_HOME -s addons/gut/gut_cmdln.gd -gexit`
-- **P2-17** 编辑器管理：
-  - **单实例**：同时只允许 1 个（检测：`Get-Process "Godot*"` / 关闭：`Stop-Process "Godot*" -Force`）
-  - **启动策略**：需要编辑器时先检测是否已运行（`Get-Process "Godot*"`），已运行则直接使用，未运行则异步启动（`Start-Process`），**不阻塞等待**
+- **P2-16** 测试命令（POSIX）：`$GODOT_HOME -s addons/gut/gut_cmdln.gd -gexit`（Windows PowerShell：`& $env:GODOT_HOME -s addons/gut/gut_cmdln.gd -gexit`）
+- **P2-17** 编辑器管理（命令以 POSIX 为主，括号内为 Windows PowerShell 等价）：
+  - **单实例**：同时只允许 1 个（检测：`pgrep -f "Godot"` / 关闭：`pkill -f "Godot"`；Windows：`Get-Process "Godot*"` / `Stop-Process "Godot*" -Force`）
+  - **启动策略**：需要编辑器时先检测是否已运行（`pgrep -f "Godot"`），已运行则直接使用，未运行则异步启动（POSIX：`nohup "$GODOT_HOME" --path <项目> >/dev/null 2>&1 &`；Windows：`Start-Process $env:GODOT_HOME --path <项目>`），**不阻塞等待**
   - **启动超时**：启动后最多轮询等待 **30 秒**（每 5 秒检测一次进程），超时仍未检测到进程则**放弃启动**，继续任务并提示用户手动启动
   - **LSP 降级**：编辑器不可用时跳过 `get_diagnostics`，改用 `scan_workspace_diagnostics`（不依赖 LSP），并在最终报告中标注"编辑器未启动，诊断可能不完整"
-  - **启动优先级**：`[MCP] godot-mcp_launch_editor` > `Start-Process $env:GODOT_HOME --path <项目>`
-  - **无头模式**：`& $env:GODOT_HOME --editor --path <项目>`（仅加载索引）
+  - **启动优先级**：`[MCP] godot-mcp_launch_editor` > 异步启动命令（POSIX `nohup` / Windows `Start-Process`）
+  - **无头模式**：`"$GODOT_HOME" --editor --path <项目>`（仅加载索引）
 
 ### 4.5 Godot 技术约束
 
