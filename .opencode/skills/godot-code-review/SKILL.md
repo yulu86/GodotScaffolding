@@ -63,19 +63,19 @@ description: >
 ### 代码规范
 
 - [ ] **P0-3** 代码除注释外无中文
-- [ ] **P0-4b** 方法（`func`）有 `##` 注释说明用途
-- [ ] **P0-4b** 枚举（`enum`）及其枚举值有 `##` 注释说明含义
-- [ ] **P0-4b** 信号（`signal`）有 `##` 注释说明用途
-- [ ] **P0-4c** 参数名不与节点内置属性冲突（`name`、`position`、`scale` 等）
-- [ ] **P0-4e** 枚举和变量命名精确反映实际用途，不含未使用的概念
+- [ ] **P0-6** 方法（`func`）有 `##` 注释说明用途
+- [ ] **P0-6** 枚举（`enum`）及其枚举值有 `##` 注释说明含义
+- [ ] **P0-6** 信号（`signal`）有 `##` 注释说明用途
+- [ ] **P0-7** 参数名不与节点内置属性冲突（`name`、`position`、`scale` 等）
+- [ ] **P0-8** 枚举和变量命名精确反映实际用途，不含未使用的概念
 - [ ] 不可达代码已删除（如 match 全覆盖后多余的 return）
 - [ ] 浮点值默认设置是否合理（如音频默认音量）
 
 ### 设计规范
 
-- [ ] **P0-4d** 复用实例模式中，生命周期入口方法（如 `enter()`）调用 `_reset()` 重置状态
-- [ ] **P1-14** Autoload/Singleton 无 `class_name`；非 Singleton 脚本定义了 `class_name`
-- [ ] **P1-14** 通过 `class_name` 进行类型引用，未使用 `preload`/`load` 后的变量名作类型别名
+- [ ] **P0-10** 复用实例模式中，生命周期入口方法（如 `enter()`）调用 `_reset()` 重置状态
+- [ ] **P1-23** Autoload/Singleton 无 `class_name`；非 Singleton 脚本定义了 `class_name`
+- [ ] **P1-23** 通过 `class_name` 进行类型引用，未使用 `preload`/`load` 后的变量名作类型别名
 - [ ] 信号驱动通信，非直接调用
 - [ ] 依赖注入而非硬编码
 
@@ -90,4 +90,4 @@ description: >
 - [ ] 使用 `add_child_autoqfree` 代替 `add_child` + `queue_free`
 - [ ] 浮点比较使用 `assert_almost_eq` 而非 `assert_eq`
 - [ ] 测试覆盖所有 BDD 场景
-- [ ] **P1-11c** 集成测试存在于 `test/integration/{模块}/` 目录
+- [ ] **P1-9** 集成测试存在于 `test/integration/{模块}/` 目录
