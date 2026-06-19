@@ -54,7 +54,7 @@ description: >
 - 列出经验教训（命名歧义、遗漏注释、参数遮蔽等）
 - 使用 `[Skill] summarize` 对检视过程进行摘要提炼
 - 将经验教训保存到 `docs/06_postmortem/MEMORY.md`
-- 提取可通用的规则，更新 `CONSTITUTION.md`
+- 提取可通用的规则，更新 `AGENTS.md`
 
 ## 检视检查项
 
