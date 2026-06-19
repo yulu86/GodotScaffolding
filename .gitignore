@@ -41,6 +41,8 @@ export_presets.cfg
 build/
 
 .zcode/
+.opencode/
+opencode.json
 
 .env
 
