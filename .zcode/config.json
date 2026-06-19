@@ -7,7 +7,7 @@
                 "args": [
                     "@coding-solo/godot-mcp"
                 ],
-                "environment": {
+                "env": {
                     "DEBUG": "false",
                     "GODOT_PATH": "{env:GODOT_HOME}"
                 }
@@ -19,7 +19,7 @@
                     "-y",
                     "@ryanmazzolini/minimal-godot-mcp"
                 ],
-                "environment": {
+                "env": {
                     "GODOT_LSP_PORT": "6005",
                     "GODOT_WORKSPACE_PATH": "{env:WORKSPACE_HOME}/code/07_games/brave-legend"
                 }
@@ -30,7 +30,7 @@
                 "args": [
                     "{env:WORKSPACE_HOME}/code/01_AI/godot-mcp-ultimate/dist/index.js"
                 ],
-                "environment": {
+                "env": {
                     "GODOT_PROJECT_PATH": "{env:WORKSPACE_HOME}/code/07_games/brave-legend",
                     "GODOT_PATH": "{env:GODOT_HOME}",
                     "GODOT_LSP_PORT": "6005"
