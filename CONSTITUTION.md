@@ -65,7 +65,7 @@
 | `godot-static-analyzer` | 质量 | `godot-static-analysis`+`tdd`+`godot-best-practices` | 读写+bash | 静态分析 + TDD 重构循环 |
 | `godot-artifact-reviewer` | 验收 | — | 读写 | 生成物独立检视 |
 | `godot-functional-tester` | 质量 | — | bash+写 | 按键模拟+截图功能测试 |
-| `godot-notifier` | 验收 | `lark-im` | bash+写 | 飞书收尾通知 |
+| `godot-notifier` | 验收 | `lark-im` | bash | 飞书收尾通知 |
 
 **调度关系**：
 
