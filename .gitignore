@@ -40,9 +40,13 @@ mono_crash.*.json
 export_presets.cfg
 build/
 
-tmp/
+.zcode/
+.opencode/
+opencode.json
 
 .env
 
+tmp/
 **/superpowers/
 test/**/*.png
+nul

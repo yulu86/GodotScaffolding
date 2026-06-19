@@ -1,0 +1,50 @@
+{
+    "mcp": {
+        "servers": {
+            "godot-mcp": {
+                "type": "stdio",
+                "command": "npx",
+                "args": [
+                    "@coding-solo/godot-mcp"
+                ],
+                "env": {
+                    "DEBUG": "false",
+                    "GODOT_PATH": "{env:GODOT_HOME}"
+                }
+            },
+            "minimal-godot": {
+                "type": "stdio",
+                "command": "npx",
+                "args": [
+                    "-y",
+                    "@ryanmazzolini/minimal-godot-mcp"
+                ],
+                "env": {
+                    "GODOT_LSP_PORT": "6005",
+                    "GODOT_WORKSPACE_PATH": "{env:WORKSPACE_HOME}/code/07_games/brave-legend"
+                }
+            },
+            "godot-ultimate": {
+                "type": "stdio",
+                "command": "node",
+                "args": [
+                    "{env:WORKSPACE_HOME}/code/01_AI/godot-mcp-ultimate/dist/index.js"
+                ],
+                "env": {
+                    "GODOT_PROJECT_PATH": "{env:WORKSPACE_HOME}/code/07_games/brave-legend",
+                    "GODOT_PATH": "{env:GODOT_HOME}",
+                    "GODOT_LSP_PORT": "6005"
+                }
+            },
+            "filesystem": {
+                "type": "stdio",
+                "command": "npx",
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-filesystem",
+                    "{env:WORKSPACE_HOME}/code/07_games/brave-legend"
+                ]
+            }
+        }
+    }
+}
