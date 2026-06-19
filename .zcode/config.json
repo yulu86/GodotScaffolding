@@ -1,14 +1,6 @@
 {
     "mcp": {
         "servers": {
-            "my-mcp-server": {
-                "type": "stdio",
-                "command": "npx",
-                "args": [
-                    "-y",
-                    "@modelcontextprotocol/server-memory"
-                ]
-            },
             "godot-mcp": {
                 "type": "stdio",
                 "command": "npx",
