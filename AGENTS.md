@@ -202,9 +202,11 @@ signal score_updated(new: int, old: int)   # ✅ 类型化信号
 
 ### 9.3 `[P0]` Headless CI 两步流水线
 
+> **入口路径以当前 GdUnit4 版本为准**：v4.6 起命令行入口为 `addons/gdUnit4/bin/GdUnitCmdTool.gd`（旧版 `src/runner/GdUnitRunnerCmd.gd` 已移除）。新版在 `--headless` 下默认以 exit 103 拒绝运行（UI 交互测试在 headless 不可靠），**必须**加 `--ignoreHeadlessMode` 才能跑。测试目录为 `test/`（非 `tests/`）。
+
 ```bash
-godot --headless --import                                          # Step1 预热导入
-godot --headless --path . -s addons/gdUnit4/src/runner/GdUnitRunnerCmd.gd -a tests/   # Step2 跑套件
+$GODOT_HOME --headless --import                                                                # Step1 预热导入
+$GODOT_HOME --headless --path . -s addons/gdUnit4/bin/GdUnitCmdTool.gd -a test/ --ignoreHeadlessMode   # Step2 跑套件
 ```
 
 ### 9.4 覆盖率
@@ -314,7 +316,7 @@ UI 开发  →【Skill】godot-ui
 
 ### 12.7 工作流总览
 
-> **`[P0]` 开发收尾前置**：代码开发完成后、提交前**必须**在 Godot 编辑器重新加载当前项目（Project → Reload Current Project，或 `$GODOT_HOME/godot -e` 重启），刷新资源导入与场景/脚本引用，避免 `.import`/缓存漂移。
+> **`[P0]` 开发收尾前置**：代码开发完成后、提交前**必须**在 Godot 编辑器重新加载当前项目（Project → Reload Current Project，或 `$GODOT_HOME -e` 重启），刷新资源导入与场景/脚本引用，避免 `.import`/缓存漂移。
 
 ```
 【前置·必做】读取 docs/99_postmortem/MEMORY.md 吸取经验教训（§12.6）
@@ -346,7 +348,8 @@ UI 开发  →【Skill】godot-ui
 
 | 目录 | 职责 | 典型文件 | MVP `[P0]` | 正式 `[P1]` |
 |------|------|---------|:---:|:---:|
-| `README.md` | 项目入口：环境/怎么跑/技术栈/索引 | `README.md` | ✅ 必备 | ✅ 持续维护 |
+| `README.md` | **游戏主题介绍（面向玩家/访客的门面）**：仅含游戏名称、简介、核心玩法亮点；**禁止**技术性/进度内容（详见 §13.4） | `README.md` | ✅ 必备 | ✅ 持续维护 |
+| `00_开发指南/` | **开发者入口**：环境/怎么跑/技术栈/项目结构/文档索引/开发约定/里程碑（README 剥离出的全部技术性内容归宿） | `01_快速开始.md` | ✅ 必备 | ✅ 持续维护 |
 | `01_需求/` | 需求与玩法设计（GDD） | `01_核心玩法.md`、`02_操作设计.md`、`03_关卡设计.md` | ✅ 核心玩法必备 | ✅ 持续维护 |
 | `02_架构/` | 技术架构/场景树/状态机/接口/ADR | `01_技术架构.md`、`02_{模块}架构.md`、`03_ADR决策记录/{NN}_{决策}.md` | ✅ 技术架构必备；模块架构/ADR 🟡 按需 | ✅ 每模块必备 + 重要决策必记 |
 | `03_美术规范/` | 美术风格/精灵命名尺寸/导入/调色板 | `01_美术总览.md`、`02_精灵规范.md`、`03_调色板.md` | 🟡 大纲即可 | ✅ 完整规范 |
@@ -357,7 +360,7 @@ UI 开发  →【Skill】godot-ui
 | `99_postmortem/` | 经验沉淀（通用/项目专属双区） | `MEMORY.md`（§12.6） | ✅ 必备 | ✅ 持续沉淀 |
 
 > 图例：✅ 强制维护 ｜ 🟡 按需/大纲即可 ｜ ⬜ 该阶段不强制
-> **MVP 最小必备集合（4 件）**：`README.md` + `01_需求/01_核心玩法.md` + `02_架构/01_技术架构.md` + `99_postmortem/MEMORY.md`。其余 🟡 项须在对应功能实现前先出大纲，避免"先写码后补文档"。
+> **MVP 最小必备集合（5 件）**：`README.md`（纯游戏主题）+ `00_开发指南/01_快速开始.md`（技术性内容归宿）+ `01_需求/01_核心玩法.md` + `02_架构/01_技术架构.md` + `99_postmortem/MEMORY.md`。其余 🟡 项须在对应功能实现前先出大纲，避免"先写码后补文档"。
 
 ### 13.2 `[P0]` 文档交付索引（按阶段读取/产出，禁止跳过）
 
@@ -374,23 +377,44 @@ UI 开发  →【Skill】godot-ui
 
 每个功能交付前**必须**对比"设计文档"与"实际代码"：①读模块设计文档（架构图/接口/状态机）；②对照实际 `.gd`/`.tscn`（节点结构/信号/接口/状态枚举）；③不一致即修正（代码偏离改代码；设计过时更新文档并说明原因）；④在代码检视（§12.3）中**显式声明一致性结论**。
 
+### 13.4 `[P0]` README 内容约束
+
+> 本节为 2026-06-21 用户授权新增（见开头变更记录）。**README.md 是项目的「游戏门面」**，面向玩家与外部访客，定位与 `docs/` 下技术文档严格区分。
+
+**允许的内容**（面向玩家/访客的题材表达）：
+- 游戏名称、代号、副标题、宣传语
+- 游戏画面/封面图
+- 项目简介、世界观、角色设定
+- 核心玩法亮点（玩法层面，非技术实现）
+- 指向开发文档的单一入口链接（如「开发者入口 → 开发指南」）
+
+**禁止的内容**（技术性 / 进度性，一律迁移至 `docs/00_开发指南/`）：
+- ❌ 技术栈、引擎/语言/框架选型、渲染管线、物理引擎等
+- ❌ 环境要求、依赖版本、环境变量（`GODOT_HOME` 等）
+- ❌ 如何运行、命令行、构建/导出步骤、headless/CI 流程
+- ❌ 项目结构、目录树、文件清单
+- ❌ 文档索引、开发约定、编码规范、质量门禁、工作流
+- ❌ 里程碑、进度状态（✅/🟡/⬜）、开发阶段标记
+- ❌ 任何代码块、命令、脚本、配置示例
+
+**迁移与维护规则**：
+- 原 README 中的全部技术性内容归宿为 `docs/00_开发指南/01_快速开始.md`，保持相对链接正确（从 `docs/00_开发指南/` 视角：`../` 进 `docs/`，`../../` 进项目根）。
+- 后续新增任何技术性/进度性信息，**必须**写入 `00_开发指南/`（或对应 `docs/` 子目录），**禁止**回流 README。
+- README 仅在「游戏主题本身变更」（改名/换题材/玩法调整）时才更新；技术迭代不触动 README。
+- 检视（§12.3）时须显式校验：README 是否混入技术/进度内容，违规即迁移修正。
+
 ---
 
 ## 附录
 
 ### A. 命令速查
 
-> **`godot` 命令路径从系统环境变量 `$GODOT_HOME` 读取**（约定指向可执行文件所在**目录**；若误指到 `godot` 可执行文件本身，下方脚本会自动截断为其所在目录）。所有命令用 `$GODOT_HOME/godot`（或先 `alias godot="$GODOT_HOME/godot"`），**禁止**硬编码绝对路径，**禁止**从 `.env` 读取。
+> **`godot` 命令路径从系统环境变量 `$GODOT_HOME` 读取**
 
 ```bash
-[ -z "$GODOT_HOME" ] && { echo "错误：系统环境变量 GODOT_HOME 未设置" >&2; exit 1; }
-# 兼容误指：若 $GODOT_HOME 指向文件（如 godot.exe），截断为其所在目录
-[ -f "$GODOT_HOME" ] && GODOT_HOME="$(dirname "$GODOT_HOME")"
-alias godot="$GODOT_HOME/godot"
-
-godot --headless --import                                          # 预热导入（§9.3 Step1）
-godot --headless --path . -s addons/gdUnit4/src/runner/GdUnitRunnerCmd.gd -a tests/   # 跑测试（Step2）
-godot --headless --check-only --script scripts/xxx.gd              # 语法检查（备选）
+$GODOT_HOME --headless --import                                                                        # 预热导入（§9.3 Step1）
+$GODOT_HOME --headless --path . -s addons/gdUnit4/bin/GdUnitCmdTool.gd -a test/ --ignoreHeadlessMode   # 跑测试（Step2）
+$GODOT_HOME --headless --check-only --script scripts/xxx.gd                                            # 语法检查（备选）
 ```
 
 ### B. MCP / Skill 索引
