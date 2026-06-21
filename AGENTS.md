@@ -410,6 +410,7 @@ UI 开发  →【Skill】godot-ui
 ### A. 命令速查
 
 > **`godot` 命令路径从系统环境变量 `$GODOT_HOME` 读取**
+> `mac`上从 `~/.zshrc` 获取
 
 ```bash
 $GODOT_HOME --headless --import                                                                        # 预热导入（§9.3 Step1）
