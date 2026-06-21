@@ -46,14 +46,21 @@ res://
 ├── assets/            # sprites/ sounds/ music/ fonts/ resources/(.tres)
 ├── addons/            # 第三方插件（GdUnit4 等）
 ├── test/              # unit/ integration/{模块}/ functional/+screenshots/
-└── docs/              # 文档（.gdignore 屏蔽），目录规划见 §13.1
+├── docs/              # 文档（.gdignore 屏蔽），目录规划见 §13.1
+└── tmp/               # 临时文件（.gitignore 屏蔽，任务结束删除，见 §2.3）
 ```
 
 ### 2.2 `[P0]` 命名 / 路径 / 版本控制
 
 - 文件名 `snake_case`，节点名 PascalCase；场景与脚本**一一对应**（`player.tscn` ↔ `player.gd`），避免孤儿脚本。
 - `res://` 只读（随包发布）；`user://` 可读写（存档/设置/最高分）。
-- `.godot/`、`.import/`、`export_presets.cfg`、构建产物须在 `.gitignore`；`.tres`/`.tscn` 文本格式提交；`docs/` 加 `.gdignore`。
+- `.godot/`、`.import/`、`export_presets.cfg`、`tmp/`、构建产物须在 `.gitignore`；`.tres`/`.tscn` 文本格式提交；`docs/` 加 `.gdignore`。
+
+### 2.3 `[P0]` 临时文件管理
+
+- **统一存放**：任务执行中生成的临时文件（中间产物、缓存、调试文件、临时脚本等）**必须**保存到项目根 `tmp/` 目录，**禁止**散落到 `res://` 其他位置或系统临时目录。
+- **任务结束必删**：任务结束后**必须**删除本次产生的全部临时文件；仅当用户**明确**要求保留或该文件已成为最终交付物时方可保留。
+- **版本控制**：`tmp/` 一律 `.gitignore` 屏蔽（见 §2.2），**禁止**提交。
 
 ---
 
@@ -428,4 +435,4 @@ $GODOT_HOME --headless --check-only --script scripts/xxx.gd                     
 
 ```
 
-> 隐藏/工具目录（不纳入版本管理或自动生成）：`.opencode/`（OpenCode agents+skills）、`.zcode/`（ZCode 配置）、`.godot/`（引擎缓存）、`.env`（本地环境变量，勿提交）、`.gitignore` / `.gitattributes` / `.editorconfig`。
+> 隐藏/工具目录（不纳入版本管理或自动生成）：`.opencode/`（OpenCode agents+skills）、`.zcode/`（ZCode 配置）、`.godot/`（引擎缓存）、`tmp/`（任务临时文件，任务结束删除，见 §2.3）、`.env`（本地环境变量，勿提交）、`.gitignore` / `.gitattributes` / `.editorconfig`。
