@@ -260,6 +260,7 @@ $GODOT_HOME --headless --path . -s addons/gdUnit4/bin/GdUnitCmdTool.gd -a test/ 
 CLI/Skill 已提供能力时**禁止**绕过直接调底层 API 或手写封装。Godot 开发协作链：
 
 ```
+任务简报  →【Skill: summarize】总结任务概要和验收标准
 架构设计  →【Skill】godot-architect（只设计，不写码）
 编码实现  →【Skill】godot-best-practices / godot-gdscript-patterns
 TDD 循环 →【Skill】test-driven-development（§9.2 单测小循环）
@@ -321,7 +322,8 @@ UI 开发  →【Skill】godot-ui
 ```
 【前置·必做】读取 docs/99_postmortem/MEMORY.md 吸取经验教训（§12.6）
 
-需求 →【Skill: architect】架构设计文档(含 Mermaid 图)
+需求 →【Skill: summarize】总结任务概要/简报和验收标准
+     →【Skill: architect】架构设计文档(含 Mermaid 图)
      →【Skill: best-practices + TDD 小循环】1个测试→最小实现→重构(循环) +【MCP】搭场景节点骨架
      →【可视化协作 §12.4】AI 用 MCP 写视觉初值 + 输出「可视化搭建指导」+ question 暂停 ⚠️涉及可见节点时强制
      →【MCP: minimal-godot/godot-ultimate】诊断 + lint
