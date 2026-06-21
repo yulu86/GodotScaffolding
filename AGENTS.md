@@ -333,6 +333,7 @@ UI 开发  →【Skill】godot-ui
      →【Skill: best-practices + TDD 小循环】1个测试→最小实现→重构(循环) +【MCP】搭场景节点骨架
      →【可视化协作 §12.4】AI 用 MCP 写视觉初值 + 输出「可视化搭建指导」+ question 暂停 ⚠️涉及可见节点时强制
      →【MCP: minimal-godot/godot-ultimate】诊断 + lint
+     →【修复】修复所有的代码警告
      →【Skill: code-review】自行逐文件检视
      →【Skill: code-review】在编辑器中(vscode)逐个文件打开，和用户一起检视
      →【设计-实现一致性】确认设计-实现一致性(§13.3)
