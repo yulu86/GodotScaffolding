@@ -341,7 +341,7 @@ UI 开发  →【Skill】godot-ui
      →【MCP: minimal-godot/godot-ultimate】诊断 + lint
      →【修复】修复所有的代码警告
      →【Skill: code-review】自行逐文件检视
-     →【Skill: code-review】在编辑器中(vscode)逐个文件打开，和用户一起检视
+     →【Skill: code-review】在编辑器中(vscode)每次打开一个文件，和用户一起检视，并暂定执行，等待用户反馈
      →【设计-实现一致性】确认设计-实现一致性(§13.3)
      →【命令: headless】测试套件全绿（§9.3）
      →【Skill: static-analysis】§10 全部门禁达标
