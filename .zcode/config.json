@@ -21,7 +21,7 @@
                 ],
                 "env": {
                     "GODOT_LSP_PORT": "6005",
-                    "GODOT_WORKSPACE_PATH": "{env:WORKSPACE_HOME}/code/07_games/brave-legend"
+                    "GODOT_WORKSPACE_PATH": "{env:WORKSPACE_HOME}/code/07_games/GodotScaffolding"
                 }
             },
             "godot-ultimate": {
@@ -31,7 +31,7 @@
                     "{env:WORKSPACE_HOME}/code/01_AI/godot-mcp-ultimate/dist/index.js"
                 ],
                 "env": {
-                    "GODOT_PROJECT_PATH": "{env:WORKSPACE_HOME}/code/07_games/brave-legend",
+                    "GODOT_PROJECT_PATH": "{env:WORKSPACE_HOME}/code/07_games/GodotScaffolding",
                     "GODOT_PATH": "{env:GODOT_HOME}",
                     "GODOT_LSP_PORT": "6005"
                 }
@@ -42,7 +42,7 @@
                 "args": [
                     "-y",
                     "@modelcontextprotocol/server-filesystem",
-                    "{env:WORKSPACE_HOME}/code/07_games/brave-legend"
+                    "{env:WORKSPACE_HOME}/code/07_games/GodotScaffolding"
                 ]
             }
         }
