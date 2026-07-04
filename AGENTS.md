@@ -44,6 +44,7 @@ res://
 ├── scenes/            # .tscn，按模块分子目录
 ├── scripts/           # .gd，与场景一一对应
 ├── assets/            # sprites/ sounds/ music/ fonts/ resources/(.tres)
+├── aseprite-assets/   # Aseprite 产物（.aseprite 源文件 + 导出 PNG/GIF/精灵表），见 §2.4
 ├── addons/            # 第三方插件（GdUnit4 等）
 ├── test/              # unit/ integration/{模块}/ functional/+screenshots/
 ├── docs/              # 文档（.gdignore 屏蔽），目录规划见 §13.1
@@ -61,6 +62,14 @@ res://
 - **统一存放**：任务执行中生成的临时文件（中间产物、缓存、调试文件、临时脚本等）**必须**保存到项目根 `tmp/` 目录，**禁止**散落到 `res://` 其他位置或系统临时目录。
 - **任务结束必删**：任务结束后**必须**删除本次产生的全部临时文件；仅当用户**明确**要求保留或该文件已成为最终交付物时方可保留。
 - **版本控制**：`tmp/` 一律 `.gitignore` 屏蔽（见 §2.2），**禁止**提交。
+
+### 2.4 `[P0]` Aseprite 产物管理
+
+- **统一存放**：所有 Aseprite 相关产物——`.aseprite` 工程源文件（`create_canvas`/`copy_sprite` 的 `filename`/`output_filename`）及导出的 PNG/GIF/JPG、精灵表 PNG + JSON 数据（`export_sprite`/`export_frame`/`export_tag`/`export_spritesheet`/`export_layers` 的 `output_filename`/`output_directory`）——**必须**保存到项目根 `aseprite-assets/` 目录下，**禁止**散落到项目根、`assets/` 其他位置、`tmp/` 或系统临时目录。
+- **游戏资源引用**：导出的 PNG/GIF 直接被 Godot 场景以 `load("res://aseprite-assets/...")` 引用，**无需**再复制到 `assets/sprites/`；`assets/sprites/` 仅存放非 Aseprite 产出的外部素材。
+- **版本控制**：`.aseprite` 源文件与导出产物（PNG/GIF/精灵表）均**纳入**版本控制（遵从 §2.2），确保 clone 即可用、不依赖重新导出。
+- **内部细分（建议）**：`aseprite-assets/` 内可按 `source/`（`.aseprite` 源文件）与 `export/`（导出产物）分子目录，或按模块/角色分子目录，保持可检索；不做强制层级。
+- **临时预览例外**：仅为 AI/用户视觉反馈而导出的大尺度预览图（如 `export_frame` scale 8-10 用于检查画面）按 §2.3 走 `tmp/`，任务结束删除，**禁止**落入 `aseprite-assets/`。
 
 ---
 
@@ -456,7 +465,7 @@ $GODOT_HOME --headless --check-only --script scripts/xxx.gd                     
 
 ### B. MCP / Skill 索引
 
-- **MCP（项目已配）**：`minimal-godot`（`get_diagnostics`/`scan_workspace_diagnostics`，G01）；`godot-ultimate`（lint/validate_scenes/validate_project/get_test_coverage/project_health 等，G02–G13）；`godot-mcp`（`create_scene`/`add_node`/`save_scene`/`load_sprite`，场景生成）。
+- **MCP（项目已配）**：`minimal-godot`（`get_diagnostics`/`scan_workspace_diagnostics`，G01）；`godot-ultimate`（lint/validate_scenes/validate_project/get_test_coverage/project_health 等，G02–G13）；`godot-mcp`（`create_scene`/`add_node`/`save_scene`/`load_sprite`，场景生成）；`aseprite`（`create_canvas`/`export_sprite`/`export_frame`/`export_spritesheet`/`draw_*` 等，像素美术创作与导出，产物存 `aseprite-assets/`，见 §2.4）。
 - **Skill（项目内）**：`godot-architect` · `godot-best-practices` · `godot-gdscript-patterns` · `godot-code-review` · `godot-static-analysis` · `godot-ui`。
 - **业界参考**：[AGENTS.md 规范](https://agents.md/) · [GdUnit4](https://github.com/godot-gdunit-labs/gdUnit4) · [GodotPrompter](https://github.com/jame581/GodotPrompter) · [Godot Autoload 文档](https://docs.godotengine.org/en/latest/tutorials/scripting/singletons_autoload.html)。
 
