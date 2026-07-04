@@ -25,12 +25,20 @@ description: >
 
 ## 1. 前置约定（项目强制）
 
-**产物路径**（遵从项目 AGENTS.md §2.4，违反即阻断）：
+**产物路径与清单**（遵从项目 AGENTS.md §2.4，违反即阻断）：
 
-| 类型 | 路径 | 说明 |
-|------|------|------|
-| `.aseprite` 工程源文件 | `aseprite-assets/source/` | `create_canvas`/`copy_sprite` 的 `filename` |
-| 导出 PNG/GIF/精灵表 | `aseprite-assets/export/` | `export_*` 的 `output_filename` |
+每次绘制任务**必须**交付下列产物（#3 仅动画任务强制）：
+
+| # | 产物 | 生成工具 | 存放路径 | 是否必须 |
+|---|------|---------|---------|:-------:|
+| 1 | `.aseprite` 工程源文件 | `create_canvas`/`copy_sprite` 的 `filename` | `aseprite-assets/source/` | ✅ 总是 |
+| 2 | 导出 PNG（静态帧 / 关键帧） | `export_sprite`/`export_frame` 的 `output_filename` | `aseprite-assets/export/` | ✅ 总是 |
+| 3 | 动画 GIF | `export_tag`（`output_filename` 取 `.gif`） | `aseprite-assets/export/` | 🎬 仅绘制动画时 |
+
+> 静态精灵交付 #1+#2；动画精灵交付 #1+#2+#3。精灵表（`export_spritesheet`+JSON）按需补充。
+
+| 临时产物 | 路径 | 说明 |
+|---------|------|------|
 | **满意度沟通用预览图**（scale 8-10） | `tmp/` | 仅供用户视觉反馈，满意后**必删**，禁止落入 `aseprite-assets/` |
 
 > 游戏场景引用导出的 PNG/GIF 时直接 `load("res://aseprite-assets/...")`，无需复制到 `assets/sprites/`。
@@ -234,8 +242,9 @@ Background（背景/底色）
 
 **用户在 Step 7 确认满意后**再执行：
 
-- [ ] `.aseprite` 源文件存 `aseprite-assets/source/`
-- [ ] 导出 PNG/GIF/精灵表存 `aseprite-assets/export/`
+- [ ] `.aseprite` 源文件存 `aseprite-assets/source/`（产出物 #1，**必须**）
+- [ ] 导出 PNG 存 `aseprite-assets/export/`（产出物 #2，**必须**）
+- [ ] （若为动画）导出 GIF 存 `aseprite-assets/export/`（产出物 #3，动画时**必须**）
 - [ ] 已用 `get_color_stats` 核验色板无冗余色
 - [ ] 已用 `export_frame` 8× 预览形态无误（且用户已确认满意）
 - [ ] （动画）已用 `render_onion_skin` + `compare_frames` 验证连贯

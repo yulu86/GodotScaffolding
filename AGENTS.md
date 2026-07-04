@@ -66,6 +66,15 @@ res://
 ### 2.4 `[P0]` Aseprite 产物管理
 
 - **统一存放**：所有 Aseprite 相关产物——`.aseprite` 工程源文件（`create_canvas`/`copy_sprite` 的 `filename`/`output_filename`）及导出的 PNG/GIF/JPG、精灵表 PNG + JSON 数据（`export_sprite`/`export_frame`/`export_tag`/`export_spritesheet`/`export_layers` 的 `output_filename`/`output_directory`）——**必须**保存到项目根 `aseprite-assets/` 目录下，**禁止**散落到项目根、`assets/` 其他位置、`tmp/` 或系统临时目录。
+- **产出物清单（强制）**：每次绘制任务**必须**交付以下产物，缺一即阻断（#3 仅动画任务强制）：
+
+  | # | 产物 | 生成工具 | 存放路径 | 是否必须 |
+  |---|------|---------|---------|:-------:|
+  | 1 | `.aseprite` 工程源文件 | `create_canvas`/`copy_sprite` 的 `filename` | `aseprite-assets/source/` | ✅ 总是 |
+  | 2 | 导出 PNG（静态帧 / 关键帧） | `export_sprite`/`export_frame` 的 `output_filename` | `aseprite-assets/export/` | ✅ 总是 |
+  | 3 | 动画 GIF | `export_tag`（`output_filename` 取 `.gif`） | `aseprite-assets/export/` | 🎬 仅绘制动画时 |
+
+  > 静态精灵交付 #1+#2；动画精灵交付 #1+#2+#3（PNG 取首帧/关键帧供游戏引擎贴图，GIF 供预览动画效果与文档演示）。精灵表（`export_spritesheet` + JSON）按需补充，不强制。
 - **游戏资源引用**：导出的 PNG/GIF 直接被 Godot 场景以 `load("res://aseprite-assets/...")` 引用，**无需**再复制到 `assets/sprites/`；`assets/sprites/` 仅存放非 Aseprite 产出的外部素材。
 - **版本控制**：`.aseprite` 源文件与导出产物（PNG/GIF/精灵表）均**纳入**版本控制（遵从 §2.2），确保 clone 即可用、不依赖重新导出。
 - **内部细分（建议）**：`aseprite-assets/` 内可按 `source/`（`.aseprite` 源文件）与 `export/`（导出产物）分子目录，或按模块/角色分子目录，保持可检索；不做强制层级。
