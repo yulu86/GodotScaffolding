@@ -145,3 +145,8 @@ Background（背景/底色）
 ## 5. 进阶参考
 
 需要深入的像素艺术技法（调色板设计、形状构建、轮廓与抗锯齿、抖动应用、动画原则、常见角色模板）时，读 [references/pixel-art-techniques.md](references/pixel-art-techniques.md)。
+
+
+## 6. 参考
+
+- MCP项目: [aseprite-mcp](https://github.com/diivi/aseprite-mcp)
