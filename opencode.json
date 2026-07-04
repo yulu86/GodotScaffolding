@@ -69,13 +69,21 @@
                 "{env:WORKSPACE_HOME}/code/07_games/GodotScaffolding"
             ]
         },
-        "pencil": {
+        "aseprite": {
             "type": "local",
             "command": [
-                "{env:PENCIL_PATH}",
-                "--app",
-                "visual_studio_code"
-            ]
+                "uv",
+                "--directory",
+                "{env:WORKSPACE_HOME}/code/07_games/aseprite-mcp",
+                "run",
+                "-m",
+                "aseprite_mcp"
+            ],
+            "environment": {
+                "ASEPRITE_PATH": "{env:ASEPRITE_PATH}"
+            },
+            "enabled": true,
+            "timeout": 30000
         }
     }
 }

@@ -44,6 +44,20 @@
                     "@modelcontextprotocol/server-filesystem",
                     "{env:WORKSPACE_HOME}/code/07_games/GodotScaffolding"
                 ]
+            },
+            "aseprite": {
+                "type": "stdio",
+                "command": "uv",
+                "args": [
+                    "--directory",
+                    "{env:WORKSPACE_HOME}/code/07_games/aseprite-mcp",
+                    "run",
+                    "-m",
+                    "aseprite_mcp"
+                ],
+                "env": {
+                    "ASEPRITE_PATH": "{env:ASEPRITE_PATH}"
+                }
             }
         }
     }
