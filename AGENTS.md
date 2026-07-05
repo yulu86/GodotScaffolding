@@ -440,15 +440,15 @@ signal score_updated(new: int, old: int)   # ✅ 类型化信号
 
 ### TDD 小循环（P0-20，Red-Green-Refactor，单测驱动）
 
-> **强制小步快跑**：每次只生成 **1 个测试方法** → 编码使其通过 → 重构，循环推进。禁止"先写一批测试再实现"。
+> **强制小步快跑**：每次只生成 **1 个测试方法(单个`gdscript`函数)** → 编码使其通过 → 重构，循环推进。禁止"先写一批测试再实现"。
 
 ```
 [Skill] test-driven-development:
-1.Red 写1个失败测试(单一行为/边界) → 2.Green 写刚好满足的最小实现(不过度设计)
+1.Red 写1个失败测试(单一`gdscript`函数) → 2.Green 写刚好满足的最小实现(不过度设计)
 → 3.Refactor 测试保护下重构保持绿 → 4.回到1写下个测试
 ```
 
-- 每个公开方法/分支/边界至少 1 个测试；命名描述行为 `test_take_damage_reduces_health()`。
+- 每个公开方法/分支/边界至少 `2` 个测试，覆盖正常和异常场景，需要根据实际参数组合出多种测试用例；命名描述行为 `test_take_damage_reduces_health()`。
 - 用 `add_child_autoqfree(child)` 自动清理；浮点比较用 `assert_almost_eq`，**禁止** `assert_eq` 比浮点。
 
 ### Headless CI 两步流水线（P0-21）
