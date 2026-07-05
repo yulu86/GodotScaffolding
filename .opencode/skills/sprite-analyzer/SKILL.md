@@ -158,7 +158,7 @@ walk   → 1:0, 1:1, ..., 1:7         （8 帧，loop）
 | **非 RGBA 图（无 alpha）** | `grid` 自动改用亮度方差判网格线（算法内置） |
 | **动画边界帧难判**（walk→idle 过渡） | `ui_diff_check` 对比相邻 tile 语义差异 |
 
-## 临时文件（遵宪法 §1.7）
+## 临时文件（遵全局宪法 §1.7）
 
 - 临时目录：`$TEMP/opencode/sprite_analyzer/<img_stem>/`（Windows）或 `$TMPDIR/...`（unix）
 - **每张图分析完（写入文档后）立即删除该图子目录**
