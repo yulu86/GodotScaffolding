@@ -39,7 +39,7 @@ description: >
 
 | 临时产物 | 路径 | 说明 |
 |---------|------|------|
-| **满意度沟通用预览图**（scale 8-10） | `tmp/` | 仅供用户视觉反馈，满意后**必删**，禁止落入 `aseprite-assets/` |
+| **满意度沟通用预览图**（scale 8-10） | `.tmp/` | 仅供用户视觉反馈，满意后**必删**，禁止落入 `aseprite-assets/` |
 
 > 游戏场景引用导出的 PNG/GIF 时直接 `load("res://aseprite-assets/...")`，无需复制到 `assets/sprites/`。
 
@@ -58,7 +58,7 @@ digraph draw_flow {
     "Step 5-6 上色/动画" [shape=box];
     "Step 7 满意度沟通(强制关卡)" [shape=box, style=bold];
     "用户满意?" [shape=diamond];
-    "交付清单 + 清理 tmp/" [shape=box];
+    "交付清单 + 清理 .tmp/" [shape=box];
     "据反馈调整" [shape=box];
 
     "用户请求" -> "Step 0 需求对齐(智能触发)";
@@ -71,7 +71,7 @@ digraph draw_flow {
     "Step 4 AI自检反馈循环" -> "Step 5-6 上色/动画";
     "Step 5-6 上色/动画" -> "Step 7 满意度沟通(强制关卡)";
     "Step 7 满意度沟通(强制关卡)" -> "用户满意?";
-    "用户满意?" -> "交付清单 + 清理 tmp/" [label="是"];
+    "用户满意?" -> "交付清单 + 清理 .tmp/" [label="是"];
     "用户满意?" -> "据反馈调整" [label="否"];
     "据反馈调整" -> "Step 4 AI自检反馈循环";
 }
@@ -147,7 +147,7 @@ Background（背景/底色）
 **AI 看不到渲染结果，这是 AI 侧自检手段，禁止跳过。**（注意：这是 AI 内部迭代，与 §Step 7 用户满意度关卡不同。）
 
 ```
-画一批 → export_frame(8×) 到 tmp/ → 读图自检 → 修正 → 再 export → 收敛
+画一批 → export_frame(8×) 到 .tmp/ → 读图自检 → 修正 → 再 export → 收敛
 ```
 
 - **形态检查**：`export_frame` scale 8 放大，确认比例/对称/剪影可读。
@@ -177,7 +177,7 @@ Background（背景/底色）
 
 ### 7.1 导出预览图供用户查看
 
-- `export_frame` scale 8-10 导出当前帧到 `tmp/preview_<sprite>.png`（动画可额外 `export_tag` 导 GIF）。
+- `export_frame` scale 8-10 导出当前帧到 `.tmp/preview_<sprite>.png`（动画可额外 `export_tag` 导 GIF）。
 - **告知用户预览图路径**，请用户查看。
 
 ### 7.2 用 `question` 发起满意度沟通（选项 + 自由补充）
@@ -186,7 +186,7 @@ Background（背景/底色）
 
 | 选项 | 含义 | AI 后续动作 |
 |------|------|------------|
-| ✅ 满意，收尾交付 | 认可当前结果 | 进入 §3 交付清单，清理 `tmp/` |
+| ✅ 满意，收尾交付 | 认可当前结果 | 进入 §3 交付清单，清理 `.tmp/` |
 | 🎨 调整配色 | 颜色/光影/饱和度方向不对 | 追问具体方向（偏冷/暖/降饱和…）→ Step 5 调色 → 回 Step 4 自检 → 回 Step 7 |
 | ✏️ 调整造型比例 | 轮廓/比例/姿态需改 | 追问具体（头大/腿短/姿态僵…）→ Step 3 修形 → 回 Step 4 → 回 Step 7 |
 | 🔧 调整细节 | 五官/纹样/装备等局部 | 追问哪个细节 → Step 3/5 微调 → 回 Step 7 |
@@ -217,7 +217,7 @@ Background（背景/底色）
 | 平滑渐变 | `apply_dither_gradient`（Bayer 抖动）/ `apply_gradient_rect` |
 | 描边提可读性 | `outline_cel`（1px）/ `outline_native`（高质量）|
 | 换某颜色 | `replace_color` |
-| **自检形态 / 满意度预览** | `export_frame`(8×) → tmp/ |
+| **自检形态 / 满意度预览** | `export_frame`(8×) → .tmp/ |
 | **自检色板** | `get_color_stats` |
 | **自检动画连贯** | `render_onion_skin` / `compare_frames` |
 | 静态导出 | `export_sprite`（PNG）→ `aseprite-assets/export/` |
@@ -248,7 +248,7 @@ Background（背景/底色）
 - [ ] 已用 `get_color_stats` 核验色板无冗余色
 - [ ] 已用 `export_frame` 8× 预览形态无误（且用户已确认满意）
 - [ ] （动画）已用 `render_onion_skin` + `compare_frames` 验证连贯
-- [ ] **`tmp/` 下的满意度沟通预览图已删除**
+- [ ] **`.tmp/` 下的满意度沟通预览图已删除**
 - [ ] 若供游戏场景使用，已确认 `load("res://aseprite-assets/...")` 路径正确
 
 ## 6. 进阶参考

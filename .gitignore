@@ -57,6 +57,7 @@ reports/report*
 
 # others
 tmp/
+.tmp/
 **/superpowers/
 test/**/*.png
 nul

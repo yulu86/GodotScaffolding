@@ -232,10 +232,10 @@
 - **project.godot 的 [input]/[autoload]/[layer_names] 段用 Godot API 脚本生成，禁手写**：
   - **Why**：project.godot 的文件头注释明示"最好用编辑器 UI 编辑"；手写这些段产生的格式可能与编辑器写入的不一致，导致编辑器重载时被覆盖或解析异常。用 `ProjectSettings.set_setting()` + `ProjectSettings.save()` 走 Godot API，保证输出与编辑器完全一致、可复现、可版本对比。
   - **How**：
-    1. 写一次性 `@tool extends SceneTree` 脚本，存 `tmp/`（临时文件任务结束必删）；
+    1. 写一次性 `@tool extends SceneTree` 脚本，存 `.tmp/`（临时文件任务结束必删）；
     2. 用对应 API 写入：`[input]` → `InputMap.add_action()` + `InputMap.action_add_event()`；`[autoload]` → `ProjectSettings.set_setting("autoload/Name", "*res://...")`；`[layer_names]` → `ProjectSettings.set_setting("layer_names/2d_physics/layer_N", "中文名")`；
     3. 最后调 `ProjectSettings.save()` 持久化，`quit()`；
-    4. 运行：`$GODOT_HOME --headless --path . --script tmp/xxx.gd`；
+    4. 运行：`$GODOT_HOME --headless --path . --script .tmp/xxx.gd`；
     5. 验证 project.godot 输出后删除脚本（临时文件任务结束必删）。
   - **反例**：手写 `[input]` 段的 `Object(InputEventKey,...)` → 字段顺序/类型错乱，编辑器打开后配置丢失或报错。
   - **适用边界**：简单纯文本段（如 `[application]` 的 `config/name`、`[display]` 的 window 设置等编辑器 UI 产出的基础 key-value）手写风险低，不强制脚本生成；但一旦涉及 Godot 对象序列化或数组/字典结构，**必须**走脚本。
