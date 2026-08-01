@@ -1,6 +1,7 @@
 # Godot 游戏开发宪法（项目级）
 
 > **Godot 4.x / GDScript 专属宪法**，条款为最高优先级指令，不可协商、不可绕过。
+> 本文档为只读文档。
 > 用户指令优先级高于 Skill。
 
 ---
@@ -28,7 +29,7 @@
 | 3 | 开源免费资产获取 | Kenney / OpenGameArt / itch.io | 免费素材包（下载走 hf-mirror / gh-proxy 加速） | 前置 |
 | 4 | 游戏资产分析 | `sprite-analyzer`【项目级】 | tile 网格 / 动画帧分组 / 精灵资源文档 | 前置 |
 | 5 | 高保真设计 | `frontend-design` + `gsap-*` 系列 | HTML 交互原型（视觉/动效/交互定稿） | 前置 |
-| 6 | 需求文档 | — | Feature/Story + 验收标准 AC（`docs/01_需求`·`docs/07_story`） | 前置 |
+| 6 | 需求文档 | — | Feature/Story + 验收标准 AC（`docs/05_需求`·`docs/06_story`） | 前置 |
 | 7 | 启动准备 | `qmd` / `wiki-query` | 读 `MEMORY.md` + 查 LLM Wiki | B1 |
 | 8 | 架构与模块设计 | `godot-architect`【项目级】（仅设计不写码） | 场景树 / 状态机 / 模块 / 接口 | B2 |
 | 9 | TDD 开发 | `test-driven-development` + `godot-best-practices` + `godot-mcp` | 红→绿→重构；`.tscn`/`.tres` 禁手写 | B3/B4 |
@@ -66,7 +67,7 @@
 
 **阶段 6 · 需求文档**
 - **目的**：冻结需求，定义可验证的验收标准
-- **产物**：Feature/Story 文档 + 验收标准 AC（`docs/01_需求`、`docs/07_story`）
+- **产物**：Feature/Story 文档 + 验收标准 AC（`docs/05_需求`、`docs/06_story`）
 - **完成标志**：每条需求都有对应可测的 AC
 
 **阶段 7 · 启动准备（B1）**
@@ -104,7 +105,7 @@
 1. **提交代码 commit**（规范遵从 §4.1：`{type}: {描述}`）
 2. **经验沉淀（C3）**：可复用经验按双区追加到 `MEMORY.md`，**独立 commit**（`docs: 沉淀经验`）
 3. **qmd 索引刷新（C5）**：改动了 `.md` 就执行 `qmd update && qmd embed`
-4. **状态追踪（C6）**：更新 story 状态（frontmatter `status:` + `docs/07_story/00_总表.md`）
+4. **状态追踪（C6）**：更新 story 状态（frontmatter `status:` + `docs/06_story/00_总表.md`）
 5. **飞书通知**：关键节点用 `lark-im` 通知用户（凭证从 `.env` 读 `FEISHU_APP_ID`/`FEISHU_APP_SECRET`，禁止硬编码）
 
 ---

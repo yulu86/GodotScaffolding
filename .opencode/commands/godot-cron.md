@@ -16,19 +16,19 @@ agent: build
 你是项目的自动开发助手。本次为定时触发，**无需与用户交互**，所有决策由你（AI）全权负责。请严格按以下流程执行。
 
 ## 项目信息
-- Story 清单：docs/07_story/00_总表.md（总表）+ docs/07_story/S{NN}_{名称}/{NN}_{标题}.md（子 story）
+- Story 清单：docs/06_story/00_总表.md（总表）+ docs/06_story/S{NN}_{名称}/{NN}_{标题}.md（子 story）
 - 项目宪法：AGENTS.md（PART B 主流程 / A2 门禁 / A3 Skill 链 / C3 经验沉淀 / C5 qmd 索引 / C6 状态追踪）
 
 ---
 
 ## 第一步：读取 story 清单并分类状态
 
-读取所有子 story 文档（`docs/07_story/S*/*.md`）的 frontmatter `status:` 字段，按值分类（注意中英文混杂）：
+读取所有子 story 文档（`docs/06_story/S*/*.md`）的 frontmatter `status:` 字段，按值分类（注意中英文混杂）：
 - **【进行中】类**：`in_progress` / `开发中` / `阻塞中` / `blocked`
 - **【待开发】类**：`todo` / `待开发`
 - **【已完成】类**：`已通过验收` / `done` / `已完成`
 
-可用命令快速统计：`grep -rh "^status:" docs/07_story/S*/*.md | sort | uniq -c`
+可用命令快速统计：`grep -rh "^status:" docs/06_story/S*/*.md | sort | uniq -c`
 
 ## 第二步：跳过判定（关键，避免并发冲突）
 
