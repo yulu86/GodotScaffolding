@@ -45,6 +45,7 @@ build/
 .opencode/
 opencode.json
 AGENTS.md
+specs/
 
 # qmd (markdown search index cache, see AGENTS.md §13.5)
 .qmd/
