@@ -110,6 +110,56 @@
 
 ---
 
+## 项目目录结构（ASCII）
+
+> 详细目录用途、阶段交付物映射、命名规范见 `docs/00_开发指南/02_目录规范.md`；本节为快速参考。
+> **设计原则**：`scripts/`=所有 `.gd`、`scenes/`=所有 `.tscn`、`assets/`=媒体、`data/`=`.tres`、`shaders/`=`.gdshader`。
+
+```
+GodotScaffolding/
+├── project.godot                  # Godot 工程配置（阶段8前必建）
+├── export_presets.cfg             # web 导出预设（阶段11）
+├── AGENTS.md                      # 项目宪法（含开发主流程）
+├── MEMORY.md                      # 经验沉淀（横切 C3）
+├── README.md
+│
+├── docs/                          # ── 文档类交付物（编号对齐11阶段）──
+│   ├── 00_开发指南/               # 流程/目录规范/快速开始/环境
+│   ├── 01_创意探索/               # 阶段1
+│   ├── 02_低保真设计/             # 阶段2
+│   ├── 03_资产/                   # 阶段3获取 + 阶段4分析
+│   ├── 04_高保真设计/             # 阶段5 HTML+gsap 原型
+│   ├── 05_需求/                   # 阶段6 Feature + AC
+│   ├── 06_story/                  # story 拆分 + 00_总表.md
+│   ├── 07_架构/                   # 阶段8 架构方案
+│   └── 08_验收/                   # 阶段11 验收报告
+│
+├── scenes/                        # ── 所有 .tscn 场景（按实体类型）──
+│   ├── _prototype/                # 阶段2 灰盒原型（临时）
+│   ├── actors/  levels/  objects/  ui/
+│   └── components/                # 可复用组件场景
+│
+├── scripts/                       # ── 所有 .gd 脚本 ──
+│   ├── classes/  utils/
+│   ├── autoloads/                 # 全局单例
+│   └── resources/                 # Resource 类定义（extends Resource）
+│
+├── assets/                        # ── 媒体资源（无代码）──
+│   └── sprites/  audio/  fonts/  textures/  themes/
+│
+├── data/                          # .tres 数据实例（Resource 取值）
+├── shaders/                       # .gdshader 着色器
+├── addons/                        # 插件（GdUnit4 等）
+├── test/                          # ── 测试（分层 + 镜像）──
+│   ├── unit/                      # 单测，子目录必须镜像源码相对路径
+│   └── integration/               # 集成测试
+│
+├── build/                         # web 导出产物（临时，验后删）
+└── .tmp/                          # 验收证据/中间产物（临时，任务后删）
+```
+
+---
+
 ## 附录：可用 Skill 速查表
 
 > **使用原则**：当任务与下表任一 Skill 触发场景相符（哪怕仅 1% 可能）时，**必须**先调用对应 Skill 再行动。
