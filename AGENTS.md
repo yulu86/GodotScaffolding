@@ -15,7 +15,7 @@
 ### 一句话总览（`->` 流程链）
 
 ```
-创意探索 -> 低保真设计 -> 开源免费资产获取 -> 游戏资产分析 -> 高保真设计 -> 需求文档 -> 启动准备 -> 架构与模块设计 -> TDD开发 -> 质量门禁 -> 黑盒验收
+创意探索 -> 开源免费资产获取 -> 游戏资产分析 -> 高保真设计 -> 需求文档 -> 启动准备 -> 架构与模块设计 -> TDD开发 -> 质量门禁 -> 黑盒验收
 ```
 
 > 每个 `->` 节点完成后，立即执行横切规则「收尾沉淀」。
@@ -25,16 +25,15 @@
 | # | 阶段 | 强制 Skill / 工具 | 产物 / 门禁 | 宪法编号 |
 |---|------|------------------|------------|:------:|
 | 1 | 创意探索 | `brainstorming` | GDD 文档（游戏设计文档：设计意图 / 约束 / 成功标准） | 前置 |
-| 2 | 低保真设计 | Godot 灰盒 / `excalidraw-diagram-generator` | 核心玩法循环验证（有趣性/可行性） | 前置 |
-| 3 | 开源免费资产获取 | Kenney / OpenGameArt / itch.io | 免费素材包（下载走 hf-mirror / gh-proxy 加速） | 前置 |
-| 4 | 游戏资产分析 | `sprite-analyzer`【项目级】 | tile 网格 / 动画帧分组 / 精灵资源文档 | 前置 |
-| 5 | 高保真设计 | `frontend-design` + `gsap-*` 系列 | HTML 交互原型（视觉/动效/交互定稿） | 前置 |
-| 6 | 需求文档 | — | Feature/Story + 验收标准 AC（`docs/05_需求`·`docs/06_story`） | 前置 |
-| 7 | 启动准备 | `qmd` / `wiki-query` | 读 `MEMORY.md` + 查 LLM Wiki | B1 |
-| 8 | 架构与模块设计 | `godot-architect`【项目级】（仅设计不写码） | 场景树 / 状态机 / 模块 / 接口 | B2 |
-| 9 | TDD 开发 | `test-driven-development` + `godot-best-practices` + `godot-mcp` | 红→绿→重构；`.tscn`/`.tres` 禁手写 | B3/B4 |
-| 10 | 质量门禁 | `gdlint`/`gdformat` + GdUnit4 + code review | **全过方可继续**，不过进阻塞修复循环 | B5/A2 |
-| 11 | 黑盒验收 | `godot-web-verify` / `playwright-cli` | web 导出验 AC；纯逻辑用 headless GdUnit4 | C2 |
+| 2 | 开源免费资产获取 | Kenney / OpenGameArt / itch.io | 免费素材包（下载走 hf-mirror / gh-proxy 加速） | 前置 |
+| 3 | 游戏资产分析 | `sprite-analyzer`【项目级】 | tile 网格 / 动画帧分组 / 精灵资源文档 | 前置 |
+| 4 | 高保真设计 | `frontend-design`/`web-artifacts-builder` + `gsap-*` 系列 | HTML 交互原型（可视化互动 → 动效/交互定稿） | 前置 |
+| 5 | 需求文档 | — | Feature/Story + 验收标准 AC（`docs/05_需求`·`docs/06_story`） | 前置 |
+| 6 | 启动准备 | `qmd` / `wiki-query` | 读 `MEMORY.md` + 查 LLM Wiki | B1 |
+| 7 | 架构与模块设计 | `godot-architect`【项目级】（仅设计不写码） | 场景树 / 状态机 / 模块 / 接口 | B2 |
+| 8 | TDD 开发 | `test-driven-development` + `godot-best-practices` + `godot-mcp` | 红→绿→重构；`.tscn`/`.tres` 禁手写 | B3/B4 |
+| 9 | 质量门禁 | `gdlint`/`gdformat` + GdUnit4 + code review | **全过方可继续**，不过进阻塞修复循环 | B5/A2 |
+| 10 | 黑盒验收 | `godot-web-verify` / `playwright-cli` | web 导出验 AC；纯逻辑用 headless GdUnit4 | C2 |
 
 ### 各阶段详解
 
@@ -45,48 +44,44 @@
 - **产物**：GDD 文档（游戏设计文档：设计意图 / 约束 / 成功标准，存放于 `docs/01_创意探索/`）
 - **完成标志**：GDD 文档经用户确认设计方向
 
-**阶段 2 · 低保真设计**
-- **目的**：用最低成本验证核心玩法循环是否有趣、可行
-- **工具**：Godot 灰盒原型 / 纸面原型 / `excalidraw-diagram-generator`（画玩法流程）
-- **完成标志**：核心玩法循环验证通过（fun factor 达标）
-
-**阶段 3 · 开源免费资产获取**
+**阶段 2 · 开源免费资产获取**
 - **目的**：获取免费可用的美术/音效资产
 - **来源**：Kenney.nl / OpenGameArt / itch.io 免费区
 - **门禁**：遵守素材许可协议；下载走加速（huggingface 加 `hf-mirror.com`，github 加 `gh-proxy.org`）
 - **产物**：素材包入项目资源目录
 
-**阶段 4 · 游戏资产分析**
+**阶段 3 · 游戏资产分析**
 - **目的**：识别精灵表结构，为后续开发做准备
 - **强制 Skill**：`sprite-analyzer`【项目级】
 - **产物**：精灵资源文档（tile 网格 / 动画帧分组）
 
-**阶段 5 · 高保真设计**
-- **目的**：基于真实资产定稿视觉风格、动效与交互
-- **强制 Skill**：`frontend-design` + `gsap-*` 系列（`gsap-core`/`gsap-timeline`/`gsap-scrolltrigger` 等）
+**阶段 4 · 高保真设计**
+- **目的**：基于真实资产定稿视觉风格、交互与动效
+- **步骤一·交互原型**：用 `frontend-design` / `web-artifacts-builder` 以**可视化互动**方式设计交互原型（生成浏览器可预览的 HTML，验证布局/交互/视觉风格）
+- **步骤二·动效优化**：用 `gsap-*` 系列 Skill（`gsap-core`/`gsap-timeline`/`gsap-scrolltrigger` 等）为原型叠加动效与交互动画
 - **产物**：HTML 交互原型（浏览器可预览，与后续 web 验收同源）
 - **完成标志**：视觉/动效/交互定稿
 
-**阶段 6 · 需求文档**
+**阶段 5 · 需求文档**
 - **目的**：冻结需求，定义可验证的验收标准
 - **模板规范**：Story 文档**必须**遵循 `specs/06_story文档模板.md` 结构填写，撰写前加载并参考
 - **产物**：Feature/Story 文档 + 验收标准 AC（`docs/05_需求`、`docs/06_story`）
 - **完成标志**：每条需求都有对应可测的 AC
 - **拆分准则**：Feature → Story 拆分遵循 INVEST·≤20min（详见下方「Story 拆分准则」专节）
 
-**阶段 7 · 启动准备（B1）**
+**阶段 6 · 启动准备（B1）**
 - **目的**：回顾已有经验与知识，避免重复造轮子（**先查再设计**）
 - **强制 Skill**：`qmd`（查 `MEMORY.md`）/ `wiki-query`（查 LLM Wiki）
 - **完成标志**：已检索 MEMORY + Wiki，确认可复用经验
 
-**阶段 8 · 架构与模块设计（B2）**
+**阶段 7 · 架构与模块设计（B2）**
 - **目的**：设计场景树结构、状态机、模块划分与接口
 - **强制 Skill**：`godot-architect`【项目级】（**仅设计，不写代码**）
 - **模板规范**：架构与模块设计**必须**遵循 `specs/07_架构设计说明书模板.md` / `specs/08_模块设计说明书模板.md` 结构填写，撰写前加载并参考
 - **产物**：架构设计说明书 + 各模块设计说明书（`docs/07_架构/`）
 - **完成标志**：架构方案通过评审
 
-**阶段 9 · TDD 开发（B3 / B4）**
+**阶段 8 · TDD 开发（B3 / B4）**
 - **目的**：以测试驱动实现功能
 - **强制 Skill**：`test-driven-development`（1 个测试 → 最小实现 → 重构）+ `godot-best-practices`【项目级】（编码规范）+ `godot-mcp`（搭建场景）
 - **编码规范**：所有 `.gd` 代码**必须**遵循 `specs/01_GDScript开发规范.md`（24 条，每条含正例/反例），编码前加载并应用
@@ -95,13 +90,13 @@
 - **门禁**：`.tscn`/`.tres` **禁手写**，用 MCP 或编辑器生成；新增 `.gd`/图片/音频/`.tscn` 必跑 `--headless --import` 生成 `.uid`/`.import`
 - **产物**：通过单元测试的功能代码
 
-**阶段 10 · 质量门禁（B5 / A2）**
+**阶段 9 · 质量门禁（B5 / A2）**
 - **目的**：保证代码质量，**全过方可继续**
 - **门禁清单**：`gdlint` / `gdformat`（lint 与格式）+ GdUnit4 单元测试 + code review
 - **检视规范**：code review **必须**遵循 `specs/04_代码检视规范.md`（18 条，每条含正例/反例），检视前加载并应用
 - **完成标志**：全部门禁通过；未过则进入「阻塞 → 最小改动修复 → 重跑」循环，**禁止跳过或降级验收标准**
 
-**阶段 11 · 黑盒验收（C2）**
+**阶段 10 · 黑盒验收（C2）**
 - **目的**：对照 AC 做端到端验证
 - **强制 Skill**：`godot-web-verify`【项目级】/ `playwright-cli`（界面类）/ headless GdUnit4（纯逻辑类）
 - **流程**：导出 web → https 启动（端口 8443）→ playwright 按条验 AC（截图/console/操作模拟）→ 验毕停服务、关浏览器、删 `build/`
@@ -109,7 +104,7 @@
 
 ### Story 拆分准则（INVEST · ≤20min）
 
-> 适用阶段 6：Feature（`docs/05_需求`）→ Story（`docs/06_story`）。每个 Story 必须满足以下 INVEST 适配原则。
+> 适用阶段 5：Feature（`docs/05_需求`）→ Story（`docs/06_story`）。每个 Story 必须满足以下 INVEST 适配原则。
 
 | 原则 | 标准 | 本项目适配 |
 |------|------|------------|
@@ -118,7 +113,7 @@
 | **V** Valuable 有价值 | 对 Feature 有可验证贡献 | 极细粒度下「价值=可测增量」，即使不端到端可玩也要有可验证断言 |
 | **E** Estimable 可估算 | 能给出预估 | 无法估算=拆分不清，继续分解 |
 | **S** Small 足够小 | **硬约束：单 Story 开发预估 ≤ 20min** | **超标必须拆分** |
-| **T** Testable 可测试 | 必有可测 AC | Story 层用 **GdUnit4（headless）** 验收；端到端 **web 黑盒验收（阶段11）在 Feature 层**（多 Story 组合后）进行 |
+| **T** Testable 可测试 | 必有可测 AC | Story 层用 **GdUnit4（headless）** 验收；端到端 **web 黑盒验收（阶段10）在 Feature 层**（多 Story 组合后）进行 |
 
 **拆分触发条件（预估 >20min 时按序尝试）**：
 - 按工作流步骤切（一个步骤一个 Story）
@@ -127,12 +122,12 @@
 - 按接口与实现切（数据结构/接口先行，逻辑实现后续）
 
 **与验收流程衔接**：
-- Story 完成（阶段 9-10）= GdUnit4 单测/集成测试通过 → `status: done`
-- Feature 完成（阶段 11）= 所属 Story 全 done 后，组合走 web 黑盒验收
+- Story 完成（阶段 8-9）= GdUnit4 单测/集成测试通过 → `status: done`
+- Feature 完成（阶段 10）= 所属 Story 全 done 后，组合走 web 黑盒验收
 
 ### 横切规则：收尾沉淀（B7 / C3 / C5 / C6）— 每个阶段完成后必做
 
-> 无论刚完成哪个阶段（1~11），都**必须**立即执行以下收尾闭环，而非等到流程最末：
+> 无论刚完成哪个阶段（1~10），都**必须**立即执行以下收尾闭环，而非等到流程最末：
 
 1. **提交代码 commit**（规范遵从 §4.1：`{type}: {描述}`）
 2. **经验沉淀（C3）**：可复用经验按双区追加到 `MEMORY.md`，**独立 commit**（`docs: 沉淀经验`）
@@ -149,25 +144,23 @@
 
 ```
 GodotScaffolding/
-├── project.godot                  # Godot 工程配置（阶段8前必建）
-├── export_presets.cfg             # web 导出预设（阶段11）
+├── project.godot                  # Godot 工程配置（阶段7前必建）
+├── export_presets.cfg             # web 导出预设（阶段10）
 ├── AGENTS.md                      # 项目宪法（含开发主流程）
 ├── MEMORY.md                      # 经验沉淀（横切 C3）
 ├── README.md
 │
-├── docs/                          # ── 文档类交付物（编号对齐11阶段）──
+├── docs/                          # ── 文档类交付物（编号对齐10阶段）──
 │   ├── 00_开发指南/               # 流程/目录规范/快速开始/环境
 │   ├── 01_创意探索/               # 阶段1
-│   ├── 02_低保真设计/             # 阶段2
-│   ├── 03_资产/                   # 阶段3获取 + 阶段4分析
-│   ├── 04_高保真设计/             # 阶段5 HTML+gsap 原型
-│   ├── 05_需求/                   # 阶段6 Feature + AC
+│   ├── 03_资产/                   # 阶段2获取 + 阶段3分析
+│   ├── 04_高保真设计/             # 阶段4 HTML+gsap 原型
+│   ├── 05_需求/                   # 阶段5 Feature + AC
 │   ├── 06_story/                  # story 拆分 + 00_总表.md
-│   ├── 07_架构/                   # 阶段8 架构方案
-│   └── 08_验收/                   # 阶段11 验收报告
+│   ├── 07_架构/                   # 阶段7 架构方案
+│   └── 08_验收/                   # 阶段10 验收报告
 │
 ├── scenes/                        # ── 所有 .tscn 场景（按实体类型）──
-│   ├── _prototype/                # 阶段2 灰盒原型（临时）
 │   ├── actors/  levels/  objects/  ui/
 │   └── components/                # 可复用组件场景
 │
