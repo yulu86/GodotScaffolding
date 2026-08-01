@@ -201,12 +201,12 @@ emit_signal("health_changed")    # 字符串易错、无补全
 
 **正例**（✅）：
 ```gdscript
-# 子节点 HealthComponent
+# 子节点 Health
 signal died
 
 # 父节点 Player
 func _ready() -> void:
-    $HealthComponent.died.connect(_on_died)
+    $Health.died.connect(_on_died)
 
 func _on_died() -> void:
     queue_free()
