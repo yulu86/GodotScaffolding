@@ -1,6 +1,7 @@
 # TDD 测试规范
 
-> Godot 4.x / GdUnit4 测试驱动开发规范。AI 在**阶段 9（TDD 开发）**写测试时**必须**加载并遵循本规范。
+> 本文档为只读文档。
+> Godot 4.x / GdUnit4 测试驱动开发规范。AI 在**阶段 8（TDD 开发）**写测试时**必须**加载并遵循本规范。
 > 与 `test-driven-development` Skill（TDD 流程纪律）+ GdUnit4（测试工具）协同。
 > 每条含：规范说明 + 正例（✅）+ 反例（❌）。
 
@@ -250,7 +251,7 @@ func test_died_signal_on_zero_health() -> void:
 - [ ] 覆盖边界与错误路径；场景用 `scene_runner`，信号用 `assert_signal`
 - [ ] 失败时改实现不改测试
 
-**headless 运行（阶段 10 门禁 / CI）：**
+**headless 运行（阶段 9 门禁 / CI）：**
 
 ```bash
 # 设置 Godot 可执行路径（按实际安装）
