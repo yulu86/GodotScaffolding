@@ -1,0 +1,14 @@
+{
+  "_comment": "playwright-cli config for Godot web verification. Copy to <project>/.playwright/cli.config.json. Uses local Chrome (constitutional §2.7), ignores self-signed cert. NOTE: do NOT add --disable-web-security to args, it breaks Godot's COOP/COEP requirement.",
+  "browser": {
+    "browserName": "chromium",
+    "launchOptions": {
+      "channel": "chrome",
+      "headless": false,
+      "args": ["--ignore-certificate-errors"]
+    },
+    "contextOptions": {
+      "ignoreHTTPSErrors": true
+    }
+  }
+}

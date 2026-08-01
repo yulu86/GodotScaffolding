@@ -1,0 +1,26 @@
+{
+    "mcp": {
+        "servers": {
+            "godot-mcp": {
+                "type": "stdio",
+                "command": "npx",
+                "args": [
+                    "@coding-solo/godot-mcp"
+                ],
+                "env": {
+                    "DEBUG": "false",
+                    "GODOT_PATH": "{env:GODOT_HOME}"
+                }
+            },
+            "filesystem": {
+                "type": "stdio",
+                "command": "npx",
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-filesystem",
+                    "{env:WORKSPACE_HOME}/code/07_games/GodotScaffolding"
+                ]
+            }
+        }
+    }
+}

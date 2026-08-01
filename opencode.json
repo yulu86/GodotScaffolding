@@ -1,0 +1,49 @@
+{
+    "$schema": "https://opencode.ai/config.json",
+    "instructions": [
+        "AGENTS.md"
+    ],
+    "provider": {
+        "ollama": {
+            "npm": "@ai-sdk/openai-compatible",
+            "name": "Ollama (local)",
+            "options": {
+                "baseURL": "http://localhost:11434/v1"
+            },
+            "models": {
+                "gemma4:12b": {
+                    "name": "gemma4:12b"
+                }
+            }
+        }
+    },
+    "permission": {
+        "skill": "allow",
+        "bash": "allow",
+        "external_directory": {
+            "*": "allow"
+        }
+    },
+    "mcp": {
+        "godot-mcp": {
+            "type": "local",
+            "command": [
+                "npx",
+                "@coding-solo/godot-mcp"
+            ],
+            "environment": {
+                "DEBUG": "false",
+                "GODOT_PATH": "{env:GODOT_HOME}"
+            }
+        },
+        "filesystem": {
+            "type": "local",
+            "command": [
+                "npx",
+                "-y",
+                "@modelcontextprotocol/server-filesystem",
+                "{env:WORKSPACE_HOME}/code/07_games/GodotScaffolding"
+            ]
+        }
+    }
+}
