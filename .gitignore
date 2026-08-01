@@ -1,0 +1,64 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Godot-specific ignores
+.import/
+export.cfg
+export_credentials.cfg
+
+# Imported translations (automatically generated from CSV files)
+*.translation
+
+# Mono-specific ignores
+.mono/
+data_*/
+mono_crash.*.json
+
+# workspace
+**/.vscode/
+**/.DS_Store
+**/*.zip
+**/*.tmp
+
+# context
+**/.context/
+
+# excalidraw
+**/.excalidraw/
+
+# log
+**/*.log
+
+# claude
+.claude/
+
+# sisyphus
+.sisyphus/
+
+# epxort
+export_presets.cfg
+build/
+
+# AI AGENT config
+.zcode/
+.opencode/
+opencode.json
+AGENTS.md
+
+# qmd (markdown search index cache, see AGENTS.md §13.5)
+.qmd/
+
+# env
+.env
+
+# reports
+reports/report*
+reports/
+
+# others
+tmp/
+.tmp/
+**/superpowers/
+test/**/*.png
+nul
