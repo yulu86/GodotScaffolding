@@ -72,6 +72,7 @@
 - **模板规范**：Story 文档**必须**遵循 `specs/06_story文档模板.md` 结构填写，撰写前加载并参考
 - **产物**：Feature/Story 文档 + 验收标准 AC（`docs/05_需求`、`docs/06_story`）
 - **完成标志**：每条需求都有对应可测的 AC
+- **拆分准则**：Feature → Story 拆分遵循 INVEST·≤20min（详见下方「Story 拆分准则」专节）
 
 **阶段 7 · 启动准备（B1）**
 - **目的**：回顾已有经验与知识，避免重复造轮子（**先查再设计**）
@@ -104,6 +105,29 @@
 - **强制 Skill**：`godot-web-verify`【项目级】/ `playwright-cli`（界面类）/ headless GdUnit4（纯逻辑类）
 - **流程**：导出 web → https 启动（端口 8443）→ playwright 按条验 AC（截图/console/操作模拟）→ 验毕停服务、关浏览器、删 `build/`
 - **完成标志**：所有 AC 验证通过
+
+### Story 拆分准则（INVEST · ≤20min）
+
+> 适用阶段 6：Feature（`docs/05_需求`）→ Story（`docs/06_story`）。每个 Story 必须满足以下 INVEST 适配原则。
+
+| 原则 | 标准 | 本项目适配 |
+|------|------|------------|
+| **I** Independent 独立 | 尽量可独立开发 | 游戏功能常耦合，**允许依赖但必须显式标注**（frontmatter 记前置 Story） |
+| **N** Negotiable 可协商 | 实现方式留空间 | AC 冻结需求，实现细节可协商 |
+| **V** Valuable 有价值 | 对 Feature 有可验证贡献 | 极细粒度下「价值=可测增量」，即使不端到端可玩也要有可验证断言 |
+| **E** Estimable 可估算 | 能给出预估 | 无法估算=拆分不清，继续分解 |
+| **S** Small 足够小 | **硬约束：单 Story 开发预估 ≤ 20min** | **超标必须拆分** |
+| **T** Testable 可测试 | 必有可测 AC | Story 层用 **GdUnit4（headless）** 验收；端到端 **web 黑盒验收（阶段11）在 Feature 层**（多 Story 组合后）进行 |
+
+**拆分触发条件（预估 >20min 时按序尝试）**：
+- 按工作流步骤切（一个步骤一个 Story）
+- 按 happy-path / 边界异常切（主路径先行，异常单独成 Story）
+- 按数据操作切（CRUD 各一）
+- 按接口与实现切（数据结构/接口先行，逻辑实现后续）
+
+**与验收流程衔接**：
+- Story 完成（阶段 9-10）= GdUnit4 单测/集成测试通过 → `status: done`
+- Feature 完成（阶段 11）= 所属 Story 全 done 后，组合走 web 黑盒验收
 
 ### 横切规则：收尾沉淀（B7 / C3 / C5 / C6）— 每个阶段完成后必做
 
