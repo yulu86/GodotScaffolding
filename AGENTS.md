@@ -48,6 +48,7 @@
 - **目的**：获取免费可用的美术/音效资产
 - **来源**：Kenney.nl / OpenGameArt / itch.io 免费区
 - **门禁**：遵守素材许可协议；下载走加速（huggingface 加 `hf-mirror.com`，github 加 `gh-proxy.org`）
+- **及时导入（硬门禁）**：资产放入项目 `assets/` 后，**必须立即**跑 `--headless --import` 生成 `.import`/`.uid`，否则后续无法被场景/脚本引用（命令见 `specs/09_Godot环境与命令手册.md` §3.1.1）
 - **产物**：素材包入项目资源目录
 
 **阶段 3 · 游戏资产分析**
@@ -87,18 +88,20 @@
 - **编码规范**：所有 `.gd` 代码**必须**遵循 `specs/01_GDScript开发规范.md`（24 条，每条含正例/反例），编码前加载并应用
 - **场景规范**：所有 `.tscn` 场景**必须**遵循 `specs/02_场景开发规范.md`（19 条，每条含正例/反例），搭建前加载并应用
 - **测试规范**：TDD 开发**必须**遵循 `specs/03_TDD测试规范.md`（18 条，每条含正例/反例），写测试前加载并应用
-- **门禁**：`.tscn`/`.tres` **禁手写**，用 MCP 或编辑器生成；新增 `.gd`/图片/音频/`.tscn` 必跑 `--headless --import` 生成 `.uid`/`.import`
+- **场景禁手写**：`.tscn`/`.tres` **禁手写**，用 MCP 或编辑器生成
+- **及时导入（硬门禁）**：每新增**游戏资源**（图片/音频/字体/3D/`.gdshader`）/ **GDScript**（`.gd`）/ **Scene**（`.tscn`）后，**必须立即**跑 `--headless --import` 生成 `.uid`/`.import`（命令见 `specs/09_Godot环境与命令手册.md` §3.1）；**禁止攒批**——否则后续场景/脚本引用报 `uid not found`
+- **CLI 手册**：Godot 可执行定位与命令行用法**必须**遵循 `specs/09_Godot环境与命令手册.md`（导入/检查/导出/headless，适用阶段 7-10）
 - **产物**：通过单元测试的功能代码
 
 **阶段 9 · 质量门禁（B5 / A2）**
 - **目的**：保证代码质量，**全过方可继续**
-- **门禁清单**：`gdlint` / `gdformat`（lint 与格式）+ GdUnit4 单元测试 + code review
+- **门禁清单**：`gdlint` / `gdformat`（lint 与格式）+ GdUnit4 单元测试 + code review（命令行用法见 `specs/09_Godot环境与命令手册.md` §3.3 `--check-only` / §4 配套工具）
 - **检视规范**：code review **必须**遵循 `specs/04_代码检视规范.md`（18 条，每条含正例/反例），检视前加载并应用
 - **完成标志**：全部门禁通过；未过则进入「阻塞 → 最小改动修复 → 重跑」循环，**禁止跳过或降级验收标准**
 
 **阶段 10 · 黑盒验收（C2）**
 - **目的**：对照 AC 做端到端验证
-- **强制 Skill**：`godot-web-verify`【项目级】/ `playwright-cli`（界面类）/ headless GdUnit4（纯逻辑类）
+- **强制 Skill**：`godot-web-verify`【项目级】/ `playwright-cli`（界面类）/ headless GdUnit4（纯逻辑类）（Web 导出命令见 `specs/09_Godot环境与命令手册.md` §3.4 `--export-release`）
 - **流程**：导出 web → https 启动（端口 8443）→ playwright 按条验 AC（截图/console/操作模拟）→ 验毕停服务、关浏览器、删 `build/`
 - **完成标志**：所有 AC 验证通过
 
