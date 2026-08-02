@@ -27,7 +27,7 @@
 | 1 | 创意探索 | `brainstorming` | GDD 文档（游戏设计文档：设计意图 / 约束 / 成功标准） | 前置 |
 | 2 | 开源免费资产获取 | Kenney / OpenGameArt / itch.io | 免费素材包（下载走 hf-mirror / gh-proxy 加速） | 前置 |
 | 3 | 游戏资产分析 | `sprite-analyzer`【项目级】 | tile 网格 / 动画帧分组 / 精灵资源文档 | 前置 |
-| 4 | 高保真设计 | `frontend-design`/`web-artifacts-builder` + `gsap-*` 系列 | HTML 交互原型（可视化互动 → 动效/交互定稿） | 前置 |
+| 4 | 高保真设计 |`using-superpowers` `brainstorming`（Visual Companion）+ `frontend-design`/`web-artifacts-builder` + `gsap-*` 系列 + Godot Theme（`.tres` 代码生成） | 视觉规范 + Theme 资源 + 界面流转图 + 逐界面 HTML 高保真 + 动效 + 设计文档（嵌截图/HTML 链接） | 前置 |
 | 5 | 需求文档 | — | Feature/Story + 验收标准 AC（`docs/05_需求`·`docs/06_story`） | 前置 |
 | 6 | 启动准备 | `qmd` / `wiki-query` | 读 `MEMORY.md` + 查 LLM Wiki | B1 |
 | 7 | 架构与模块设计 | `godot-architect`【项目级】（仅设计不写码） | 场景树 / 状态机 / 模块 / 接口 | B2 |
@@ -57,11 +57,24 @@
 - **产物**：精灵资源文档（tile 网格 / 动画帧分组）
 
 **阶段 4 · 高保真设计**
-- **目的**：基于真实资产定稿视觉风格、交互与动效
-- **步骤一·交互原型**：用 `frontend-design` / `web-artifacts-builder` 以**可视化互动**方式设计交互原型（生成浏览器可预览的 HTML，验证布局/交互/视觉风格）
-- **步骤二·动效优化**：用 `gsap-*` 系列 Skill（`gsap-core`/`gsap-timeline`/`gsap-scrolltrigger` 等）为原型叠加动效与交互动画
-- **产物**：HTML 交互原型（浏览器可预览，与后续 web 验收同源）
-- **完成标志**：视觉/动效/交互定稿
+- **目的**：基于真实资产（阶段3精灵资源文档）定稿视觉规范、界面流转、逐界面设计、动效与可交互原型，并沉淀为 Godot Theme 资源
+- **强制 Skill**：`brainstorming`（启用 **Visual Companion** 浏览器伴侣，与用户实时可视化定稿）+ `frontend-design`/`web-artifacts-builder`（HTML 高保真）+ `gsap-*` 系列（动效）
+- **强制工作流（按序执行，每步需用户确认方可进入下一步）**：
+  1. **视觉规范**：开启 `brainstorming` 的 **Visual Companion**（`--open`），与用户**一起**基于游戏资产定稿视觉规范——配色（主/辅/强调/背景/文字，含色值）、字体与字号阶梯、间距栅格、圆角/阴影/描边、控件样式（按钮/面板/输入框/滚动条等）、图标与图示风格
+  2. **Godot Theme 资源**：用**专用 `.gd` 脚本**（代码动态生成，**禁止手写 `.tres` 文本**）将上一步视觉规范参数化为 `Theme` 资源并保存为 `.tres`（字体/图标引用游戏资产；脚本→`scripts/resources/`，资源→`data/ui/`）。**硬门禁**：生成后**必须立即**跑 `--headless --import`（命令见 `specs/09_Godot环境与命令手册.md` §3.1.1），否则后续 UI 场景引用报 `uid not found`
+  3. **界面流转流程**：与用户**一起**在 `Visual Companion` 中梳理全部界面（菜单/暂停/HUD/结算/设置等）及流转关系，绘制界面流转图（Mermaid `stateDiagram`/`flowchart`），标注触发条件、入口/出口、返回路径
+  4. **逐界面详细设计**：对每个界面单独与用户定稿——布局（线框）、信息层级、控件清单与状态、交互行为、引用的视觉规范条目；每个界面在 Visual Companion 中**可视化对比**多方案后定稿
+  5. **HTML 高保真**：用 `frontend-design`/`web-artifacts-builder` 为每个定稿界面产出**浏览器可预览的 HTML**，颜色/字体/间距/控件**严格对齐**视觉规范与 Godot Theme 取值
+  6. **动效设计**：用 `gsap-*` 系列（`gsap-core`/`gsap-timeline`/`gsap-scrolltrigger` 等）为 HTML 原型叠加界面转场、控件反馈、入场/退场、强调等动效，并与用户在浏览器中定稿
+- **产物（全部归档到 `docs/04_高保真设计/`）**：
+  - `视觉规范.md`（配色/字体/间距/控件样式数值表）
+  - `界面流转.md`（嵌 Mermaid 流转图）
+  - 各界面 HTML 高保真文件（`.html`，浏览器可预览）
+  - 各界面截图（`.png`，浏览器渲染截取，按界面命名）
+  - `设计说明.md`：逐界面说明 + **必须内嵌**对应截图（`![](./<界面名>.png)`）与 HTML 链接（`[在线预览](./<界面名>.html)`）
+  - Godot Theme 资源 `data/ui/theme_default.tres` + 生成脚本 `scripts/resources/`
+- **完成标志**：视觉规范、Theme 资源、界面流转图、全部界面 HTML 高保真 + 截图 + 动效经用户逐项确认定稿；`设计说明.md` 内嵌的截图与 HTML 链接全部可访问
+- **门禁**：`.tres` **禁手写文本**（仅由 `.gd` 脚本生成）；新增 `.tres`/`.gd` 后**必须立即** `--headless --import`
 
 **阶段 5 · 需求文档**
 - **目的**：冻结需求，定义可验证的验收标准
