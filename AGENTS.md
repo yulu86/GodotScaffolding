@@ -39,7 +39,7 @@
 
 **阶段 1 · 创意探索**
 - **目的**：明确做什么游戏/功能、为谁做、成功标准是什么
-- **强制 Skill**：`brainstorming`（探索意图 → 提 2-3 方案 → 定设计 → 用户批准）
+- **强制 Skill**：`grill-me`（追问式澄清设计意图与约束）+ `brainstorming`（探索意图 → 提 2-3 方案 → 定设计 → 用户批准）
 - **模板规范**：GDD 文档**必须**遵循 `specs/05_GDD模板.md` 结构填写，撰写前加载并参考
 - **产物**：GDD 文档（游戏设计文档：设计意图 / 约束 / 成功标准，存放于 `docs/01_创意探索/`）
 - **完成标志**：GDD 文档经用户确认设计方向
@@ -58,7 +58,7 @@
 
 **阶段 4 · 高保真设计**
 - **目的**：基于真实资产（阶段3精灵资源文档）定稿视觉规范、界面流转、逐界面设计、动效与可交互原型，并沉淀为 Godot Theme 资源
-- **强制 Skill**：`brainstorming`（启用 **Visual Companion** 浏览器伴侣，与用户实时可视化定稿）+ `frontend-design`/`web-artifacts-builder`（HTML 高保真）+ `gsap-*` 系列（动效）
+- **强制 Skill**：`using-superpowers`（确立 Skill 调用规范）+ `brainstorming`（启用 **Visual Companion** 浏览器伴侣，与用户实时可视化定稿）+ `frontend-design`/`web-artifacts-builder`（HTML 高保真）+ `gsap-*` 系列（动效）+ Godot Theme（`.tres` 代码生成）
 - **设计规范**：高保真设计**必须**遵循 `specs/10_高保真设计规范.md`，开展工作前加载并参考
 - **强制工作流**：按序执行 6 步（`视觉规范` → `Godot Theme 资源` → `界面流转流程` → `逐界面详细设计` → `HTML 高保真` → `动效设计`），每步需用户确认方可进入下一步；详细步骤与门禁见 `specs/10_高保真设计规范.md` §三
 - **产物（全部归档到 `docs/04_高保真设计/`）**：
@@ -110,7 +110,7 @@
 
 **阶段 10 · 黑盒验收（C2）**
 - **目的**：对照 AC 做端到端验证
-- **强制 Skill**：`godot-web-verify`【项目级】/ `playwright-cli`（界面类）/ headless GdUnit4（纯逻辑类）（Web 导出命令见 `specs/09_Godot环境与命令手册.md` §3.4 `--export-release`）
+- **强制 Skill**：`godot cli`（Godot 命令行：web 导出/headless）+ `godot-web-verify`【项目级】/ `playwright-cli`（界面类）/ headless GdUnit4（纯逻辑类）（Web 导出命令见 `specs/09_Godot环境与命令手册.md` §3.4 `--export-release`）
 - **流程**：导出 web → https 启动（端口 8443）→ playwright 按条验 AC（截图/console/操作模拟）→ 验毕停服务、关浏览器、删 `build/`
 - **完成标志**：所有 AC 验证通过
 
