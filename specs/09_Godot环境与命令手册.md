@@ -391,3 +391,247 @@ $GodotExe = if ($env:GODOT_HOME -and (Test-Path $env:GODOT_HOME)) {
 # 3. 导出 Web（阶段 10）
 & $GodotExe --headless --export-release "Web" build/index.html
 ```
+
+---
+
+## 七、面向 AI 的操作指导与适用场景
+
+> 本节专为 **AI Agent** 设计：以「任务驱动」给出**决策路径**与**操作 SOP**，命令语法细节见 §二/§三。
+> 所有自动化**必须**遵循 §7.1 六条核心原则；跨平台示例遵从全局宪法 §1.4（Windows 用 PowerShell，macOS/Linux 用 bash/zsh）。
+> 约定：`$GODOT` 代表**已按 §一 解析**的可执行路径（PowerShell 取 `$GodotExe`，POSIX 取 `$GODOT_HOME` 或 `command -v godot`）。
+
+### 7.1 AI 调用 Godot CLI 的六条核心原则
+
+| # | 原则 | 硬要求 | 违反后果 |
+|:--:|------|--------|---------|
+| 1 | **退出码判定** | 门禁结果**只看退出码**（POSIX `$?` / PowerShell `$LASTEXITCODE`），**禁止**靠 stdout 文本猜测「成功」 | 误判导入/导出成功，后续引用连锁报错 |
+| 2 | **幂等可重跑** | `--import` / `--check-only` / `--export-release` 均可安全重复执行，无副作用；失败修复后直接重跑 | —（提示：不必担心重跑伤项目） |
+| 3 | **无头优先** | 自动化一律加 `--headless`（不弹窗、不依赖 GPU、CI/服务器友好） | 无显示环境进程挂起或超时 |
+| 4 | **及时导入** | 新增/改动 `.gd` / `.tscn` / 任何资源后**立即** `--headless --import`，**禁止攒批**（宪法阶段 8 硬门禁） | 后续场景/脚本引用报 `uid not found` |
+| 5 | **路径先解析** | 每次会话首次调用前按 §一 三级定位解析到 `$GODOT`，全程复用；含空格路径（如 macOS `Application Support`）**必须加引号** | `command not found` 或空格路径断裂 |
+| 6 | **禁止交互式** | 自动化**禁用** `-e` / `-p`（编辑器/项目管理器需人工操作）；长跑命令加 `--quit-after N` 兜底 | 进程挂起等待人类输入，CI 卡死 |
+
+### 7.2 任务 → 命令决策树
+
+> AI 接到任务后，沿此图定位「该用哪条命令 + 成功/失败如何分支」。命令标记（R/D/X/E）见 §二脚注。
+
+```mermaid
+flowchart TD
+    Start[AI 接到任务] --> Loc{首次调用本会话?}
+    Loc -->|是| Resolve["§一 三级定位解析 $GODOT<br/>跑 --version 自检"]
+    Resolve --> Task
+    Loc -->|否| Task
+    Task{任务类型?}
+
+    Task -->|新增/改动资源<br/>.gd .tscn 图片 音频| Import["--headless --import"]
+    Import --> ImportChk{退出码 = 0?}
+    ImportChk -->|否| FixSyntax["先 --check-only 排查语法错误"]
+    FixSyntax --> Import
+    ImportChk -->|是| Done1["可被场景/脚本引用"]
+
+    Task -->|检查代码质量| Check["--headless --check-only -s file.gd"]
+    Check --> CheckChk{退出码 = 0?}
+    CheckChk -->|否| FixCode["按报错修复源码"]
+    FixCode --> Check
+    CheckChk -->|是| Done2["质量门禁通过"]
+
+    Task -->|运行验证/验收| Run{需要画面渲染?}
+    Run -->|否 纯逻辑/headless| Headless["--headless --quit-after N"]
+    Run -->|是 需要图形| GUI["直接运行 可选 -d 调试"]
+    Headless --> Done3["跑完指定帧数退出"]
+    GUI --> Done3
+
+    Task -->|阶段10 黑盒验收导出| Pre{期间有新增资源?}
+    Pre -->|是| Import
+    Pre -->|否| Export["--headless --export-release 预设 产物路径"]
+    Export --> ExportChk{退出码=0 且产物齐全?}
+    ExportChk -->|否| FixExport["查 preset 名/导出模板"]
+    FixExport --> Export
+    ExportChk -->|是| Done4["交 godot-web-verify 验收"]
+
+    Task -->|跑单元测试| Test["--headless -s GdUnitCmdTool.gd<br/>-a directory test/"]
+    Test --> Done5["测试报告无失败用例"]
+```
+
+### 7.3 宪法 10 阶段 × CLI 场景速查（AI 视角）
+
+> AI 按当前所处阶段直接对号入座；「成功判定」列**必须**用退出码，不可靠文本。
+
+| 阶段 | AI 典型任务 | 命令（`$GODOT` 已解析） | 成功判定 | 失败处理 |
+|:----:|------------|----------------------|---------|---------|
+| 7 架构 | 新建 `project.godot` / 首批 `.gd`/`.tscn` 后建索引 | `--headless --import` | 退出码=0 | `--check-only` 修语法后重跑 |
+| 8 TDD | 每写一个 `.gd`/`.tscn` 立即导入 | `--headless --import` | 退出码=0 + `.uid` 生成 | 见 §3.1.6 陷阱表 |
+| 8 TDD | 跑单测验证红/绿 | `--headless -s res://addons/gdUnit4/GdUnitCmdTool.gd -a directory test/` | 报告无失败用例 | 按失败用例修代码 |
+| 9 门禁 | GDScript 静态检查 | `--headless --check-only -s <file.gd>` | 退出码=0 | 按报错修源码 |
+| 9 门禁 | lint / 格式 | `gdlint scripts/` / `gdformat -c scripts/` | 退出码=0 | `gdformat` 修复后重检 |
+| 10 验收 | 导出 Web 产物 | `--headless --export-release "Web" build/index.html` | 退出码=0 + `index.wasm` 齐全 | 查 preset 名 / 装导出模板 |
+| 10 验收 | 跑若干帧录屏/采样 | `--headless --quit-after 60 [--write-movie out.avi]` | 退出码=0 | 加 `-v` 看进度 |
+| 全 | 定位引擎 + 自检 | `--version` | 打印版本号 | 按 §一 三级定位 |
+
+### 7.4 AI 操作 SOP（逐场景 · 三平台并重）
+
+> 每个 SOP 含：**何时用 → 命令（POSIX / PowerShell 双版本）→ 成功判定 → 失败处理 → 易错点**。
+
+#### 7.4.1 资源导入（阶段 7/8 硬门禁）
+
+**何时用**：新增或改动 `.gd` / `.tscn` / 图片 / 音频 / 字体 / `.gdshader` 后，**立即**执行（禁止攒批）。
+
+**命令**：
+```bash
+# POSIX（macOS / Linux）—— 注意含空格的 $GODOT_HOME 必须引号
+"$GODOT" --headless --import                     # 在项目根目录（含 project.godot）
+"$GODOT" --headless --import --path /abs/project # 不在根目录时指定项目路径
+```
+```powershell
+# Windows PowerShell
+& $GodotExe --headless --import
+& $GodotExe --headless --import --path D:\proj   # 不在根目录时
+```
+
+**成功判定**：退出码=0；`ls scripts/xxx.uid`（或 `Test-Path`）确认 `.uid` 生成；二进制资源额外有 `.import` 文件。
+
+**失败处理**：退出码≠0 → 多数是某 `.gd` 语法错误 → 先跑 §7.4.2 `--check-only` 逐个修复 → 再重跑 `--import`。
+
+**AI 易错点**：①忘记加 `--headless`（无显示环境挂起）；②含空格路径未加引号（macOS Steam 路径 `Application Support`）；③攒批导入导致场景引用报 `uid not found`。
+
+#### 7.4.2 GDScript 语法 / 类型检查（阶段 9 门禁）
+
+**何时用**：质量门禁前逐文件检查；或 `--import` 失败时定位语法错误。
+
+**命令**（**必须**带 `-s`/`--script`，否则 `--check-only` 不生效）：
+```bash
+# POSIX
+"$GODOT" --headless --check-only -s scripts/player_controller.gd
+```
+```powershell
+# Windows PowerShell
+& $GodotExe --headless --check-only -s scripts/player_controller.gd
+```
+
+**成功判定**：退出码=0（无错误）；≠0 时 stdout 列出错误行号与原因。
+
+**失败处理**：按报错定位行号修复源码 → 重跑本命令直至退出码=0。
+
+**AI 易错点**：①漏写 `-s`（`--check-only` 单独使用什么也不检查）；②误以为会执行脚本（它**只解析不执行**）；③用 `--check-only` 替代导入（它不生成 `.uid`，导入仍需 §7.4.1）。
+
+#### 7.4.3 运行验证（跑 N 帧退出，阶段 8/10）
+
+**何时用**：自动化验证游戏逻辑（跑若干帧后退出），或录屏/像素采样。
+
+**命令**：
+```bash
+# POSIX —— headless 跑 60 帧后退出（纯逻辑/CI 验证）
+"$GODOT" --headless --quit-after 60
+# 需要画面 + 调试输出（本地有显示环境）
+"$GODOT" -d
+# 录制视频（强制固定帧率，配合 --quit-after）
+"$GODOT" --write-movie .tmp/out.avi --quit-after 120 --fixed-fps 60
+```
+```powershell
+# Windows PowerShell
+& $GodotExe --headless --quit-after 60
+& $GodotExe --write-movie .tmp\out.avi --quit-after 120 --fixed-fps 60
+```
+
+**成功判定**：退出码=0；跑完指定帧数自动退出（不挂起）。
+
+**失败处理**：进程不退出 → 检查是否漏 `--quit-after`；崩溃 → 加 `-d` 看堆栈，或 `--log-file .tmp/run.log` 落盘排查。
+
+**AI 易错点**：①headless 环境漏 `--quit-after` 导致挂起；②想验证渲染却用了 `--headless`（headless 无画面，像素采样需有显示驱动）。
+
+#### 7.4.4 导出 Web（阶段 10 黑盒验收前置）
+
+**何时用**：阶段 10 导出 Web 产物，供 `godot-web-verify` 黑盒验收。
+
+**命令**：
+```bash
+# POSIX —— preset 名必须与 export_presets.cfg 的 name= 一致
+"$GODOT" --headless --export-release "Web" build/index.html
+```
+```powershell
+# Windows PowerShell —— 产物目录需预先存在
+New-Item -ItemType Directory -Force build | Out-Null
+& $GodotExe --headless --export-release "Web" build/index.html
+```
+
+**成功判定**：退出码=0；`build/` 下生成 `index.html` + `index.js` + `index.pck` + `index.wasm`（`index.wasm` > 10MB 视为正常）。
+
+**失败处理**：`preset not found` → 核对 `export_presets.cfg` 的 `name=`；wasm 缺失/过小 → 编辑器内安装对应版本导出模板；导出前若有新增资源 → **先**跑 §7.4.1 `--import`。
+
+**AI 易错点**：①导出前未导入新资源（引用缺失）；②产物目录不存在（需预建）；③把 debug 导出当 release（`--export-debug` 含调试符号，体积/行为不同）。
+
+#### 7.4.5 Headless 单元测试（GdUnit4，阶段 8/9）
+
+**何时用**：Story 层 GdUnit4 单测/集成测试验收（headless）。
+
+**命令**：
+```bash
+# POSIX
+"$GODOT" --headless -s res://addons/gdunit4/GdUnitCmdTool.gd -a directory test/
+```
+```powershell
+# Windows PowerShell
+& $GodotExe --headless -s res://addons/gdunit4/GdUnitCmdTool.gd -a directory test/
+```
+
+**成功判定**：测试报告**无失败用例**（GdUnit4 退出码约定以其官方文档为准，AI 应以报告中失败计数=0 为准）。
+
+**失败处理**：按失败用例定位 → 修代码或修测试 → 重跑。
+
+**AI 易错点**：①误以为 `-a directory` 是引擎参数（实为 GdUnit4 工具脚本自解析）；②改动被测代码后忘记重跑导入导致测试引用旧 uid。
+
+### 7.5 AI 自动化陷阱清单（红黑表）
+
+| 场景 | ❌ 错误做法 | ✅ 正确做法 |
+|------|-----------|-----------|
+| 判定结果 | 靠 stdout 含 "SUCCESS" 猜成功 | **只看退出码**（`$?` / `$LASTEXITCODE`） |
+| 首次调用 | 直接 `godot --import` | 先 §一 三级定位解析 `$GODOT` + `--version` 自检 |
+| 含空格路径 | `"$GODOT" --import`（漏引号）→ macOS Steam 路径断裂 | `"$GODOT" --import`（**必须双引号**） |
+| 导入时机 | 攒一批资源最后统一导入 | **每个**新增/改动后立即导入（宪法硬门禁） |
+| 语法检查 | `--check-only foo.gd`（漏 `-s`） | `--check-only -s foo.gd` |
+| 无显示环境 | `--import`（漏 `--headless`）→ 弹窗卡死 | 一律 `--headless` |
+| 长跑命令 | 不加退出条件 → 进程挂起 | 加 `--quit-after N` 兜底 |
+| 导出 preset | 猜 preset 名 | 核对 `export_presets.cfg` 的 `name=` |
+| 导出产物 | 直接判定退出码=0 即成功 | 额外检查 `index.wasm` 等产物齐全 |
+| 重新导入 | 用不存在的 `--reimport` | 删 `.godot/imported/` 后跑 `--import`（见 §3.1.4） |
+| 用户参数 | `$GODOT --level 2`（被引擎吞） | `$GODOT -- --level 2`（`--` 后透传，见 §3.7） |
+| 包装器转义 | Windows `.bat` 引号异常静默出错 | 降级用 `GODOT_HOME` 直调 `.exe`（见 §1.2） |
+
+### 7.6 跨平台退出码判定速查
+
+| 平台 | Shell | 取退出码 | 判定为成功 | 判定为失败 |
+|------|-------|---------|-----------|-----------|
+| macOS / Linux | bash / zsh | `$?` | `[ $? -eq 0 ]` | `[ $? -ne 0 ]` |
+| Windows | PowerShell | `$LASTEXITCODE` | `$LASTEXITCODE -eq 0` | `$LASTEXITCODE -ne 0` |
+
+**封装示例（POSIX）**：
+```bash
+"$GODOT" --headless --import || { echo "导入失败"; exit 1; }
+```
+**封装示例（PowerShell）**：
+```powershell
+& $GodotExe --headless --import
+if ($LASTEXITCODE -ne 0) { throw "导入失败（退出码 $LASTEXITCODE）" }
+```
+
+### 7.7 高级 / 调试选项备忘（AI 按需用）
+
+> 完整列表以 `$GODOT --help` 实时输出为准（本表基于 Godot 4.7）。下列为 AI 自动化**偶发**用到的高级项，日常 SOP 不涉及。
+
+| 选项 | 标记 | AI 适用场景 |
+|------|:----:|------------|
+| `--log-file <file>` | R | 长跑/验收把日志落盘（`.tmp/run.log`）便于事后排查 |
+| `-v` / `--verbose` | R | 导入慢/卡住时观察进度；`--gpu-index` 需配合 verbose 列设备 |
+| `--remote-debug <uri>` | R | 远程调试（`tcp://127.0.0.1:6007`），AI 调试场景少用 |
+| `--rendering-method <renderer>` | R | 指定 `forward_plus`/`mobile`/`gl_compatibility`，渲染异常时切换 |
+| `--rendering-driver <driver>` | R | macOS 可选 `vulkan`/`metal`/`opengl3`，渲染后端排错 |
+| `--convert-3to4` | E | 老 3.x 项目升级 4.x（一次性，非日常） |
+| `--doctool [path]` | E | 导出引擎 API 文档（生成工具链，非游戏开发日常） |
+| `--recovery-mode` | E | 启动崩溃时禁插件/工具脚本排查（交互式，AI 仅建议用户用） |
+| `--debug-collisions` / `--debug-navigation` | D | 可视化碰撞/导航（需画面，本地调试） |
+
+> **标记含义**（来自 `--help`）：`R`=通用可用 / `D`=仅 debug 模板 / `X`=仅 editor 构建（需 `disable_path_overrides=false`）/ `E`=仅 editor 构建。本项目用 Steam **tools 版**（=editor 构建），上述**全部可用**。
+
+---
+
+> **AI 使用入口**：接到 Godot CLI 相关任务时，先看 §7.2 决策树定位命令 → 按 §7.4 SOP 执行 → 用 §7.6 判定退出码 → 出错查 §7.5 陷阱表与 §五 故障排查。命令语法细节回查 §二/§三。

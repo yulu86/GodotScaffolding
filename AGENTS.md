@@ -24,7 +24,7 @@
 
 | # | 阶段 | 强制 Skill / 工具 | 产物 / 门禁 | 宪法编号 |
 |---|------|------------------|------------|:------:|
-| 1 | 创意探索 | `brainstorming` | GDD 文档（游戏设计文档：设计意图 / 约束 / 成功标准） | 前置 |
+| 1 | 创意探索 | `grill-me` `brainstorming` | GDD 文档（游戏设计文档：设计意图 / 约束 / 成功标准） | 前置 |
 | 2 | 开源免费资产获取 | Kenney / OpenGameArt / itch.io | 免费素材包（下载走 hf-mirror / gh-proxy 加速） | 前置 |
 | 3 | 游戏资产分析 | `sprite-analyzer`【项目级】 | tile 网格 / 动画帧分组 / 精灵资源文档 | 前置 |
 | 4 | 高保真设计 |`using-superpowers` `brainstorming`（Visual Companion）+ `frontend-design`/`web-artifacts-builder` + `gsap-*` 系列 + Godot Theme（`.tres` 代码生成） | 视觉规范 + Theme 资源 + 界面流转图 + 逐界面 HTML 高保真 + 动效 + 设计文档（嵌截图/HTML 链接） | 前置 |
@@ -33,7 +33,7 @@
 | 7 | 架构与模块设计 | `godot-architect`【项目级】（仅设计不写码） | 场景树 / 状态机 / 模块 / 接口 | B2 |
 | 8 | TDD 开发 | `test-driven-development` + `godot-best-practices` + `godot-mcp` | 红→绿→重构；`.tscn`/`.tres` 禁手写 | B3/B4 |
 | 9 | 质量门禁 | `gdlint`/`gdformat` + GdUnit4 + code review | **全过方可继续**，不过进阻塞修复循环 | B5/A2 |
-| 10 | 黑盒验收 | `godot-web-verify` / `playwright-cli` | web 导出验 AC；纯逻辑用 headless GdUnit4 | C2 |
+| 10 | 黑盒验收 | `godot cli` `godot-web-verify` / `playwright-cli` | web 导出验 AC；纯逻辑用 headless GdUnit4 | C2 |
 
 ### 各阶段详解
 
@@ -99,6 +99,7 @@
 - **场景禁手写**：`.tscn`/`.tres` **禁手写**，用 MCP 或编辑器生成
 - **及时导入（硬门禁）**：每新增**游戏资源**（图片/音频/字体/3D/`.gdshader`）/ **GDScript**（`.gd`）/ **Scene**（`.tscn`）后，**必须立即**跑 `--headless --import` 生成 `.uid`/`.import`（命令见 `specs/09_Godot环境与命令手册.md` §3.1）；**禁止攒批**——否则后续场景/脚本引用报 `uid not found`
 - **CLI 手册**：Godot 可执行定位与命令行用法**必须**遵循 `specs/09_Godot环境与命令手册.md`（导入/检查/导出/headless，适用阶段 7-10）
+- **AI 自动化决策入口**：AI 调用 Godot CLI 时**优先**查 `specs/09_Godot环境与命令手册.md` **§七「面向 AI 的操作指导与适用场景」**（任务→命令决策树 / 逐场景操作 SOP / 自动化陷阱红黑表 / 跨平台退出码判定）
 - **产物**：通过单元测试的功能代码
 
 **阶段 9 · 质量门禁（B5 / A2）**
