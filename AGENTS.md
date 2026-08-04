@@ -33,7 +33,7 @@
 | 7 | 架构与模块设计 | `godot-architect`【项目级】（仅设计不写码） | 场景树 / 状态机 / 模块 / 接口 | B2 |
 | 8 | TDD 开发 | `test-driven-development` + `godot-best-practices` + `godot-mcp` | 红→绿→重构；`.tscn`/`.tres` 禁手写 | B3/B4 |
 | 9 | 质量门禁 | `gdlint`/`gdformat` + GdUnit4 + code review | **全过方可继续**，不过进阻塞修复循环 | B5/A2 |
-| 10 | 黑盒验收 | `godot cli` `godot-web-verify` / `playwright-cli` | web 导出验 AC；纯逻辑用 headless GdUnit4 | C2 |
+| 10 | 黑盒验收 | `godot-blackbox-testing`【项目级】+ `godot cli` `godot-web-verify` / `playwright-cli` | web 导出验 AC；纯逻辑用 headless GdUnit4 | C2 |
 
 ### 各阶段详解
 
@@ -110,7 +110,7 @@
 
 **阶段 10 · 黑盒验收（C2）**
 - **目的**：对照 AC 做端到端验证
-- **强制 Skill**：`godot cli`（Godot 命令行：web 导出/headless）+ `godot-web-verify`【项目级】/ `playwright-cli`（界面类）/ headless GdUnit4（纯逻辑类）（Web 导出命令见 `specs/09_Godot环境与命令手册.md` §3.4 `--export-release`）
+- **强制 Skill**：`godot-blackbox-testing`【项目级】（黑盒方法论总纲：5 种黑盒理论 × 游戏适配 × Godot CLI 执行）+ `godot cli`（Godot 命令行：web 导出/headless）+ `godot-web-verify`【项目级】（web 渲染验收子流程）/ `playwright-cli`（界面类）/ headless GdUnit4（纯逻辑类）（Web 导出命令见 `specs/09_Godot环境与命令手册.md` §3.4 `--export-release`）
 - **流程**：导出 web → https 启动（端口 8443）→ playwright 按条验 AC（截图/console/操作模拟）→ 验毕停服务、关浏览器、删 `build/`
 - **完成标志**：所有 AC 验证通过
 
@@ -209,6 +209,7 @@ GodotScaffolding/
 |-------|---------|
 | `godot-architect`【项目级】 | 设计新功能架构、规划场景树结构、设计状态机、系统模块划分、制定技术方案时。**仅设计，不写代码** |
 | `godot-best-practices`【项目级】 | 生成 GDScript 代码、创建场景、设计架构、实现状态机/对象池/存档系统、autoload/@export/类型标注等规范时 |
+| `godot-blackbox-testing`【项目级】 | 黑盒测试/验收时：用 5 种黑盒理论（等价类/边界值/状态转换/决策表/错误猜测）设计游戏测试用例 + 用 Godot CLI 执行（headless/`--quit-after`/`--log-file`/`--write-movie`/`--`透传/GdUnit4 集成）。是阶段 10 黑盒验收方法论总纲，`godot-web-verify` 是其 web 渲染验收子流程 |
 | `godot-web-verify`【项目级】 | Godot 导出 Web 版并用 playwright 黑盒自动验收（场景切换/配色/按钮交互/数值日志）时 |
 
 ### B. 美术资源生成
