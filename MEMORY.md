@@ -65,7 +65,7 @@
 
 | 标签 | 一句话规则 | 类型 | 来源 |
 |------|----------|:---:|------|
-| |  |  |  |
+| `#MCP` | `godot-ai` 为 HTTP 远程 MCP，用前先确认编辑器会话就绪（`session_manage(op="list")` → `session_activate`） | 通用 | 2026-08-16 MCP 迁移 |
 
 <!-- 检索表新增行格式：
 | `#标签` | 简明规则描述（≤30 字） | 通用 | 日期 + 任务名 |
@@ -100,6 +100,8 @@
 ### `#代码规范`
 
 ### `#MCP`
+
+- **godot-ai 会话就绪前置**：MCP 服务已由 stdio `godot-mcp`（`@coding-solo/godot-mcp`）切换为 HTTP 远程 `godot-ai`（`http://127.0.0.1:8000/mcp`，配置于 `opencode.json` / `.zcode/config.json`）。Why：编辑器常驻集成，新增截图取证 / 运行时输入模拟 / `game_eval` 断言 / GdUnit4 `test_run` / 三源日志读取等旧 MCP 没有的能力（详见 AGENTS.md 附录 B）。How：调用前确保 Godot 编辑器已打开项目且 `addons/godot_ai/` 插件已连接，先 `session_manage(op="list")` 确认会话、多编辑器时 `session_activate` 绑定；写操作报 `EDITOR_NOT_READY` 时先查一次 `editor_state` 同步缓存再重试。反例：编辑器未启动就调写操作 → 全部被拒。
 
 ### `#qmd`
 
