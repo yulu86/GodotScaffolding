@@ -25,16 +25,9 @@
         }
     },
     "mcp": {
-        "godot-mcp": {
-            "type": "local",
-            "command": [
-                "npx",
-                "@coding-solo/godot-mcp"
-            ],
-            "environment": {
-                "DEBUG": "false",
-                "GODOT_PATH": "{env:GODOT_HOME}"
-            }
+        "godot-ai": {
+            "type": "remote",
+            "url": "http://127.0.0.1:8000/mcp"
         },
         "filesystem": {
             "type": "local",

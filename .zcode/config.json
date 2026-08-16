@@ -1,16 +1,9 @@
 {
     "mcp": {
         "servers": {
-            "godot-mcp": {
-                "type": "stdio",
-                "command": "npx",
-                "args": [
-                    "@coding-solo/godot-mcp"
-                ],
-                "env": {
-                    "DEBUG": "false",
-                    "GODOT_PATH": "{env:GODOT_HOME}"
-                }
+            "godot-ai": {
+                "type": "http",
+                "url": "http://127.0.0.1:8000/mcp"
             },
             "filesystem": {
                 "type": "stdio",
