@@ -54,7 +54,7 @@ agent: build
 - **必须使用 TDD 方式开发**：加载 `test-driven-development` skill，每次 1 个测试方法 → 最小实现 → 重构
 - **Skill 链不可绕过**：架构用 `godot-architect`、编码用 `godot-best-practices` / `godot-gdscript-patterns`、检视用 `godot-code-review`、质量验证用 `godot-static-analysis`
 - **全程不调用 question 工具**，遇阻（门禁失败 / 验证失败 / 依赖问题）自行进入「阻塞中 → 最小改动修复 → 恢复开发中」循环，**禁止跳过或降级验收标准**
-- **C1 可视化搭建**：AI 直接用 MCP `godot-mcp` 写初值，**不暂停等用户精调**
+- **C1 可视化搭建**：AI 直接用 MCP `godot-ai` 写初值，**不暂停等用户精调**
 - **状态实时刷新**（C6）：编码开始立即把该 story status 置 `开发中`（frontmatter + 总表 🔵）；验收通过后置 `已通过验收`（frontmatter + 总表 ✅ + 统计计数）
 
 ## 第五步：界面开发的额外自动验证（替代 C2 玩家手工验证）
@@ -92,7 +92,7 @@ story 验收通过后：
 - 所有临时文件统一存 `.tmp/`，任务结束删除
 - 代码除注释外无中文；标识符用英文/拼音
 - 新增 .gd / 图片 / 音频 / .tscn 必跑 `$GODOT_HOME --headless --import` 生成 .uid / .import
-- .tscn / .tres 禁手写，用 MCP `godot-mcp` 或编辑器生成
+- .tscn / .tres 禁手写，用 MCP `godot-ai` 或编辑器生成
 - 飞书通知凭证从项目根 `.env` 读取（FEISHU_APP_ID / FEISHU_APP_SECRET / FEISHU_USER_ID），禁止硬编码
 
 ## 执行报告

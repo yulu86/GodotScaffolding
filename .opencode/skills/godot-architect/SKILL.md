@@ -78,5 +78,7 @@ compatibility: opencode
 ## 工具使用
 
 - **必须使用** Context7 查询 Godot 架构最佳实践
-- **可以使用** Godot MCP 工具读取项目信息（只读）
+- **可以使用** `godot-ai` MCP 只读能力读取项目信息（严禁写操作）：
+  - `godot://editor/state`、`godot://scene/hierarchy`、`godot://node/{path}/properties`（现状勘察）
+  - `api_manage get_class` / `godot://class/{class_name}`（查 ClassDB 属性/方法/信号/枚举，写设计文档前查证防猜 API）
 - **严禁**修改任何项目文件（.tscn、.gd 等）

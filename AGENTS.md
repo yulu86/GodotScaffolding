@@ -31,7 +31,7 @@
 | 5 | 需求文档 | — | Feature/Story + 验收标准 AC（`docs/05_需求`·`docs/06_story`） | 前置 |
 | 6 | 启动准备 | `qmd` / `wiki-query` | 读 `MEMORY.md` + 查 LLM Wiki | B1 |
 | 7 | 架构与模块设计 | `godot-architect`【项目级】（仅设计不写码） | 场景树 / 状态机 / 模块 / 接口 | B2 |
-| 8 | TDD 开发 | `test-driven-development` + `godot-best-practices` + `godot-mcp` | 红→绿→重构；`.tscn`/`.tres` 禁手写 | B3/B4 |
+| 8 | TDD 开发 | `test-driven-development` + `godot-best-practices` + `godot-ai`【MCP】 | 红→绿→重构；`.tscn`/`.tres` 禁手写 | B3/B4 |
 | 9 | 质量门禁 | `gdlint`/`gdformat` + GdUnit4 + code review | **全过方可继续**，不过进阻塞修复循环 | B5/A2 |
 | 10 | 黑盒验收 | `godot-blackbox-testing`【项目级】+ `godot cli` `godot-web-verify` / `playwright-cli` | web 导出验 AC；纯逻辑用 headless GdUnit4 | C2 |
 
@@ -92,11 +92,11 @@
 
 **阶段 8 · TDD 开发（B3 / B4）**
 - **目的**：以测试驱动实现功能
-- **强制 Skill**：`test-driven-development`（1 个测试 → 最小实现 → 重构）+ `godot-best-practices`【项目级】（编码规范）+ `godot-mcp`（搭建场景）
+- **强制 Skill**：`test-driven-development`（1 个测试 → 最小实现 → 重构）+ `godot-best-practices`【项目级】（编码规范）+ `godot-ai`【MCP】（搭建场景/脚本/资源，能力见附录 B）
 - **编码规范**：所有 `.gd` 代码**必须**遵循 `specs/01_GDScript开发规范.md`（24 条，每条含正例/反例），编码前加载并应用
 - **场景规范**：所有 `.tscn` 场景**必须**遵循 `specs/02_场景开发规范.md`（19 条，每条含正例/反例），搭建前加载并应用
 - **测试规范**：TDD 开发**必须**遵循 `specs/03_TDD测试规范.md`（18 条，每条含正例/反例），写测试前加载并应用
-- **场景禁手写**：`.tscn`/`.tres` **禁手写**，用 MCP 或编辑器生成
+- **场景禁手写**：`.tscn`/`.tres` **禁手写**，用 MCP（`godot-ai`，能力见附录 B）或编辑器生成
 - **及时导入（硬门禁）**：每新增**游戏资源**（图片/音频/字体/3D/`.gdshader`）/ **GDScript**（`.gd`）/ **Scene**（`.tscn`）后，**必须立即**跑 `--headless --import` 生成 `.uid`/`.import`（命令见 `specs/09_Godot环境与命令手册.md` §3.1）；**禁止攒批**——否则后续场景/脚本引用报 `uid not found`
 - **CLI 手册**：Godot 可执行定位与命令行用法**必须**遵循 `specs/09_Godot环境与命令手册.md`（导入/检查/导出/headless，适用阶段 7-10）
 - **AI 自动化决策入口**：AI 调用 Godot CLI 时**优先**查 `specs/09_Godot环境与命令手册.md` **§七「面向 AI 的操作指导与适用场景」**（任务→命令决策树 / 逐场景操作 SOP / 自动化陷阱红黑表 / 跨平台退出码判定）
@@ -112,6 +112,7 @@
 - **目的**：对照 AC 做端到端验证
 - **强制 Skill**：`godot-blackbox-testing`【项目级】（黑盒方法论总纲：5 种黑盒理论 × 游戏适配 × Godot CLI 执行）+ `godot cli`（Godot 命令行：web 导出/headless）+ `godot-web-verify`【项目级】（web 渲染验收子流程）/ `playwright-cli`（界面类）/ headless GdUnit4（纯逻辑类）（Web 导出命令见 `specs/09_Godot环境与命令手册.md` §3.4 `--export-release`）
 - **流程**：导出 web → https 启动（端口 8443）→ playwright 按条验 AC（截图/console/操作模拟）→ 验毕停服务、关浏览器、删 `build/`
+- **编辑器内补充验证（godot-ai MCP）**：`project_run` 启动游戏 → `game_manage` 运行时检查（场景树/UI 元素）+ 输入模拟（键鼠/action/帧级 `input_sequence`）→ `editor_manage(op="game_eval")` 在游戏中执行 GDScript 断言取返回值 → `editor_screenshot` 截图取证 → 验毕 `logs_read` 查 editor/game 日志（能力见附录 B）；**不替代 web 黑盒主流程**，作为编辑器内快速验证补充
 - **完成标志**：所有 AC 验证通过
 
 ### Story 拆分准则（INVEST · ≤20min）
@@ -266,3 +267,53 @@ GodotScaffolding/
 ---
 
 > **降级策略提醒**：当某 Skill 不可用（未安装/服务未运行/命令报错）时，方可降级使用通用工具（read/grep/glob/bash/webfetch），并在回复中注明降级原因。
+
+---
+
+## 附录 B：godot-ai MCP 能力速查（阶段 7-10 场景搭建与验证）
+
+> **接入方式**：HTTP 远程服务 `http://127.0.0.1:8000/mcp`（已配置于 `opencode.json` / `.zcode/config.json`，替代旧 stdio `godot-mcp`）。
+> **使用前提**：Godot 编辑器已打开本项目且 `addons/godot_ai/` 插件已启用连接。
+> **会话就绪前置（必做）**：调用前先 `session_manage(op="list")` 确认会话、多编辑器时 `session_activate` 绑定；写操作被拒 `EDITOR_NOT_READY` 时先查一次 `editor_state` 同步缓存后重试。
+
+### B1 核心动词（高频）
+
+| 工具 | 用途 | 适用阶段 |
+|------|------|:-------:|
+| `node_create` / `node_set_property` / `node_find` | 建/改/查节点（写属性前先 `node_get_properties` 查证名称） | 8 |
+| `scene_open` / `scene_save` | 打开/保存场景 | 8 |
+| `script_create` / `script_attach` / `script_patch` | 建脚本/挂载/锚点补丁 | 8 |
+| `batch_execute` | 多步编辑原子执行（失败自动回滚） | 8 |
+| `editor_state` / `scene_get_hierarchy` / `node_get_properties` | 就绪态/场景树/属性读取 | 7-10 |
+
+### B2 域专项 rollup（`op=` + `params`）
+
+| 领域 | 工具 | 亮点 |
+|------|------|------|
+| 场景/节点 | `scene_manage` `node_manage` | duplicate / reparent / groups |
+| UI/主题 | `ui_manage`（`build_layout` 声明式 UI / `draw_recipe` 矢量绘制）、`theme_manage` | 阶段 4 Theme 落地 |
+| TileSet/TileMap | `tilemap_manage`、`tileset_manage`（`tileset_get_atlas_image` 图集预览） | 阶段 3/8 tile 搭建 |
+| 动画 | `animation_manage` | 关键帧 / preset_fade·slide·shake·pulse |
+| 资源 | `resource_manage` | Environment / Curve / 渐变 / 噪声纹理 / 物理形状 autofit |
+| 材质/粒子/相机/音频 | `material_manage` `particle_manage` `camera_manage` `audio_manage` | 含 `apply_preset` 预设 |
+| 信号/输入//autoload | `signal_manage` `input_map_manage` `autoload_manage` | 信号连接 / InputMap 绑定 / 全局单例 |
+| CSG/GridMap | `csg_manage` `gridmap_manage` | 3D 布尔造型 / 网格填充 |
+| API 文档查询 | `api_manage get_class` | 查 ClassDB 属性/方法/信号/枚举，**写代码前查证防猜 API** |
+
+### B3 运行 / 测试 / 取证（新能力，旧 godot-mcp 无）
+
+| 工具 | 用途 | 适用阶段 |
+|------|------|:-------:|
+| `project_run` / `project_manage(op="stop")` | 编辑器内启动/停止游戏 | 10 |
+| `game_manage` | 运行时检查（场景树/节点/UI 元素）+ 输入模拟（键鼠/action/帧级 `input_sequence`） | 10 |
+| `editor_manage(op="game_eval")` | 在运行的游戏中执行 GDScript 并取返回值（断言式验证） | 10 |
+| `test_run` / `test_manage(op="results_get")` | 编辑器内跑 `res://tests/` 下 GdUnit4 套件（门禁补充；CLI headless 结果仍为准） | 9 |
+| `editor_screenshot` | 编辑器视口 / 2D / cinematic / 运行中游戏截图取证 | 9-10 |
+| `logs_read` | plugin / editor / game 三源日志（**宣称验证通过前必查**） | 8-10 |
+| `editor_manage(op="monitors_get")` | FPS / 内存 / draw calls 性能监视 | 9 |
+
+### B4 只读资源 URI（零工具成本，读操作优先）
+
+`godot://sessions` `godot://editor/state` `godot://selection/current` `godot://scene/hierarchy` `godot://node/{path}/properties|children|groups` `godot://class/{class_name}` `godot://script/{path}` `godot://project/info` `godot://project/settings` `godot://input_map` `godot://materials` `godot://logs/recent` `godot://performance` `godot://test/results`
+
+> **门禁不变**：`.tscn`/`.tres` 禁手写仍有效——`godot-ai` 是生成手段之一；新增 `.gd`/`.tscn`/游戏资源后仍**必须立即** `--headless --import`（见阶段 8 硬门禁）。
